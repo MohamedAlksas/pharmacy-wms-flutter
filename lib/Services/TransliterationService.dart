@@ -1,41 +1,42 @@
 /// Converts English text to Arabic script (transliteration).
-/// No API calls — runs fully offline and instantly.
+/// No API calls â€” runs fully offline and instantly.
 ///
 /// Designed for pharmaceutical / warehouse names:
-///   Burfen        → بروفين
-///   Paracetamol   → باراسيتامول
-///   Amoxicillin   → أموكسيسيلين
-///   Aspirin       → أسبرين
+///   Burfen        â†’ ط¨ط±ظˆظپظٹظ†
+///   Paracetamol   â†’ ط¨ط§ط±ط§ط³ظٹطھط§ظ…ظˆظ„
+///   Amoxicillin   â†’ ط£ظ…ظˆظƒط³ظٹط³ظٹظ„ظٹظ†
+///   Aspirin       â†’ ط£ط³ط¨ط±ظٹظ†
 library transliteration_service;
 
 import 'package:pharmacy_wms/Models/app_localizations.dart';
 
 class TransliterationService {
-  // ── In-memory cache ───────────────────────────────────────────────────────
+  // â”€â”€ In-memory cache â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   static final Map<String, String> _cache = {};
 
   static void clearCache() => _cache.clear();
 
-  // ── Public API ─────────────────────────────────────────────────────────────
+  // â”€â”€ Public API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /// Transliterate a single word/phrase.
   /// Returns the original string if language is English.
   static String transliterate(String text) {
     if (languageNotifier.value != AppLanguage.ar) return text;
     if (text.trim().isEmpty) return text;
-    return _cache.putIfAbsent(text, () => _convert(text));
+    return _cache.putIfAbsent(text, () => _convert(text)));
+
   }
 
-  /// Transliterate a list and return original→transliterated map.
+  /// Transliterate a list and return originalâ†’transliterated map.
   static Map<String, String> transliterateAll(List<String> texts) {
     final result = <String, String>{};
     for (final t in texts) {
       result[t] = transliterate(t);
-    }
-    return result;
+    
+return result;
   }
 
-  // ── Core conversion ────────────────────────────────────────────────────────
+  // â”€â”€ Core conversion â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   static String _convert(String input) {
     // 1. Check the pharma dictionary first (exact match, case-insensitive)
@@ -43,17 +44,17 @@ class TransliterationService {
     if (_pharmaDict.containsKey(lower)) return _pharmaDict[lower]!;
 
     // 2. Word-by-word: each word checked in dictionary, else letter-mapped
-    final words = input.trim().split(RegExp(r'\s+'));
-    return words.map(_convertWord).join(' ');
-  }
+    final words = input.trim().split(RegExp(r'\s+')));
 
-  static String _convertWord(String word) {
+    return words.map(_convertWord).join(' ');
+  
+static String _convertWord(String word) {
     final key = word.toLowerCase();
     if (_pharmaDict.containsKey(key)) return _pharmaDict[key]!;
     return _letterMap(word);
   }
 
-  /// Letter-by-letter mapping using common English→Arabic phonetic rules.
+  /// Letter-by-letter mapping using common Englishâ†’Arabic phonetic rules.
   static String _letterMap(String word) {
     final buf = StringBuffer();
     final chars = word.toLowerCase().split('');
@@ -64,345 +65,343 @@ class TransliterationService {
       final next = i + 1 < chars.length ? chars[i + 1] : '';
       final next2 = i + 2 < chars.length ? chars[i + 2] : '';
 
-      // ── Digraphs (must come before single-letter checks) ──────────────────
+      // â”€â”€ Digraphs (must come before single-letter checks) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       if (c == 'p' && next == 'h') {
-        buf.write('ف'); i += 2; continue;
+        buf.write('ظپ'); i += 2; continue;
       }
       if (c == 'c' && next == 'h') {
-        buf.write('ش'); i += 2; continue;
+        buf.write('ط´'); i += 2; continue;
       }
       if (c == 's' && next == 'h') {
-        buf.write('ش'); i += 2; continue;
+        buf.write('ط´'); i += 2; continue;
       }
       if (c == 't' && next == 'h') {
-        buf.write('ث'); i += 2; continue;
+        buf.write('ط«'); i += 2; continue;
       }
       if (c == 'g' && next == 'h') {
         // silent or 'f' sound (e.g. -ough)
         buf.write(''); i += 2; continue;
       }
       if (c == 'c' && next == 'k') {
-        buf.write('ك'); i += 2; continue;
+        buf.write('ظƒ'); i += 2; continue;
       }
       if (c == 'q' && next == 'u') {
-        buf.write('كو'); i += 2; continue;
+        buf.write('ظƒظˆ'); i += 2; continue;
       }
       if (c == 'x') {
-        buf.write('كس'); i++; continue;
+        buf.write('ظƒط³'); i++; continue;
       }
 
-      // ── Vowels ─────────────────────────────────────────────────────────────
+      // â”€â”€ Vowels â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       // Leading vowel gets hamza
       if (_isVowel(c) && i == 0) {
-        buf.write(_leadingVowel(c, next)); i++; continue;
+        buf.write(_leadingVowel(c, next)));
+ i++; continue;
       }
       if (_isVowel(c)) {
-        // Two consecutive vowels — write once
+        // Two consecutive vowels â€” write once
         if (_isVowel(next) && c == next) { i++; continue; }
         buf.write(_vowelMap[c] ?? ''); i++; continue;
       }
 
-      // ── Consonants ─────────────────────────────────────────────────────────
-      // Double consonant → write once
+      // â”€â”€ Consonants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      // Double consonant â†’ write once
       if (c == next && !_isVowel(c)) {
         buf.write(_consonantMap[c] ?? c); i += 2; continue;
       }
 
       buf.write(_consonantMap[c] ?? c);
       i++;
-    }
-
-    return buf.toString();
-  }
-
-  static bool _isVowel(String c) => 'aeiou'.contains(c);
+    
+return buf.toString();
+  
+static bool _isVowel(String c) => 'aeiou'.contains(c);
 
   static String _leadingVowel(String c, String next) {
     switch (c) {
-      case 'a': return next == 'l' ? 'ال' : 'أ';
-      case 'e': return 'إ';
-      case 'i': return 'إي';
-      case 'o': return 'أو';
-      case 'u': return 'أو';
-      default:  return 'أ';
+      case 'a': return next == 'l' ? 'ط§ظ„' : 'ط£';
+      case 'e': return 'ط¥';
+      case 'i': return 'ط¥ظٹ';
+      case 'o': return 'ط£ظˆ';
+      case 'u': return 'ط£ظˆ';
+      default:  return 'ط£';
     }
-  }
-
-  static const Map<String, String> _vowelMap = {
-    'a': 'ا',
-    'e': 'ي',
-    'i': 'ي',
-    'o': 'و',
-    'u': 'و',
+  
+static const Map<String, String> _vowelMap = {
+    'a': 'ط§',
+    'e': 'ظٹ',
+    'i': 'ظٹ',
+    'o': 'ظˆ',
+    'u': 'ظˆ',
   };
 
   static const Map<String, String> _consonantMap = {
-    'b': 'ب',
-    'c': 'ك',  // default; overridden by digraphs above
-    'd': 'د',
-    'f': 'ف',
-    'g': 'ج',
-    'h': 'ه',
-    'j': 'ج',
-    'k': 'ك',
-    'l': 'ل',
-    'm': 'م',
-    'n': 'ن',
-    'p': 'ب',  // default; overridden by ph digraph
-    'q': 'ك',
-    'r': 'ر',
-    's': 'س',
-    't': 'ت',
-    'v': 'ف',
-    'w': 'و',
-    'y': 'ي',
-    'z': 'ز',
+    'b': 'ط¨',
+    'c': 'ظƒ',  // default; overridden by digraphs above
+    'd': 'ط¯',
+    'f': 'ظپ',
+    'g': 'ط¬',
+    'h': 'ظ‡',
+    'j': 'ط¬',
+    'k': 'ظƒ',
+    'l': 'ظ„',
+    'm': 'ظ…',
+    'n': 'ظ†',
+    'p': 'ط¨',  // default; overridden by ph digraph
+    'q': 'ظƒ',
+    'r': 'ط±',
+    's': 'ط³',
+    't': 'طھ',
+    'v': 'ظپ',
+    'w': 'ظˆ',
+    'y': 'ظٹ',
+    'z': 'ط²',
     '-': '-',
     '/': '/',
     ' ': ' ',
   };
 
-  // ── Pharmaceutical dictionary ──────────────────────────────────────────────
+  // â”€â”€ Pharmaceutical dictionary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Common brand names and INN (International Nonproprietary Names).
   // Key = lowercase English.  Value = Arabic transliteration.
   static const Map<String, String> _pharmaDict = {
-    // ── Analgesics / Antipyretics ──────────────────────────────────────────
-    'paracetamol'      : 'باراسيتامول',
-    'acetaminophen'    : 'أسيتامينوفين',
-    'aspirin'          : 'أسبرين',
-    'ibuprofen'        : 'إيبوبروفين',
-    'burfen'           : 'بروفين',
-    'brufen'           : 'بروفين',
-    'diclofenac'       : 'ديكلوفيناك',
-    'naproxen'         : 'نابروكسين',
-    'ketoprofen'       : 'كيتوبروفين',
-    'ketorolac'        : 'كيتورولاك',
-    'indomethacin'     : 'إندوميثاسين',
-    'piroxicam'        : 'بيروكسيكام',
-    'meloxicam'        : 'ميلوكسيكام',
-    'celecoxib'        : 'سيليكوكسيب',
-    'tramadol'         : 'ترامادول',
-    'morphine'         : 'مورفين',
-    'codeine'          : 'كوديين',
-    'pethidine'        : 'بيثيدين',
+    // â”€â”€ Analgesics / Antipyretics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    'paracetamol'      : 'ط¨ط§ط±ط§ط³ظٹطھط§ظ…ظˆظ„',
+    'acetaminophen'    : 'ط£ط³ظٹطھط§ظ…ظٹظ†ظˆظپظٹظ†',
+    'aspirin'          : 'ط£ط³ط¨ط±ظٹظ†',
+    'ibuprofen'        : 'ط¥ظٹط¨ظˆط¨ط±ظˆظپظٹظ†',
+    'burfen'           : 'ط¨ط±ظˆظپظٹظ†',
+    'brufen'           : 'ط¨ط±ظˆظپظٹظ†',
+    'diclofenac'       : 'ط¯ظٹظƒظ„ظˆظپظٹظ†ط§ظƒ',
+    'naproxen'         : 'ظ†ط§ط¨ط±ظˆظƒط³ظٹظ†',
+    'ketoprofen'       : 'ظƒظٹطھظˆط¨ط±ظˆظپظٹظ†',
+    'ketorolac'        : 'ظƒظٹطھظˆط±ظˆظ„ط§ظƒ',
+    'indomethacin'     : 'ط¥ظ†ط¯ظˆظ…ظٹط«ط§ط³ظٹظ†',
+    'piroxicam'        : 'ط¨ظٹط±ظˆظƒط³ظٹظƒط§ظ…',
+    'meloxicam'        : 'ظ…ظٹظ„ظˆظƒط³ظٹظƒط§ظ…',
+    'celecoxib'        : 'ط³ظٹظ„ظٹظƒظˆظƒط³ظٹط¨',
+    'tramadol'         : 'طھط±ط§ظ…ط§ط¯ظˆظ„',
+    'morphine'         : 'ظ…ظˆط±ظپظٹظ†',
+    'codeine'          : 'ظƒظˆط¯ظٹظٹظ†',
+    'pethidine'        : 'ط¨ظٹط«ظٹط¯ظٹظ†',
 
-    // ── Antibiotics ────────────────────────────────────────────────────────
-    'amoxicillin'      : 'أموكسيسيلين',
-    'ampicillin'       : 'أمبيسيلين',
-    'penicillin'       : 'بنسيلين',
-    'cephalexin'       : 'سيفاليكسين',
-    'cefuroxime'       : 'سيفوروكسيم',
-    'ceftriaxone'      : 'سيفترياكسون',
-    'cefixime'         : 'سيفيكسيم',
-    'azithromycin'     : 'أزيثروميسين',
-    'clarithromycin'   : 'كلاريثروميسين',
-    'erythromycin'     : 'إريثروميسين',
-    'ciprofloxacin'    : 'سيبروفلوكساسين',
-    'levofloxacin'     : 'ليفوفلوكساسين',
-    'doxycycline'      : 'دوكسيسيكلين',
-    'tetracycline'     : 'تيتراسيكلين',
-    'metronidazole'    : 'ميترونيدازول',
-    'clindamycin'      : 'كليندامايسين',
-    'trimethoprim'     : 'تريميثوبريم',
-    'vancomycin'       : 'فانكوميسين',
-    'gentamicin'       : 'جنتاميسين',
-    'augmentin'        : 'أوجمنتين',
-    'flagyl'           : 'فلاجيل',
-    'zithromax'        : 'زيثروماكس',
-    'klacid'           : 'كلاسيد',
+    // â”€â”€ Antibiotics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    'amoxicillin'      : 'ط£ظ…ظˆظƒط³ظٹط³ظٹظ„ظٹظ†',
+    'ampicillin'       : 'ط£ظ…ط¨ظٹط³ظٹظ„ظٹظ†',
+    'penicillin'       : 'ط¨ظ†ط³ظٹظ„ظٹظ†',
+    'cephalexin'       : 'ط³ظٹظپط§ظ„ظٹظƒط³ظٹظ†',
+    'cefuroxime'       : 'ط³ظٹظپظˆط±ظˆظƒط³ظٹظ…',
+    'ceftriaxone'      : 'ط³ظٹظپطھط±ظٹط§ظƒط³ظˆظ†',
+    'cefixime'         : 'ط³ظٹظپظٹظƒط³ظٹظ…',
+    'azithromycin'     : 'ط£ط²ظٹط«ط±ظˆظ…ظٹط³ظٹظ†',
+    'clarithromycin'   : 'ظƒظ„ط§ط±ظٹط«ط±ظˆظ…ظٹط³ظٹظ†',
+    'erythromycin'     : 'ط¥ط±ظٹط«ط±ظˆظ…ظٹط³ظٹظ†',
+    'ciprofloxacin'    : 'ط³ظٹط¨ط±ظˆظپظ„ظˆظƒط³ط§ط³ظٹظ†',
+    'levofloxacin'     : 'ظ„ظٹظپظˆظپظ„ظˆظƒط³ط§ط³ظٹظ†',
+    'doxycycline'      : 'ط¯ظˆظƒط³ظٹط³ظٹظƒظ„ظٹظ†',
+    'tetracycline'     : 'طھظٹطھط±ط§ط³ظٹظƒظ„ظٹظ†',
+    'metronidazole'    : 'ظ…ظٹطھط±ظˆظ†ظٹط¯ط§ط²ظˆظ„',
+    'clindamycin'      : 'ظƒظ„ظٹظ†ط¯ط§ظ…ط§ظٹط³ظٹظ†',
+    'trimethoprim'     : 'طھط±ظٹظ…ظٹط«ظˆط¨ط±ظٹظ…',
+    'vancomycin'       : 'ظپط§ظ†ظƒظˆظ…ظٹط³ظٹظ†',
+    'gentamicin'       : 'ط¬ظ†طھط§ظ…ظٹط³ظٹظ†',
+    'augmentin'        : 'ط£ظˆط¬ظ…ظ†طھظٹظ†',
+    'flagyl'           : 'ظپظ„ط§ط¬ظٹظ„',
+    'zithromax'        : 'ط²ظٹط«ط±ظˆظ…ط§ظƒط³',
+    'klacid'           : 'ظƒظ„ط§ط³ظٹط¯',
 
-    // ── Antifungals ────────────────────────────────────────────────────────
-    'fluconazole'      : 'فلوكونازول',
-    'itraconazole'     : 'إيتراكونازول',
-    'ketoconazole'     : 'كيتوكونازول',
-    'clotrimazole'     : 'كلوتريمازول',
-    'miconazole'       : 'ميكونازول',
-    'nystatin'         : 'نيستاتين',
+    // â”€â”€ Antifungals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    'fluconazole'      : 'ظپظ„ظˆظƒظˆظ†ط§ط²ظˆظ„',
+    'itraconazole'     : 'ط¥ظٹطھط±ط§ظƒظˆظ†ط§ط²ظˆظ„',
+    'ketoconazole'     : 'ظƒظٹطھظˆظƒظˆظ†ط§ط²ظˆظ„',
+    'clotrimazole'     : 'ظƒظ„ظˆطھط±ظٹظ…ط§ط²ظˆظ„',
+    'miconazole'       : 'ظ…ظٹظƒظˆظ†ط§ط²ظˆظ„',
+    'nystatin'         : 'ظ†ظٹط³طھط§طھظٹظ†',
 
-    // ── Antivirals ─────────────────────────────────────────────────────────
-    'acyclovir'        : 'أسيكلوفير',
-    'valacyclovir'     : 'فالاسيكلوفير',
-    'oseltamivir'      : 'أوسيلتاميفير',
-    'tamiflu'          : 'تاميفلو',
-    'remdesivir'       : 'ريمديسيفير',
+    // â”€â”€ Antivirals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    'acyclovir'        : 'ط£ط³ظٹظƒظ„ظˆظپظٹط±',
+    'valacyclovir'     : 'ظپط§ظ„ط§ط³ظٹظƒظ„ظˆظپظٹط±',
+    'oseltamivir'      : 'ط£ظˆط³ظٹظ„طھط§ظ…ظٹظپظٹط±',
+    'tamiflu'          : 'طھط§ظ…ظٹظپظ„ظˆ',
+    'remdesivir'       : 'ط±ظٹظ…ط¯ظٹط³ظٹظپظٹط±',
 
-    // ── Cardiovascular ─────────────────────────────────────────────────────
-    'amlodipine'       : 'أملوديبين',
-    'nifedipine'       : 'نيفيديبين',
-    'atenolol'         : 'أتينولول',
-    'metoprolol'       : 'ميتوبرولول',
-    'propranolol'      : 'بروبرانولول',
-    'lisinopril'       : 'ليسينوبريل',
-    'enalapril'        : 'إنالابريل',
-    'ramipril'         : 'راميبريل',
-    'losartan'         : 'لوسارتان',
-    'valsartan'        : 'فالسارتان',
-    'furosemide'       : 'فيوروسيمايد',
-    'spironolactone'   : 'سبيرونولاكتون',
-    'hydrochlorothiazide': 'هيدروكلوروثيازيد',
-    'digoxin'          : 'ديجوكسين',
-    'warfarin'         : 'وارفارين',
-    'heparin'          : 'هيبارين',
-    'clopidogrel'      : 'كلوبيدوجريل',
-    'plavix'           : 'بلافيكس',
-    'simvastatin'      : 'سيمفاستاتين',
-    'atorvastatin'     : 'أتورفاستاتين',
-    'rosuvastatin'     : 'روسوفاستاتين',
-    'isosorbide'       : 'إيزوسوربيد',
-    'nitroglycerin'    : 'نيتروجليسرين',
+    // â”€â”€ Cardiovascular â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    'amlodipine'       : 'ط£ظ…ظ„ظˆط¯ظٹط¨ظٹظ†',
+    'nifedipine'       : 'ظ†ظٹظپظٹط¯ظٹط¨ظٹظ†',
+    'atenolol'         : 'ط£طھظٹظ†ظˆظ„ظˆظ„',
+    'metoprolol'       : 'ظ…ظٹطھظˆط¨ط±ظˆظ„ظˆظ„',
+    'propranolol'      : 'ط¨ط±ظˆط¨ط±ط§ظ†ظˆظ„ظˆظ„',
+    'lisinopril'       : 'ظ„ظٹط³ظٹظ†ظˆط¨ط±ظٹظ„',
+    'enalapril'        : 'ط¥ظ†ط§ظ„ط§ط¨ط±ظٹظ„',
+    'ramipril'         : 'ط±ط§ظ…ظٹط¨ط±ظٹظ„',
+    'losartan'         : 'ظ„ظˆط³ط§ط±طھط§ظ†',
+    'valsartan'        : 'ظپط§ظ„ط³ط§ط±طھط§ظ†',
+    'furosemide'       : 'ظپظٹظˆط±ظˆط³ظٹظ…ط§ظٹط¯',
+    'spironolactone'   : 'ط³ط¨ظٹط±ظˆظ†ظˆظ„ط§ظƒطھظˆظ†',
+    'hydrochlorothiazide': 'ظ‡ظٹط¯ط±ظˆظƒظ„ظˆط±ظˆط«ظٹط§ط²ظٹط¯',
+    'digoxin'          : 'ط¯ظٹط¬ظˆظƒط³ظٹظ†',
+    'warfarin'         : 'ظˆط§ط±ظپط§ط±ظٹظ†',
+    'heparin'          : 'ظ‡ظٹط¨ط§ط±ظٹظ†',
+    'clopidogrel'      : 'ظƒظ„ظˆط¨ظٹط¯ظˆط¬ط±ظٹظ„',
+    'plavix'           : 'ط¨ظ„ط§ظپظٹظƒط³',
+    'simvastatin'      : 'ط³ظٹظ…ظپط§ط³طھط§طھظٹظ†',
+    'atorvastatin'     : 'ط£طھظˆط±ظپط§ط³طھط§طھظٹظ†',
+    'rosuvastatin'     : 'ط±ظˆط³ظˆظپط§ط³طھط§طھظٹظ†',
+    'isosorbide'       : 'ط¥ظٹط²ظˆط³ظˆط±ط¨ظٹط¯',
+    'nitroglycerin'    : 'ظ†ظٹطھط±ظˆط¬ظ„ظٹط³ط±ظٹظ†',
 
-    // ── Respiratory ────────────────────────────────────────────────────────
-    'salbutamol'       : 'سالبيوتامول',
-    'albuterol'        : 'ألبيوتيرول',
-    'ventolin'         : 'فنتولين',
-    'budesonide'       : 'بيوديسونيد',
-    'fluticasone'      : 'فلوتيكازون',
-    'salmeterol'       : 'سالميتيرول',
-    'theophylline'     : 'ثيوفيلين',
-    'montelukast'      : 'مونتيلوكاست',
-    'ipratropium'      : 'إبراتروبيوم',
-    'cetirizine'       : 'سيتيريزين',
-    'loratadine'       : 'لوراتادين',
-    'fexofenadine'     : 'فيكسوفينادين',
-    'promethazine'     : 'بروميثازين',
-    'chlorphenamine'   : 'كلورفينامين',
-    'dextromethorphan' : 'ديكستروميثورفان',
-    'guaifenesin'      : 'جوايفينيسين',
+    // â”€â”€ Respiratory â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    'salbutamol'       : 'ط³ط§ظ„ط¨ظٹظˆطھط§ظ…ظˆظ„',
+    'albuterol'        : 'ط£ظ„ط¨ظٹظˆطھظٹط±ظˆظ„',
+    'ventolin'         : 'ظپظ†طھظˆظ„ظٹظ†',
+    'budesonide'       : 'ط¨ظٹظˆط¯ظٹط³ظˆظ†ظٹط¯',
+    'fluticasone'      : 'ظپظ„ظˆطھظٹظƒط§ط²ظˆظ†',
+    'salmeterol'       : 'ط³ط§ظ„ظ…ظٹطھظٹط±ظˆظ„',
+    'theophylline'     : 'ط«ظٹظˆظپظٹظ„ظٹظ†',
+    'montelukast'      : 'ظ…ظˆظ†طھظٹظ„ظˆظƒط§ط³طھ',
+    'ipratropium'      : 'ط¥ط¨ط±ط§طھط±ظˆط¨ظٹظˆظ…',
+    'cetirizine'       : 'ط³ظٹطھظٹط±ظٹط²ظٹظ†',
+    'loratadine'       : 'ظ„ظˆط±ط§طھط§ط¯ظٹظ†',
+    'fexofenadine'     : 'ظپظٹظƒط³ظˆظپظٹظ†ط§ط¯ظٹظ†',
+    'promethazine'     : 'ط¨ط±ظˆظ…ظٹط«ط§ط²ظٹظ†',
+    'chlorphenamine'   : 'ظƒظ„ظˆط±ظپظٹظ†ط§ظ…ظٹظ†',
+    'dextromethorphan' : 'ط¯ظٹظƒط³طھط±ظˆظ…ظٹط«ظˆط±ظپط§ظ†',
+    'guaifenesin'      : 'ط¬ظˆط§ظٹظپظٹظ†ظٹط³ظٹظ†',
 
-    // ── GIT ───────────────────────────────────────────────────────────────
-    'omeprazole'       : 'أوميبرازول',
-    'pantoprazole'     : 'بانتوبرازول',
-    'esomeprazole'     : 'إيسوميبرازول',
-    'ranitidine'       : 'رانيتيدين',
-    'famotidine'       : 'فاموتيدين',
-    'metoclopramide'   : 'ميتوكلوبراميد',
-    'domperidone'      : 'دومبيريدون',
-    'ondansetron'      : 'أوندانسيترون',
-    'loperamide'       : 'لوبيراميد',
-    'bisacodyl'        : 'بيساكوديل',
-    'lactulose'        : 'لاكتولوز',
-    'sucralfate'       : 'سوكرالفيت',
-    'antacid'          : 'مضاد حموضة',
-    'maalox'           : 'مالوكس',
-    'gaviscon'         : 'جافيسكون',
+    // â”€â”€ GIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    'omeprazole'       : 'ط£ظˆظ…ظٹط¨ط±ط§ط²ظˆظ„',
+    'pantoprazole'     : 'ط¨ط§ظ†طھظˆط¨ط±ط§ط²ظˆظ„',
+    'esomeprazole'     : 'ط¥ظٹط³ظˆظ…ظٹط¨ط±ط§ط²ظˆظ„',
+    'ranitidine'       : 'ط±ط§ظ†ظٹطھظٹط¯ظٹظ†',
+    'famotidine'       : 'ظپط§ظ…ظˆطھظٹط¯ظٹظ†',
+    'metoclopramide'   : 'ظ…ظٹطھظˆظƒظ„ظˆط¨ط±ط§ظ…ظٹط¯',
+    'domperidone'      : 'ط¯ظˆظ…ط¨ظٹط±ظٹط¯ظˆظ†',
+    'ondansetron'      : 'ط£ظˆظ†ط¯ط§ظ†ط³ظٹطھط±ظˆظ†',
+    'loperamide'       : 'ظ„ظˆط¨ظٹط±ط§ظ…ظٹط¯',
+    'bisacodyl'        : 'ط¨ظٹط³ط§ظƒظˆط¯ظٹظ„',
+    'lactulose'        : 'ظ„ط§ظƒطھظˆظ„ظˆط²',
+    'sucralfate'       : 'ط³ظˆظƒط±ط§ظ„ظپظٹطھ',
+    'antacid'          : 'ظ…ط¶ط§ط¯ ط­ظ…ظˆط¶ط©',
+    'maalox'           : 'ظ…ط§ظ„ظˆظƒط³',
+    'gaviscon'         : 'ط¬ط§ظپظٹط³ظƒظˆظ†',
 
-    // ── Endocrine / Diabetes ───────────────────────────────────────────────
-    'metformin'        : 'ميتفورمين',
-    'glibenclamide'    : 'جليبينكلاميد',
-    'glimepiride'      : 'جليميبيريد',
-    'gliclazide'       : 'جليكلازيد',
-    'sitagliptin'      : 'سيتاجليبتين',
-    'insulin'          : 'إنسولين',
-    'levothyroxine'    : 'ليفوثيروكسين',
-    'thyroxine'        : 'ثيروكسين',
-    'prednisolone'     : 'بريدنيزولون',
-    'prednisone'       : 'بريدنيزون',
-    'dexamethasone'    : 'ديكساميثازون',
-    'hydrocortisone'   : 'هيدروكورتيزون',
-    'methylprednisolone': 'ميثيل بريدنيزولون',
+    // â”€â”€ Endocrine / Diabetes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    'metformin'        : 'ظ…ظٹطھظپظˆط±ظ…ظٹظ†',
+    'glibenclamide'    : 'ط¬ظ„ظٹط¨ظٹظ†ظƒظ„ط§ظ…ظٹط¯',
+    'glimepiride'      : 'ط¬ظ„ظٹظ…ظٹط¨ظٹط±ظٹط¯',
+    'gliclazide'       : 'ط¬ظ„ظٹظƒظ„ط§ط²ظٹط¯',
+    'sitagliptin'      : 'ط³ظٹطھط§ط¬ظ„ظٹط¨طھظٹظ†',
+    'insulin'          : 'ط¥ظ†ط³ظˆظ„ظٹظ†',
+    'levothyroxine'    : 'ظ„ظٹظپظˆط«ظٹط±ظˆظƒط³ظٹظ†',
+    'thyroxine'        : 'ط«ظٹط±ظˆظƒط³ظٹظ†',
+    'prednisolone'     : 'ط¨ط±ظٹط¯ظ†ظٹط²ظˆظ„ظˆظ†',
+    'prednisone'       : 'ط¨ط±ظٹط¯ظ†ظٹط²ظˆظ†',
+    'dexamethasone'    : 'ط¯ظٹظƒط³ط§ظ…ظٹط«ط§ط²ظˆظ†',
+    'hydrocortisone'   : 'ظ‡ظٹط¯ط±ظˆظƒظˆط±طھظٹط²ظˆظ†',
+    'methylprednisolone': 'ظ…ظٹط«ظٹظ„ ط¨ط±ظٹط¯ظ†ظٹط²ظˆظ„ظˆظ†',
 
-    // ── CNS / Psychiatry ───────────────────────────────────────────────────
-    'diazepam'         : 'ديازيبام',
-    'alprazolam'       : 'ألبرازولام',
-    'lorazepam'        : 'لورازيبام',
-    'clonazepam'       : 'كلونازيبام',
-    'phenobarbital'    : 'فينوباربيتال',
-    'phenytoin'        : 'فينيتوين',
-    'carbamazepine'    : 'كاربامازيبين',
-    'valproate'        : 'فالبروات',
-    'valproic acid'    : 'حمض الفالبرويك',
-    'levetiracetam'    : 'ليفيتيراسيتام',
-    'amitriptyline'    : 'أميتريبتيلين',
-    'fluoxetine'       : 'فلوكسيتين',
-    'sertraline'       : 'سيرترالين',
-    'paroxetine'       : 'باروكسيتين',
-    'escitalopram'     : 'إيسيتالوبرام',
-    'citalopram'       : 'سيتالوبرام',
-    'haloperidol'      : 'هالوبيريدول',
-    'risperidone'      : 'ريسبيريدون',
-    'olanzapine'       : 'أولانزابين',
-    'quetiapine'       : 'كويتيابين',
-    'zolpidem'         : 'زولبيديم',
+    // â”€â”€ CNS / Psychiatry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    'diazepam'         : 'ط¯ظٹط§ط²ظٹط¨ط§ظ…',
+    'alprazolam'       : 'ط£ظ„ط¨ط±ط§ط²ظˆظ„ط§ظ…',
+    'lorazepam'        : 'ظ„ظˆط±ط§ط²ظٹط¨ط§ظ…',
+    'clonazepam'       : 'ظƒظ„ظˆظ†ط§ط²ظٹط¨ط§ظ…',
+    'phenobarbital'    : 'ظپظٹظ†ظˆط¨ط§ط±ط¨ظٹطھط§ظ„',
+    'phenytoin'        : 'ظپظٹظ†ظٹطھظˆظٹظ†',
+    'carbamazepine'    : 'ظƒط§ط±ط¨ط§ظ…ط§ط²ظٹط¨ظٹظ†',
+    'valproate'        : 'ظپط§ظ„ط¨ط±ظˆط§طھ',
+    'valproic acid'    : 'ط­ظ…ط¶ ط§ظ„ظپط§ظ„ط¨ط±ظˆظٹظƒ',
+    'levetiracetam'    : 'ظ„ظٹظپظٹطھظٹط±ط§ط³ظٹطھط§ظ…',
+    'amitriptyline'    : 'ط£ظ…ظٹطھط±ظٹط¨طھظٹظ„ظٹظ†',
+    'fluoxetine'       : 'ظپظ„ظˆظƒط³ظٹطھظٹظ†',
+    'sertraline'       : 'ط³ظٹط±طھط±ط§ظ„ظٹظ†',
+    'paroxetine'       : 'ط¨ط§ط±ظˆظƒط³ظٹطھظٹظ†',
+    'escitalopram'     : 'ط¥ظٹط³ظٹطھط§ظ„ظˆط¨ط±ط§ظ…',
+    'citalopram'       : 'ط³ظٹطھط§ظ„ظˆط¨ط±ط§ظ…',
+    'haloperidol'      : 'ظ‡ط§ظ„ظˆط¨ظٹط±ظٹط¯ظˆظ„',
+    'risperidone'      : 'ط±ظٹط³ط¨ظٹط±ظٹط¯ظˆظ†',
+    'olanzapine'       : 'ط£ظˆظ„ط§ظ†ط²ط§ط¨ظٹظ†',
+    'quetiapine'       : 'ظƒظˆظٹطھظٹط§ط¨ظٹظ†',
+    'zolpidem'         : 'ط²ظˆظ„ط¨ظٹط¯ظٹظ…',
 
-    // ── Vitamins / Supplements ─────────────────────────────────────────────
-    'vitamin c'        : 'فيتامين ج',
-    'vitamin d'        : 'فيتامين د',
-    'vitamin b12'      : 'فيتامين ب١٢',
-    'vitamin b6'       : 'فيتامين ب٦',
-    'folic acid'       : 'حمض الفوليك',
-    'ferrous sulfate'  : 'كبريتات الحديد',
-    'iron'             : 'حديد',
-    'calcium'          : 'كالسيوم',
-    'zinc'             : 'زنك',
-    'magnesium'        : 'مغنيسيوم',
-    'potassium'        : 'بوتاسيوم',
-    'omega 3'          : 'أوميجا 3',
-    'fish oil'         : 'زيت السمك',
+    // â”€â”€ Vitamins / Supplements â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    'vitamin c'        : 'ظپظٹطھط§ظ…ظٹظ† ط¬',
+    'vitamin d'        : 'ظپظٹطھط§ظ…ظٹظ† ط¯',
+    'vitamin b12'      : 'ظپظٹطھط§ظ…ظٹظ† ط¨ظ،ظ¢',
+    'vitamin b6'       : 'ظپظٹطھط§ظ…ظٹظ† ط¨ظ¦',
+    'folic acid'       : 'ط­ظ…ط¶ ط§ظ„ظپظˆظ„ظٹظƒ',
+    'ferrous sulfate'  : 'ظƒط¨ط±ظٹطھط§طھ ط§ظ„ط­ط¯ظٹط¯',
+    'iron'             : 'ط­ط¯ظٹط¯',
+    'calcium'          : 'ظƒط§ظ„ط³ظٹظˆظ…',
+    'zinc'             : 'ط²ظ†ظƒ',
+    'magnesium'        : 'ظ…ط؛ظ†ظٹط³ظٹظˆظ…',
+    'potassium'        : 'ط¨ظˆطھط§ط³ظٹظˆظ…',
+    'omega 3'          : 'ط£ظˆظ…ظٹط¬ط§ 3',
+    'fish oil'         : 'ط²ظٹطھ ط§ظ„ط³ظ…ظƒ',
 
-    // ── Topical / Dermatology ──────────────────────────────────────────────
-    'betamethasone'    : 'بيتاميثازون',
-    'mometasone'       : 'موميتازون',
-    'triamcinolone'    : 'ترايامسينولون',
-    'calamine'         : 'كالامين',
-    'permethrin'       : 'بيرميثرين',
+    // â”€â”€ Topical / Dermatology â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    'betamethasone'    : 'ط¨ظٹطھط§ظ…ظٹط«ط§ط²ظˆظ†',
+    'mometasone'       : 'ظ…ظˆظ…ظٹطھط§ط²ظˆظ†',
+    'triamcinolone'    : 'طھط±ط§ظٹط§ظ…ط³ظٹظ†ظˆظ„ظˆظ†',
+    'calamine'         : 'ظƒط§ظ„ط§ظ…ظٹظ†',
+    'permethrin'       : 'ط¨ظٹط±ظ…ظٹط«ط±ظٹظ†',
 
-    // ── Ophthalmology ─────────────────────────────────────────────────────
-    'timolol'          : 'تيمولول',
-    'latanoprost'      : 'لاتانوبروست',
-    'pilocarpine'      : 'بيلوكاربين',
-    'tobramycin'       : 'توبراميسين',
-    'ofloxacin'        : 'أوفلوكساسين',
+    // â”€â”€ Ophthalmology â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    'timolol'          : 'طھظٹظ…ظˆظ„ظˆظ„',
+    'latanoprost'      : 'ظ„ط§طھط§ظ†ظˆط¨ط±ظˆط³طھ',
+    'pilocarpine'      : 'ط¨ظٹظ„ظˆظƒط§ط±ط¨ظٹظ†',
+    'tobramycin'       : 'طھظˆط¨ط±ط§ظ…ظٹط³ظٹظ†',
+    'ofloxacin'        : 'ط£ظˆظپظ„ظˆظƒط³ط§ط³ظٹظ†',
 
-    // ── Common brand names (Egypt market) ─────────────────────────────────
-    'panadol'          : 'بانادول',
-    'cataflam'         : 'كتافلام',
-    'voltaren'         : 'فولتارين',
-    'norgesic'         : 'نورجيزيك',
-    'brufen retard'    : 'بروفين ريتارد',
-    'nurofen'          : 'نوروفين',
-    // 'zithromax'        : 'زيثروماكس',
-    // 'augmentin'        : 'أوجمنتين',
-    'ospamox'          : 'أوسباموكس',
-    'zinnat'           : 'زينات',
-    'suprax'           : 'سوبراكس',
-    'nexium'           : 'نيكسيوم',
-    'losec'            : 'لوسيك',
-    'zantac'           : 'زانتاك',
-    'primperan'        : 'بريمبيران',
-    'motilium'         : 'موتيليوم',
-    'zofran'           : 'زوفران',
-    'imodium'          : 'إيموديوم',
-    'glucophage'       : 'جلوكوفاج',
-    'amaryl'           : 'أماريل',
-    'concor'           : 'كونكور',
-    'norvasc'          : 'نورفاسك',
-    'cozaar'           : 'كوزار',
-    'diovan'           : 'ديوفان',
-    'lipitor'          : 'ليبيتور',
-    'zocor'            : 'زوكور',
-    'crestor'          : 'كريستور',
-    'xanax'            : 'زاناكس',
-    'valium'           : 'فاليوم',
-    'rivotril'         : 'ريفوتريل',
-    'tegretol'         : 'تيجريتول',
-    'depakine'         : 'ديباكين',
-    'prozac'           : 'بروزاك',
-    'zoloft'           : 'زولوفت',
-    'cipralex'         : 'سيبراليكس',
-    'lexapro'          : 'ليكسابرو',
-    'risperdal'        : 'ريسبيردال',
-    'zyprexa'          : 'زيبريكسا',
-    'seroquel'         : 'سيروكويل',
-    'ambien'           : 'أمبيان',
-    'stilnox'          : 'ستيلنوكس',
-    'synthroid'        : 'سينثرويد',
-    'eltroxin'         : 'إلتروكسين',
-    'decadron'         : 'ديكادرون',
-    'medrol'           : 'ميدرول',
-    'betnovate'        : 'بيتنوفيت',
-    'elocon'           : 'إيلوكون',
-    'zovirax'          : 'زوفيراكس',
-    'diflucan'         : 'ديفلوكان',
-    'klaricid'         : 'كلاريسيد',
+    // â”€â”€ Common brand names (Egypt market) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    'panadol'          : 'ط¨ط§ظ†ط§ط¯ظˆظ„',
+    'cataflam'         : 'ظƒطھط§ظپظ„ط§ظ…',
+    'voltaren'         : 'ظپظˆظ„طھط§ط±ظٹظ†',
+    'norgesic'         : 'ظ†ظˆط±ط¬ظٹط²ظٹظƒ',
+    'brufen retard'    : 'ط¨ط±ظˆظپظٹظ† ط±ظٹطھط§ط±ط¯',
+    'nurofen'          : 'ظ†ظˆط±ظˆظپظٹظ†',
+    // 'zithromax'        : 'ط²ظٹط«ط±ظˆظ…ط§ظƒط³',
+    // 'augmentin'        : 'ط£ظˆط¬ظ…ظ†طھظٹظ†',
+    'ospamox'          : 'ط£ظˆط³ط¨ط§ظ…ظˆظƒط³',
+    'zinnat'           : 'ط²ظٹظ†ط§طھ',
+    'suprax'           : 'ط³ظˆط¨ط±ط§ظƒط³',
+    'nexium'           : 'ظ†ظٹظƒط³ظٹظˆظ…',
+    'losec'            : 'ظ„ظˆط³ظٹظƒ',
+    'zantac'           : 'ط²ط§ظ†طھط§ظƒ',
+    'primperan'        : 'ط¨ط±ظٹظ…ط¨ظٹط±ط§ظ†',
+    'motilium'         : 'ظ…ظˆطھظٹظ„ظٹظˆظ…',
+    'zofran'           : 'ط²ظˆظپط±ط§ظ†',
+    'imodium'          : 'ط¥ظٹظ…ظˆط¯ظٹظˆظ…',
+    'glucophage'       : 'ط¬ظ„ظˆظƒظˆظپط§ط¬',
+    'amaryl'           : 'ط£ظ…ط§ط±ظٹظ„',
+    'concor'           : 'ظƒظˆظ†ظƒظˆط±',
+    'norvasc'          : 'ظ†ظˆط±ظپط§ط³ظƒ',
+    'cozaar'           : 'ظƒظˆط²ط§ط±',
+    'diovan'           : 'ط¯ظٹظˆظپط§ظ†',
+    'lipitor'          : 'ظ„ظٹط¨ظٹطھظˆط±',
+    'zocor'            : 'ط²ظˆظƒظˆط±',
+    'crestor'          : 'ظƒط±ظٹط³طھظˆط±',
+    'xanax'            : 'ط²ط§ظ†ط§ظƒط³',
+    'valium'           : 'ظپط§ظ„ظٹظˆظ…',
+    'rivotril'         : 'ط±ظٹظپظˆطھط±ظٹظ„',
+    'tegretol'         : 'طھظٹط¬ط±ظٹطھظˆظ„',
+    'depakine'         : 'ط¯ظٹط¨ط§ظƒظٹظ†',
+    'prozac'           : 'ط¨ط±ظˆط²ط§ظƒ',
+    'zoloft'           : 'ط²ظˆظ„ظˆظپطھ',
+    'cipralex'         : 'ط³ظٹط¨ط±ط§ظ„ظٹظƒط³',
+    'lexapro'          : 'ظ„ظٹظƒط³ط§ط¨ط±ظˆ',
+    'risperdal'        : 'ط±ظٹط³ط¨ظٹط±ط¯ط§ظ„',
+    'zyprexa'          : 'ط²ظٹط¨ط±ظٹظƒط³ط§',
+    'seroquel'         : 'ط³ظٹط±ظˆظƒظˆظٹظ„',
+    'ambien'           : 'ط£ظ…ط¨ظٹط§ظ†',
+    'stilnox'          : 'ط³طھظٹظ„ظ†ظˆظƒط³',
+    'synthroid'        : 'ط³ظٹظ†ط«ط±ظˆظٹط¯',
+    'eltroxin'         : 'ط¥ظ„طھط±ظˆظƒط³ظٹظ†',
+    'decadron'         : 'ط¯ظٹظƒط§ط¯ط±ظˆظ†',
+    'medrol'           : 'ظ…ظٹط¯ط±ظˆظ„',
+    'betnovate'        : 'ط¨ظٹطھظ†ظˆظپظٹطھ',
+    'elocon'           : 'ط¥ظٹظ„ظˆظƒظˆظ†',
+    'zovirax'          : 'ط²ظˆظپظٹط±ط§ظƒط³',
+    'diflucan'         : 'ط¯ظٹظپظ„ظˆظƒط§ظ†',
+    'klaricid'         : 'ظƒظ„ط§ط±ظٹط³ظٹط¯',
   };
 }

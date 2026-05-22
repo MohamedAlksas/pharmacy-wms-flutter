@@ -13,7 +13,8 @@ super.key, required this.provider
 });
   @override  State<AddMaterialWizard> createState() => _AddMaterialWizardState();
 
-}class _SessionMaterial {
+
+class _SessionMaterial {
   final String mode;
   final String? productId;
   final String name;
@@ -28,7 +29,8 @@ super.key, required this.provider
     required this.mode,    this.productId,    required this.name,    required this.sku,    required this.quantity,    required this.unit,    required this.logNumber,    required this.categoryId,    required this.expiryDate,    required this.body,  
 });
 
-}class _AddMaterialWizardState extends State<AddMaterialWizard> {
+
+class _AddMaterialWizardState extends State<AddMaterialWizard> {
   final _formKey = GlobalKey<FormState>();
   int _step = 0;
   int? _selectionMode;
@@ -60,7 +62,8 @@ super.key, required this.provider
       if (_newQuantityController.text.trim().isNotEmpty) return true;
       if (_newExpiryDate != null) return true;
     
-}    return false;
+
+return false;
   
 }  @override  void dispose() {
     _invoiceController.dispose();
@@ -71,33 +74,39 @@ super.key, required this.provider
     _newQuantityController.dispose();
     super.dispose();
   
-}  Future<bool> _maybeDiscard() async {
+
+Future<bool> _maybeDiscard() async {
     if (!_hasUnsavedChanges || _popIntercepted) return true;
     _popIntercepted = true;
     final result = await showDialog<bool>(      context: context,      builder: (ctx) => AlertDialog(        title: const Text('Discard changes?'),        content: const Text('You have unsaved changes. Are you sure you want to discard them?'),        actions: [          TextButton(            onPressed: () => Navigator.pop(ctx, false),            child: Text(context.tr.cancel),          ),          ElevatedButton(            onPressed: () => Navigator.pop(ctx, true),            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),            child: const Text('Discard', style: TextStyle(color: Colors.white)),          ),        ],      ),    );
     return result ?? false;
   
-}  void _goToStep(int step) {
+
+void _goToStep(int step) {
     setState(() {
       _submitted = false;
       _step = step;
     
 });
   
-}  void _selectMode(int mode) {
+
+void _selectMode(int mode) {
     setState(() {
       _selectionMode = mode;
     
 });
   
-}  bool _canProceedFromSelection() {
+
+bool _canProceedFromSelection() {
     return _selectionMode != null;
   
-}  void _onNextFromSelection() {
+
+void _onNextFromSelection() {
     if (!_canProceedFromSelection()) return;
     _goToStep(2);
   
-}  void _onAddToSession() {
+
+void _onAddToSession() {
     setState(() {
       _submitted = true;
     
@@ -113,7 +122,8 @@ super.key, required this.provider
       setState(() => _submitted = false);
     
 }  
-}  bool _addExistingToSession() {
+
+bool _addExistingToSession() {
     final tr = context.tr;
     final selected = _selectedExistingProduct;
     if (selected == null) {
@@ -129,15 +139,18 @@ super.key, required this.provider
     if (_existingExpiryDate != null) {
       body['expiryDate'] = _existingExpiryDate!.toUtc().toIso8601String();
     
-}    setState(() {
-      _sessionMaterials.add(_SessionMaterial(        mode: 'existing',        productId: product.id,        name: product.name,        sku: product.sku,        quantity: addedQty,        unit: product.unit,        logNumber: product.lot,        categoryId: product.categoryId,        expiryDate: _existingExpiryDate?.toUtc().toIso8601String() ?? product.expiryDate,        body: body,      ));
+
+setState(() {
+      _sessionMaterials.add(_SessionMaterial(        mode: 'existing',        productId: product.id,        name: product.name,        sku: product.sku,        quantity: addedQty,        unit: product.unit,        logNumber: product.lot,        categoryId: product.categoryId,        expiryDate: _existingExpiryDate?.toUtc().toIso8601String() ?? product.expiryDate,        body: body,      )));
+
       _clearExistingForm();
       _goToStep(1);
     
 });
     return true;
   
-}  bool _addNewToSession() {
+
+bool _addNewToSession() {
     final tr = context.tr;
     if (!_formKey.currentState!.validate()) return false;
     final name = _newNameController.text.trim();
@@ -149,20 +162,23 @@ super.key, required this.provider
       'materialName': name,      'material_SKU': sku,      'quantity': qty,      'unit': '',      'logNumber': '',      'expiryDate': _newExpiryDate!.toUtc().toIso8601String(),      'storageLocation': '',      'isAvailable': true,      'categoryId': 0,    
 };
     setState(() {
-      _sessionMaterials.add(_SessionMaterial(        mode: 'new',        productId: null,        name: name,        sku: sku,        quantity: qty,        unit: '',        logNumber: '',        categoryId: 0,        expiryDate: _newExpiryDate!.toUtc().toIso8601String(),        body: body,      ));
+      _sessionMaterials.add(_SessionMaterial(        mode: 'new',        productId: null,        name: name,        sku: sku,        quantity: qty,        unit: '',        logNumber: '',        categoryId: 0,        expiryDate: _newExpiryDate!.toUtc().toIso8601String(),        body: body,      )));
+
       _clearNewForm();
       _goToStep(1);
     
 });
     return true;
   
-}  void _removeSessionMaterial(int index) {
+
+void _removeSessionMaterial(int index) {
     setState(() {
       _sessionMaterials.removeAt(index);
     
 });
   
-}  Future<void> _finishAndSave() async {
+
+Future<void> _finishAndSave() async {
     final tr = context.tr;
     if (_sessionMaterials.isEmpty) return;
     setState(() => _saving = true);
@@ -177,10 +193,12 @@ super.key, required this.provider
         final err = await widget.provider.addProduct(sessionItem.body);
         if (err != null && error == null) error = err;
       
-}      final order = OrderModel(        productId: sessionItem.productId,        productName: sessionItem.name,        productSku: sessionItem.sku,        quantity: sessionItem.quantity,        unit: sessionItem.unit,        logNumber: sessionItem.logNumber,        categoryId: sessionItem.categoryId,        type: OrderType.add,        status: OrderStatus.completed,        createdBy: AuthService.currentUser?.fullName ?? '',        notes: invoiceNum.isNotEmpty ? 'Invoice: $invoiceNum' : null,      );
+
+final order = OrderModel(        productId: sessionItem.productId,        productName: sessionItem.name,        productSku: sessionItem.sku,        quantity: sessionItem.quantity,        unit: sessionItem.unit,        logNumber: sessionItem.logNumber,        categoryId: sessionItem.categoryId,        type: OrderType.add,        status: OrderStatus.completed,        createdBy: AuthService.currentUser?.fullName ?? '',        notes: invoiceNum.isNotEmpty ? 'Invoice: $invoiceNum' : null,      );
       OrderService.addOrder(order);
     
-}    setState(() => _saving = false);
+
+setState(() => _saving = false);
     if (error != null) {
       _toast(error);
     
@@ -189,10 +207,12 @@ super.key, required this.provider
     
 }    if (mounted) Navigator.of(context).pop(true);
   
-}  void _toast(String message) {
+
+void _toast(String message) {
     showToast(context, message);
   
-}  Future<void> _pickDate(bool forExisting) async {
+
+Future<void> _pickDate(bool forExisting) async {
     final initial = forExisting ? _existingExpiryDate : _newExpiryDate;
     final picked = await showDatePicker(      context: context,      initialDate: initial ?? DateTime.now(),      firstDate: DateTime(2020),      lastDate: DateTime(2100),    );
     if (picked != null) {
@@ -207,20 +227,23 @@ super.key, required this.provider
 });
     
 }  
-}  void _clearExistingForm() {
+
+void _clearExistingForm() {
     _existingSearchController.clear();
     _existingQuantityController.clear();
     _selectedExistingProduct = null;
     _existingQuery = '';
     _existingExpiryDate = null;
   
-}  void _clearNewForm() {
+
+void _clearNewForm() {
     _newNameController.clear();
     _newSkuController.clear();
     _newQuantityController.clear();
     _newExpiryDate = null;
   
-}  void _clearExistingSelection() {
+
+void _clearExistingSelection() {
     setState(() {
       _selectedExistingProduct = null;
       _existingQuery = '';
@@ -230,25 +253,30 @@ super.key, required this.provider
     
 });
   
-}  List<MaterialModel> _matchingExisting() {
+
+List<MaterialModel> _matchingExisting() {
     final query = _existingQuery.trim().toLowerCase();
     if (query.isEmpty) return const [];
     return widget.provider.products        .where((p) =>            p.name.toLowerCase().contains(query) ||            p.sku.toLowerCase().contains(query))        .take(6)        .toList();
   
-}  String _formatDate(DateTime date) {
+
+String _formatDate(DateTime date) {
     final m = date.month.toString().padLeft(2, '0');
     final d = date.day.toString().padLeft(2, '0');
     return '${
 date.year
 }-$m-$d';
   
-}  String? _required(String? value) {
+
+String? _required(String? value) {
     if (value == null || value.trim().isEmpty) return context.tr.required;
     return null;
   
-}  String? _validatePositiveInt(String? value) {
+
+String? _validatePositiveInt(String? value) {
     if (value == null || value.trim().isEmpty) return context.tr.required;
-    final parsed = int.tryParse(value.trim());
+    final parsed = int.tryParse(value.trim()));
+
     if (parsed == null || parsed <= 0) return context.tr.positiveNumber;
     return null;
   
@@ -262,7 +290,8 @@ date.year
         
 },        child: Container(          width: 680,          padding: const EdgeInsets.all(24),          child: Form(            key: _formKey,            child: SingleChildScrollView(              child: Column(                mainAxisSize: MainAxisSize.min,                crossAxisAlignment: CrossAxisAlignment.start,                children: [                  _buildHeader(tr, isDark),                  const SizedBox(height: 20),                  _buildStepContent(tr, isDark),                  const SizedBox(height: 20),                  if (_hasSessionItems) ...[                    _buildSessionList(tr, isDark),                    const SizedBox(height: 16),                    _buildFinishButton(tr, isDark),                    const SizedBox(height: 12),                  ],                  _buildActionRow(tr, isDark),                ],              ),            ),          ),        ),      ),    );
   
-}  Widget _buildHeader(AppLocalizations tr, bool isDark) {
+
+Widget _buildHeader(AppLocalizations tr, bool isDark) {
     final title = _step == 0        ? tr.invoiceNumber        : _step == 1            ? tr.selectMaterial            : _selectionMode == 0                ? tr.existingStock                : tr.newMaterial;
     final subtitle = _step == 0        ? tr.invoiceInfo        : _step == 1            ? ''            : '';
     return Row(      children: [        Expanded(          child: Column(            crossAxisAlignment: CrossAxisAlignment.start,            children: [              Text(                title,                style: TextStyle(                  fontSize: 22,                  fontWeight: FontWeight.bold,                  color: isDark ? Colors.white : Colors.black,                ),              ),              if (subtitle.isNotEmpty) ...[                const SizedBox(height: 6),                Text(                  subtitle,                  style: TextStyle(                    fontSize: 13,                    color: isDark ? Colors.white60 : Colors.black54,                  ),                ),              ],            ],          ),        ),        IconButton(          onPressed: () async {
@@ -271,34 +300,40 @@ date.year
           
 },          icon: Icon(Icons.close,              color: isDark ? Colors.white70 : Colors.black54),        ),      ],    );
   
-}  Widget _buildStepContent(AppLocalizations tr, bool isDark) {
+
+Widget _buildStepContent(AppLocalizations tr, bool isDark) {
     switch (_step) {
       case 0:        return _buildInvoiceStep(tr, isDark);
       case 1:        return _buildSelectionStep(tr, isDark);
       case 2:        if (_selectionMode == 0) {
           return _buildExistingFormStep(tr, isDark);
         
-}        return _buildNewFormStep(tr, isDark);
+
+return _buildNewFormStep(tr, isDark);
       default:        return const SizedBox.shrink();
     
 }  
-}  Widget _buildInvoiceStep(AppLocalizations tr, bool isDark) {
+
+Widget _buildInvoiceStep(AppLocalizations tr, bool isDark) {
     return SizedBox(      width: 400,      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          Text(            tr.invoiceNumber,            style: TextStyle(              fontSize: 13,              fontWeight: FontWeight.w600,              color: isDark ? Colors.white : Colors.black,            ),          ),          const SizedBox(height: 8),          TextFormField(            controller: _invoiceController,            style: TextStyle(color: isDark ? Colors.white : Colors.black87),            decoration: InputDecoration(              hintText: tr.invoiceNumber,              prefixIcon: const Icon(Icons.description_outlined),              filled: true,              fillColor: isDark ? const Color(0xFF2A3441) : Colors.grey[100],              border: OutlineInputBorder(                borderRadius: BorderRadius.circular(12),                borderSide: BorderSide.none,              ),            ),          ),        ],      ),    );
   
-}  on ─────────────────────────────────────────────────────  Widget _buildSelectionStep(AppLocalizations tr, bool isDark) {
+}  on   Widget _buildSelectionStep(AppLocalizations tr, bool isDark) {
     return Column(      crossAxisAlignment: CrossAxisAlignment.start,      children: [        Row(          children: [            Expanded(              child: _buildSelectionCard(                icon: Icons.checklist,                label: tr.existingStock,                description: 'Add to existing material in stock',                color: const Color(0xFF3B82F6),                isDark: isDark,                selected: _selectionMode == 0,                onTap: () => _selectMode(0),              ),            ),            const SizedBox(width: 16),            Expanded(              child: _buildSelectionCard(                icon: Icons.add_box_outlined,                label: tr.newMaterial,                description: 'Add a completely new material',                color: const Color(0xFF22C55E),                isDark: isDark,                selected: _selectionMode == 1,                onTap: () => _selectMode(1),              ),            ),          ],        ),      ],    );
   
-}  Widget _buildSelectionCard({
+
+Widget _buildSelectionCard({
     required IconData icon,    required String label,    required String description,    required Color color,    required bool isDark,    required bool selected,    required VoidCallback onTap,  
 }) {
     return GestureDetector(      onTap: onTap,      child: AnimatedContainer(        duration: const Duration(milliseconds: 200),        padding: const EdgeInsets.all(20),        decoration: BoxDecoration(          color: selected              ? color.withOpacity(0.15)              : isDark                  ? const Color(0xFF2A3441)                  : Colors.grey[100],          borderRadius: BorderRadius.circular(12),          border: Border.all(            color: selected ? color : Colors.transparent,            width: 2,          ),        ),        child: Column(          children: [            Container(              width: 56,              height: 56,              decoration: BoxDecoration(                shape: BoxShape.circle,                color: color.withOpacity(0.2),              ),              child: Icon(icon, color: color, size: 28),            ),            const SizedBox(height: 14),            Text(              label,              style: TextStyle(                fontSize: 15,                fontWeight: FontWeight.bold,                color: isDark ? Colors.white : Colors.black87,              ),              textAlign: TextAlign.center,            ),            const SizedBox(height: 6),            Text(              description,              style: TextStyle(                fontSize: 12,                color: isDark ? Colors.white60 : Colors.black54,              ),              textAlign: TextAlign.center,            ),          ],        ),      ),    );
   
-}  Widget _buildExistingFormStep(AppLocalizations tr, bool isDark) {
+
+Widget _buildExistingFormStep(AppLocalizations tr, bool isDark) {
     final selected = _selectedExistingProduct != null;
     final results = _matchingExisting();
     return Column(      crossAxisAlignment: CrossAxisAlignment.start,      children: [        Text(          tr.searchByNameOrSku,          style: TextStyle(            fontSize: 13,            fontWeight: FontWeight.w600,            color: isDark ? Colors.white : Colors.black,          ),        ),        const SizedBox(height: 8),        TextFormField(          controller: _existingSearchController,          readOnly: selected,          onChanged: (v) => setState(() => _existingQuery = v),          style: TextStyle(color: isDark ? Colors.white : Colors.black87),          decoration: InputDecoration(            hintText: tr.typeHintSearch,            prefixIcon: const Icon(Icons.search),            suffixIcon: selected ? const Icon(Icons.lock_outline) : null,            filled: true,            fillColor: isDark ? const Color(0xFF2A3441) : Colors.grey[100],            border: OutlineInputBorder(              borderRadius: BorderRadius.circular(12),              borderSide: BorderSide.none,            ),          ),        ),        if (!selected && results.isNotEmpty) ...[          const SizedBox(height: 4),          _existingResultsList(results, isDark),        ],        if (selected) ...[          const SizedBox(height: 8),          Align(            alignment: Alignment.centerRight,            child: TextButton.icon(              onPressed: _clearExistingSelection,              icon: const Icon(Icons.clear, size: 18),              label: Text(tr.clear),            ),          ),        ],        if (selected) ...[          const SizedBox(height: 12),          _buildExistingInfoBox(tr, isDark),        ],        const SizedBox(height: 20),        Wrap(          spacing: 16,          runSpacing: 16,          children: [            _buildField(              controller: _existingQuantityController,              label: tr.quantityToAdd,              hintText: '1',              icon: Icons.inventory_2_outlined,              isDark: isDark,              keyboardType: TextInputType.number,              validator: _validatePositiveInt,              width: 280,            ),            _buildExpiryPicker(              label: tr.expiryDate,              isDark: isDark,              date: _existingExpiryDate,              onTap: () => _pickDate(true),              width: 280,            ),          ],        ),      ],    );
   
-}  Widget _existingResultsList(List<MaterialModel> results, bool isDark) {
+
+Widget _existingResultsList(List<MaterialModel> results, bool isDark) {
     return Container(      width: double.infinity,      constraints: const BoxConstraints(maxHeight: 190),      margin: const EdgeInsets.only(top: 6),      decoration: BoxDecoration(        color: isDark ? const Color(0xFF2A3441) : Colors.grey[100],        borderRadius: BorderRadius.circular(12),      ),      child: ListView.separated(        shrinkWrap: true,        itemCount: results.length,        separatorBuilder: (_, __) => const Divider(height: 1),        itemBuilder: (context, index) {
           final p = results[index];
           return ListTile(            dense: true,            title: Text(p.name),            subtitle: Text(              '${
@@ -320,27 +355,33 @@ p.sku
         
 },      ),    );
   
-}  Widget _buildExistingInfoBox(AppLocalizations tr, bool isDark) {
+
+Widget _buildExistingInfoBox(AppLocalizations tr, bool isDark) {
     final p = _selectedExistingProduct!;
     return Container(      width: double.infinity,      padding: const EdgeInsets.all(14),      decoration: BoxDecoration(        color: const Color(0xFF3B82F6).withOpacity(0.12),        borderRadius: BorderRadius.circular(12),        border: Border.all(          color: const Color(0xFF3B82F6).withOpacity(0.3),        ),      ),      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          Text(            tr.currentInfo,            style: const TextStyle(              fontSize: 13,              fontWeight: FontWeight.bold,              color: Color(0xFF3B82F6),            ),          ),          const SizedBox(height: 8),          _infoRow('Name', p.name),          _infoRow('SKU', p.sku),          _infoRow('Stock', p.quantity.toString()),          _infoRow('Unit', p.unit),          _infoRow('Location', p.location),          if (p.expiryDate.isNotEmpty)            _infoRow('Expiry', p.expiryDate),        ],      ),    );
   
-}  Widget _infoRow(String label, String value) {
+
+Widget _infoRow(String label, String value) {
     return Padding(      padding: const EdgeInsets.only(bottom: 4),      child: Row(        children: [          SizedBox(            width: 68,            child: Text(              '$label:',              style: const TextStyle(                fontSize: 12,                fontWeight: FontWeight.w600,                color: Color(0xFF3B82F6),              ),            ),          ),          Expanded(            child: Text(              value,              style: const TextStyle(                fontSize: 12,                color: Color(0xFF3B82F6),              ),            ),          ),        ],      ),    );
   
-}  Widget _buildNewFormStep(AppLocalizations tr, bool isDark) {
+
+Widget _buildNewFormStep(AppLocalizations tr, bool isDark) {
     return Wrap(      spacing: 16,      runSpacing: 16,      children: [        _buildField(          controller: _newNameController,          label: tr.materialName,          hintText: 'e.g. Paracetamol',          icon: Icons.medication_outlined,          isDark: isDark,          validator: _required,          width: 280,        ),        _buildField(          controller: _newSkuController,          label: tr.materialSku,          hintText: 'MED-1001',          icon: Icons.qr_code_2_outlined,          isDark: isDark,          validator: _required,          width: 280,        ),        _buildField(          controller: _newQuantityController,          label: tr.quantity,          hintText: '1',          icon: Icons.inventory_2_outlined,          isDark: isDark,          keyboardType: TextInputType.number,          validator: _validatePositiveInt,          width: 280,        ),        _buildExpiryPicker(          label: tr.expiryDate,          isDark: isDark,          date: _newExpiryDate,          onTap: () => _pickDate(false),          width: 280,        ),      ],    );
   
-}  Widget _buildField({
+
+Widget _buildField({
     required TextEditingController controller,    required String label,    required String hintText,    required IconData icon,    required bool isDark,    double width = 280,    bool readOnly = false,    TextInputType? keyboardType,    String? Function(String?)? validator,    ValueChanged<String>? onChanged,  
 }) {
     return SizedBox(      width: width,      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          Text(            label,            style: TextStyle(              fontSize: 13,              fontWeight: FontWeight.w600,              color: isDark ? Colors.white : Colors.black,            ),          ),          const SizedBox(height: 8),          TextFormField(            controller: controller,            keyboardType: keyboardType,            readOnly: readOnly,            onChanged: onChanged,            validator: readOnly ? (_) => null : validator ?? _required,            style: TextStyle(color: isDark ? Colors.white : Colors.black87),            decoration: InputDecoration(              hintText: hintText,              prefixIcon: Icon(icon),              suffixIcon: readOnly ? const Icon(Icons.lock_outline) : null,              filled: true,              fillColor: isDark ? const Color(0xFF2A3441) : Colors.grey[100],              border: OutlineInputBorder(                borderRadius: BorderRadius.circular(12),                borderSide: BorderSide.none,              ),            ),          ),        ],      ),    );
   
-}  Widget _buildExpiryPicker({
+
+Widget _buildExpiryPicker({
     required String label,    required bool isDark,    required DateTime? date,    required VoidCallback onTap,    double width = 280,  
 }) {
     return SizedBox(      width: width,      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          Text(            label,            style: TextStyle(              fontSize: 13,              fontWeight: FontWeight.w600,              color: isDark ? Colors.white : Colors.black,            ),          ),          const SizedBox(height: 8),          InkWell(            onTap: onTap,            borderRadius: BorderRadius.circular(12),            child: InputDecorator(              decoration: InputDecoration(                prefixIcon: const Icon(Icons.calendar_today_outlined),                filled: true,                fillColor: isDark ? const Color(0xFF2A3441) : Colors.grey[100],                border: OutlineInputBorder(                  borderRadius: BorderRadius.circular(12),                  borderSide: BorderSide.none,                ),                errorText: _submitted && date == null                    ? 'Please select a date'                    : null,              ),              child: Text(                date == null                    ? context.tr.selectDate                    : _formatDate(date),                style:                    TextStyle(color: isDark ? Colors.white : Colors.black87),              ),            ),          ),        ],      ),    );
   
-}  Widget _buildSessionList(AppLocalizations tr, bool isDark) {
+
+Widget _buildSessionList(AppLocalizations tr, bool isDark) {
     return Container(      width: double.infinity,      decoration: BoxDecoration(        color: isDark            ? const Color(0xFF2A3441)            : Colors.grey[50],        borderRadius: BorderRadius.circular(12),        border: Border.all(          color: isDark              ? Colors.white12              : Colors.black12,        ),      ),      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          Padding(            padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),            child: Row(              children: [                Text(                  tr.materialsAdded,                  style: TextStyle(                    fontSize: 14,                    fontWeight: FontWeight.bold,                    color: isDark ? Colors.white : Colors.black87,                  ),                ),                const SizedBox(width: 8),                Container(                  padding:                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),                  decoration: BoxDecoration(                    color: const Color(0xFF1CA0A5),                    borderRadius: BorderRadius.circular(10),                  ),                  child: Text(                    '${
 _sessionMaterials.length
 }',                    style: const TextStyle(                      fontSize: 12,                      fontWeight: FontWeight.bold,                      color: Colors.white,                    ),                  ),                ),              ],            ),          ),          const Divider(height: 1),          ListView.separated(            shrinkWrap: true,            physics: const NeverScrollableScrollPhysics(),            itemCount: _sessionMaterials.length,            separatorBuilder: (_, __) => const Divider(height: 1, indent: 16),            itemBuilder: (context, index) {
@@ -356,10 +397,12 @@ item.unit
             
 },          ),        ],      ),    );
   
-}  Widget _buildFinishButton(AppLocalizations tr, bool isDark) {
+
+Widget _buildFinishButton(AppLocalizations tr, bool isDark) {
     return SizedBox(      width: double.infinity,      height: 48,      child: ElevatedButton.icon(        onPressed: _saving ? null : _finishAndSave,        icon: _saving            ? const SizedBox(                width: 18,                height: 18,                child: CircularProgressIndicator(                  strokeWidth: 2,                  color: Colors.white,                ),              )            : const Icon(Icons.check_circle_outline),        label: Text(tr.finishSaveAll),        style: ElevatedButton.styleFrom(          backgroundColor: const Color(0xFF22C55E),          foregroundColor: Colors.white,          disabledBackgroundColor: const Color(0xFF22C55E).withOpacity(0.5),          shape: RoundedRectangleBorder(            borderRadius: BorderRadius.circular(12),          ),          textStyle: const TextStyle(            fontSize: 15,            fontWeight: FontWeight.bold,          ),        ),      ),    );
   
-}  Widget _buildActionRow(AppLocalizations tr, bool isDark) {
+
+Widget _buildActionRow(AppLocalizations tr, bool isDark) {
     final isLastStep = _step == 2;
     return Row(      children: [        if (_step > 0)          TextButton.icon(            onPressed: () => _goToStep(_step - 1),            icon: const Icon(Icons.arrow_back, size: 18),            label: Text(tr.back),          )        else          const SizedBox(width: 1),        const Spacer(),        TextButton(          onPressed: () async {
             final shouldPop = await _maybeDiscard();

@@ -14,23 +14,21 @@ class UpdateService {
   static Future<PackageInfo> get packageInfo async {
     _packageInfo ??= await PackageInfo.fromPlatform();
     return _packageInfo!;
-  }
-
-  static Future<String> get currentVersion async {
+  
+static Future<String> get currentVersion async {
     final info = await packageInfo;
     return info.version;
-  }
-
-  static Future<int> get currentBuildNumber async {
+  
+static Future<int> get currentBuildNumber async {
     final info = await packageInfo;
     return int.tryParse(info.buildNumber) ?? 0;
-  }
-
-  static Future<AppVersion?> fetchLatestVersion() async {
+  
+static Future<AppVersion?> fetchLatestVersion() async {
     try {
       final response = await http
           .get(Uri.parse(_versionUrl))
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 10)));
+
 
       if (response.statusCode != 200) return null;
 
@@ -43,9 +41,8 @@ class UpdateService {
       debugPrint('[UpdateService] Failed to fetch latest version: $e');
       return _cachedRemote;
     }
-  }
-
-  static Future<bool> isUpdateAvailable() async {
+  
+static Future<bool> isUpdateAvailable() async {
     try {
       final remote = await fetchLatestVersion();
       if (remote == null) return false;

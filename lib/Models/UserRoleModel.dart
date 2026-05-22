@@ -1,12 +1,10 @@
 import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pharmacy_wms/Services/api_config.dart';
 
-enum UserRole { warehouseManager, supervisor }
-
+enum UserRole { warehouseManager, supervisor 
 class UserModel {
   final String id;
   final String email;
@@ -35,9 +33,8 @@ class UserModel {
       role: _roleFromString(rawRole),
       token: (json['token'] ?? json['accessToken'] ?? '').toString(),
     );
-  }
-
-  Map<String, dynamic> toJson() {
+  
+Map<String, dynamic> toJson() {
     return {
       'id': id,
       'email': email,
@@ -64,9 +61,8 @@ class UserModel {
       role: role ?? this.role,
       token: token ?? this.token,
     );
-  }
-
-  static String _extractRoleText(Map<String, dynamic> json) {
+  
+static String _extractRoleText(Map<String, dynamic> json) {
     final roleCandidate =
         json['role'] ??
         json['userRole'] ??
@@ -76,11 +72,9 @@ class UserModel {
 
     if (roleCandidate is List && roleCandidate.isNotEmpty) {
       return roleCandidate.first.toString();
-    }
-
-    return (roleCandidate ?? '').toString();
+    
+return (roleCandidate ?? '').toString();
   }
-}
 
 class AuthResponseModel {
   final String token;
@@ -115,9 +109,8 @@ class AuthResponseModel {
       refreshToken: (json['refreshToken'] ?? '').toString(),
       user: user,
     );
-  }
-
-  static String _extractToken(Map<String, dynamic> json) {
+  
+static String _extractToken(Map<String, dynamic> json) {
     final nestedData = json['data'];
     final nestedUser = json['user'];
     return (json['token'] ??
@@ -130,9 +123,8 @@ class AuthResponseModel {
                 : null) ??
             '')
         .toString();
-  }
-
-  static Map<String, dynamic> _extractUserMap(Map<String, dynamic> json) {
+  
+static Map<String, dynamic> _extractUserMap(Map<String, dynamic> json) {
     final user = json['user'];
     final data = json['data'];
 
@@ -144,13 +136,11 @@ class AuthResponseModel {
       final nestedUser = data['user'];
       if (nestedUser is Map<String, dynamic>) {
         return nestedUser;
-      }
-      return data;
-    }
-
-    return json;
+      
+return data;
+    
+return json;
   }
-}
 
 class AuthService {
   static String get _baseUrl => ApiConfig.baseUrl;
@@ -171,11 +161,10 @@ class AuthService {
     final headers = <String, String>{'Content-Type': 'application/json'};
     if (token.isNotEmpty) {
       headers['Authorization'] = 'Bearer $token';
-    }
-    return headers;
-  }
-
-  static Future<void> initialize() async {
+    
+return headers;
+  
+static Future<void> initialize() async {
     final prefs = await SharedPreferences.getInstance();
     final storedUser = prefs.getString(_userKey);
     final storedToken = prefs.getString(_tokenKey);
@@ -195,9 +184,8 @@ class AuthService {
       await prefs.remove(_tokenKey);
       await prefs.remove(_userKey);
     }
-  }
-
-  static Future<String?> login(String email, String password) async {
+  
+static Future<String?> login(String email, String password) async {
     try {
       final response = await http
           .post(
@@ -207,14 +195,14 @@ class AuthService {
           )
           .timeout(const Duration(seconds: 15));
 
+
       final decoded = _decodeBody(response.body);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (decoded is! Map<String, dynamic>) {
           return 'Unexpected login response from the server.';
-        }
-
-        final auth = AuthResponseModel.fromJson(
+        
+final auth = AuthResponseModel.fromJson(
           decoded,
           fallbackEmail: email.trim(),
         );
@@ -224,16 +212,15 @@ class AuthService {
         }
 
         await _saveSession(auth.user.copyWith(token: auth.token));
-        return null;
-      }
 
-      return _extractErrorMessage(response.statusCode, decoded);
+        return null;
+      
+return _extractErrorMessage(response.statusCode, decoded);
     } catch (e) {
       return 'Unable to sign in right now. Please check your connection and try again.';
     }
-  }
-
-  static Future<String?> registerAdmin({
+  
+static Future<String?> registerAdmin({
     required String email,
     required String password,
     required String fullName,
@@ -246,9 +233,8 @@ class AuthService {
       fullName: fullName,
       phoneNumber: phoneNumber,
     );
-  }
-
-  static Future<String?> registerUser({
+  
+static Future<String?> registerUser({
     required String email,
     required String password,
     required String fullName,
@@ -261,9 +247,8 @@ class AuthService {
       fullName: fullName,
       phoneNumber: phoneNumber,
     );
-  }
-
-  static Future<String?> _register({
+  
+static Future<String?> _register({
     required String path,
     required String email,
     required String password,
@@ -284,43 +269,40 @@ class AuthService {
           )
           .timeout(const Duration(seconds: 15));
 
+
       final decoded = _decodeBody(response.body);
       if (response.statusCode == 200 || response.statusCode == 201) {
         return null;
-      }
-
-      return _extractErrorMessage(response.statusCode, decoded);
+      
+return _extractErrorMessage(response.statusCode, decoded);
     } catch (_) {
       return 'Unable to complete registration right now. Please try again.';
     }
-  }
-
-  static Future<void> logout() async {
+  
+static Future<void> logout() async {
     _currentUser = null;
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
     await prefs.remove(_userKey);
     sessionChanges.value++;
-  }
-
-  static Future<void> updateCurrentUser(UserModel updated) async {
+  
+static Future<void> updateCurrentUser(UserModel updated) async {
     final tokenValue = updated.token.isNotEmpty ? updated.token : token;
     await _saveSession(updated.copyWith(token: tokenValue));
-  }
 
-  static Future<void> expireSession() async {
+  
+static Future<void> expireSession() async {
     await logout();
-  }
-
-  static Future<void> _saveSession(UserModel user) async {
+  
+static Future<void> _saveSession(UserModel user) async {
     _currentUser = user;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_tokenKey, user.token);
     await prefs.setString(_userKey, jsonEncode(user.toJson()));
-    sessionChanges.value++;
-  }
 
-  static dynamic _decodeBody(String body) {
+    sessionChanges.value++;
+  
+static dynamic _decodeBody(String body) {
     if (body.trim().isEmpty) {
       return null;
     }
@@ -330,9 +312,8 @@ class AuthService {
     } catch (_) {
       return body;
     }
-  }
-
-  static String _extractErrorMessage(int statusCode, dynamic body) {
+  
+static String _extractErrorMessage(int statusCode, dynamic body) {
     final fallback = switch (statusCode) {
       400 => 'Please review the entered data and try again.',
       401 => 'Invalid credentials or unauthorized request.',
@@ -350,19 +331,18 @@ class AuthService {
             .where((value) => value.trim().isNotEmpty)
             .toList();
         if (messages.isNotEmpty) {
-          return messages.join('\n');
+          return messages.join('
+');
         }
-      }
-
-      return (body['message'] ?? body['error'] ?? body['title'] ?? fallback)
+      
+return (body['message'] ?? body['error'] ?? body['title'] ?? fallback)
           .toString();
     }
 
     if (body is String && body.trim().isNotEmpty) {
       return body;
-    }
-
-    return fallback;
+    
+return fallback;
   }
 }
 
@@ -370,9 +350,8 @@ UserRole _roleFromString(String rawRole) {
   final normalized = rawRole.toLowerCase();
   if (normalized.contains('admin') || normalized.contains('manager')) {
     return UserRole.warehouseManager;
-  }
-  return UserRole.supervisor;
-}
+  
+return UserRole.supervisor;
 
 String? _extractRoleFromToken(String token) {
   if (token.isEmpty || !token.contains('.')) {
@@ -383,26 +362,23 @@ String? _extractRoleFromToken(String token) {
     final parts = token.split('.');
     if (parts.length < 2) {
       return null;
-    }
-
-    final payload = utf8.decode(
+    
+final payload = utf8.decode(
       base64Url.decode(base64Url.normalize(parts[1])),
     );
     final decoded = jsonDecode(payload);
     if (decoded is! Map<String, dynamic>) {
       return null;
-    }
-
-    final role =
+    
+final role =
         decoded['role'] ??
         decoded['roles'] ??
         decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
 
     if (role is List && role.isNotEmpty) {
       return role.first.toString();
-    }
-
-    return role?.toString();
+    
+return role?.toString();
   } catch (_) {
     return null;
   }

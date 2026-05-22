@@ -9,13 +9,13 @@ import 'package:pharmacy_wms/Models/app_localizations.dart';
 class TranslationService {
   static const String _apiUrl = 'https://api.anthropic.com/v1/messages';
 
-  // ── In-memory cache:  original → translated ───────────────────────────────
+  // â”€â”€ In-memory cache:  original â†’ translated â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   static final Map<String, String> _cache = {};
 
-  // ── Pending futures to avoid duplicate in-flight requests ─────────────────
+  // â”€â”€ Pending futures to avoid duplicate in-flight requests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   static final Map<String, Future<String>> _inflight = {};
 
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   /// Translate a single string.
   /// Returns the original string immediately if the language is English,
   /// or if the string is already in the cache.
@@ -39,21 +39,21 @@ class TranslationService {
     } catch (e) {
       debugPrint('[TranslationService] Error translating "$text": $e');
       return text; // fallback: show original
-    } finally {
+    
+finally {
       _inflight.remove(text);
     }
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   /// Translate a batch of strings in ONE API call (much more efficient).
-  /// Returns a map of original → translated.
+  /// Returns a map of original â†’ translated.
   static Future<Map<String, String>> translateBatch(
       List<String> texts) async {
     if (languageNotifier.value != AppLanguage.ar) {
       return {for (final t in texts) t: t};
-    }
-
-    final results = <String, String>{};
+    
+final results = <String, String>{};
     final toFetch = <String>[];
 
     for (final text in texts) {
@@ -81,19 +81,18 @@ class TranslationService {
       for (final t in toFetch) {
         results[t] = t;
       }
-    }
-
-    return results;
+    
+return results;
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   /// Clear the cache (e.g. when switching language back to English).
   static void clearCache() {
     _cache.clear();
     _inflight.clear();
   }
 
-  // ── Private helpers ───────────────────────────────────────────────────────
+  // â”€â”€ Private helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   static Future<String> _doTranslate(String text) async {
     final response = await http
@@ -111,27 +110,29 @@ class TranslationService {
                 'role': 'user',
                 'content':
                     'Translate the following pharmaceutical/warehouse term to Arabic. '
-                    'Return ONLY the Arabic translation, nothing else, no explanation.\n\n'
+                    'Return ONLY the Arabic translation, nothing else, no explanation.
+
+'
                     'Text: $text',
               }
             ],
           }),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(const Duration(seconds: 15)));
+
 
     if (response.statusCode != 200) {
       throw Exception('HTTP ${response.statusCode}');
-    }
-
-    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+    
+final decoded = jsonDecode(response.body) as Map<String, dynamic>;
     final content = decoded['content'] as List<dynamic>;
     return (content.first['text'] as String).trim();
-  }
-
-  static Future<List<String>> _doTranslateBatch(List<String> texts) async {
+  
+static Future<List<String>> _doTranslateBatch(List<String> texts) async {
     // Build a numbered list so the model returns a numbered list back
     final numbered =
-        texts.asMap().entries.map((e) => '${e.key + 1}. ${e.value}').join('\n');
+        texts.asMap().entries.map((e) => '${e.key + 1}. ${e.value}').join('
+');
 
     final response = await http
         .post(
@@ -149,32 +150,36 @@ class TranslationService {
                 'content':
                     'Translate the following pharmaceutical/warehouse terms to Arabic. '
                     'Return ONLY a numbered list with the Arabic translations in the same order. '
-                    'No explanations, no extra text.\n\n'
+                    'No explanations, no extra text.
+
+'
                     '$numbered',
               }
             ],
           }),
         )
-        .timeout(const Duration(seconds: 20));
+        .timeout(const Duration(seconds: 20)));
+
 
     if (response.statusCode != 200) {
       throw Exception('HTTP ${response.statusCode}');
-    }
-
-    final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+    
+final decoded = jsonDecode(response.body) as Map<String, dynamic>;
     final content = decoded['content'] as List<dynamic>;
     final raw = (content.first['text'] as String).trim();
 
-    // Parse "1. كلمة\n2. كلمة" → ['كلمة', 'كلمة']
+    // Parse "1. ظƒظ„ظ…ط©
+2. ظƒظ„ظ…ط©" â†’ ['ظƒظ„ظ…ط©', 'ظƒظ„ظ…ط©']
     final lines = raw
-        .split('\n')
+        .split('
+')
         .map((l) => l.trim())
         .where((l) => l.isNotEmpty)
         .toList();
 
     return lines.map((line) {
-      // Remove leading "1. " or "١. " etc.
-      return line.replaceFirst(RegExp(r'^[\d١٢٣٤٥٦٧٨٩٠]+[.\-\)]\s*'), '').trim();
+      // Remove leading "1. " or "ظ،. " etc.
+      return line.replaceFirst(RegExp(r'^[\dظ،ظ¢ظ£ظ¤ظ¥ظ¦ظ§ظ¨ظ©ظ ]+[.\-\)]\s*'), '').trim();
     }).toList();
   }
 }

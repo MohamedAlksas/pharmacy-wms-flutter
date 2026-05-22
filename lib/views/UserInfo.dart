@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:pharmacy_wms/Models/UserRoleModel.dart';
 import 'package:pharmacy_wms/Models/app_localizations.dart';
@@ -14,7 +13,6 @@ class UserInfoPage extends StatefulWidget {
 
   @override
   State<UserInfoPage> createState() => _UserInfoPageState();
-}
 
 class _UserInfoPageState extends State<UserInfoPage> {
   static String get _baseUrl => ApiConfig.baseUrl;
@@ -35,15 +33,13 @@ class _UserInfoPageState extends State<UserInfoPage> {
     _nameController.dispose();
     _phoneController.dispose();
     super.dispose();
-  }
-
-  void _loadUserData() {
+  
+void _loadUserData() {
     final user = AuthService.currentUser;
     _nameController.text = user?.fullName ?? '';
     _phoneController.text = user?.phoneNumber ?? '';
-  }
-
-  Future<void> _saveChanges() async {
+  
+Future<void> _saveChanges() async {
     if (!_formKey.currentState!.validate()) return;
     final current = AuthService.currentUser;
     if (current == null) return;
@@ -59,7 +55,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
               'phoneNumber': _phoneController.text.trim(),
             }),
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 15)));
+
 
       if (!mounted) return;
       if (response.statusCode < 200 || response.statusCode >= 300) {
@@ -78,7 +75,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
       _showSnack('Profile updated successfully');
     } catch (e) {
       if (mounted) _showSnack('Unable to update profile.', isError: true);
-    } finally {
+    
+finally {
       if (mounted) setState(() => _saving = false);
     }
   }
@@ -253,9 +251,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
         ),
       ),
     );
-  }
-
-  Widget _profileHeader(
+  
+Widget _profileHeader(
     Color cardColor,
     Color roleColor,
     bool isManager,
@@ -315,9 +312,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
         ],
       ),
     );
-  }
-
-  Widget _roleBadge(bool isManager, Color roleColor) {
+  
+Widget _roleBadge(bool isManager, Color roleColor) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -330,15 +326,13 @@ class _UserInfoPageState extends State<UserInfoPage> {
         style: TextStyle(color: roleColor, fontWeight: FontWeight.w700),
       ),
     );
-  }
-
-  String _profileInitial() {
+  
+String _profileInitial() {
     final name = _nameController.text.trim();
     if (name.isEmpty) return '?';
     return name.substring(0, 1).toUpperCase();
-  }
-
-  Widget _notificationBadge() {
+  
+Widget _notificationBadge() {
     final count = NotificationService.getUnread().length;
     if (count == 0) return const Icon(Icons.chevron_right);
     return Container(
@@ -366,9 +360,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
         ),
       ],
     );
-  }
-
-  Widget _field({
+  
+Widget _field({
     required TextEditingController controller,
     required String label,
     required IconData icon,
@@ -393,9 +386,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
         return null;
       },
     );
-  }
-
-  void _showNotificationsDialog() {
+  
+void _showNotificationsDialog() {
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
@@ -411,7 +403,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
                       return ListTile(
                         title: Text(item.title),
                         subtitle: Text(
-                          '${item.body}\n${item.createdAt.toLocal().toString().substring(0, 16)}',
+                          '${item.body}
+${item.createdAt.toLocal().toString().substring(0, 16)}',
                         ),
                         isThreeLine: true,
                         trailing: item.isRead
@@ -445,13 +438,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
         ),
       ),
     );
-  }
+  
+void _showChangePasswordDialog() {
+    showDialog(context: context, builder: (_) => const _ChangePasswordDialog()));
 
-  void _showChangePasswordDialog() {
-    showDialog(context: context, builder: (_) => const _ChangePasswordDialog());
-  }
-
-  void _showSnack(String message, {bool isError = false}) {
+  
+void _showSnack(String message, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -459,14 +451,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
       ),
     );
   }
-}
 
 class _ChangePasswordDialog extends StatefulWidget {
   const _ChangePasswordDialog();
 
   @override
   State<_ChangePasswordDialog> createState() => _ChangePasswordDialogState();
-}
 
 class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
   static String get _baseUrl => ApiConfig.baseUrl;
@@ -572,9 +562,8 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
         ),
       ],
     );
-  }
-
-  Widget _stepContent({required List<Widget> children}) {
+  
+Widget _stepContent({required List<Widget> children}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -595,9 +584,8 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
     if (_step > index) return StepState.complete;
     if (_step == index) return StepState.editing;
     return StepState.indexed;
-  }
-
-  Future<void> _sendCode() async {
+  
+Future<void> _sendCode() async {
     final email = _registeredEmail;
     if (email.isEmpty) {
       setState(() => _error = 'No registered email address was found.');
@@ -612,16 +600,15 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
             'A verification code has been sent to your registered email address.';
       }),
     );
-  }
-
-  Future<void> _verifyCode() async {
+  
+Future<void> _verifyCode() async {
     await _post('/Auth/verify-reset-code', {
       'email': _registeredEmail,
       'code': _codeCtrl.text.trim(),
-    }, onSuccess: () => setState(() => _step = 2));
-  }
+    }, onSuccess: () => setState(() => _step = 2)));
 
-  Future<void> _changePassword() async {
+  
+Future<void> _changePassword() async {
     if (_newPasswordCtrl.text.length < 6) {
       setState(() => _error = 'New password must be at least 6 characters.');
       return;
@@ -649,9 +636,8 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
         });
       },
     );
-  }
-
-  String get _registeredEmail => AuthService.currentUser?.email.trim() ?? '';
+  
+String get _registeredEmail => AuthService.currentUser?.email.trim() ?? '';
 
   Future<void> _post(
     String path,
@@ -670,21 +656,23 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
             headers: AuthService.authHeaders,
             body: jsonEncode(body),
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 15)));
+
       if (!mounted) return;
       if (response.statusCode >= 200 && response.statusCode < 300) {
         onSuccess();
       } else {
-        setState(() => _error = _extractError(response));
+        setState(() => _error = _extractError(response)));
+
       }
     } catch (_) {
       if (mounted) setState(() => _error = 'Request failed. Please try again.');
-    } finally {
+    
+finally {
       if (mounted) setState(() => _loading = false);
     }
-  }
-
-  String _extractError(http.Response response) {
+  
+String _extractError(http.Response response) {
     if (response.body.trim().isEmpty) {
       return 'Request failed (${response.statusCode}).';
     }
@@ -699,9 +687,10 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
               .map((value) => value.toString())
               .where((value) => value.trim().isNotEmpty)
               .toList();
-          if (messages.isNotEmpty) return messages.join('\n');
-        }
-        final message =
+          if (messages.isNotEmpty) return messages.join('
+');
+        
+final message =
             decoded['message'] ?? decoded['error'] ?? decoded['title'];
         if (message != null && message.toString().trim().isNotEmpty) {
           return message.toString();
@@ -710,8 +699,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
       if (decoded is String && decoded.trim().isNotEmpty) return decoded;
     } catch (_) {
       if (response.body.trim().isNotEmpty) return response.body;
-    }
-
-    return 'Request failed (${response.statusCode}).';
+    
+return 'Request failed (${response.statusCode}).';
   }
 }

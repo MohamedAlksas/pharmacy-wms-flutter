@@ -5,8 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
-enum DownloadState { idle, downloading, extracting, launching, done, error }
-
+enum DownloadState { idle, downloading, extracting, launching, done, error 
 class DownloadProgress {
   final DownloadState state;
   final double progress;
@@ -33,7 +32,6 @@ class DownloadProgress {
       error: error ?? this.error,
     );
   }
-}
 
 class DownloadService {
   static Future<DownloadProgress> downloadAndInstall({
@@ -41,7 +39,8 @@ class DownloadService {
     required void Function(DownloadProgress) onProgress,
   }) async {
     try {
-      onProgress(const DownloadProgress(state: DownloadState.idle));
+      onProgress(const DownloadProgress(state: DownloadState.idle)));
+
       final uri = Uri.parse(url);
 
       final dir = await getTemporaryDirectory();
@@ -63,9 +62,8 @@ class DownloadService {
         );
         onProgress(err);
         return err;
-      }
-
-      final totalBytes = response.contentLength ?? -1;
+      
+final totalBytes = response.contentLength ?? -1;
       final receivedBytes = <int>[];
       final completer = Completer<DownloadProgress>();
 
@@ -76,7 +74,8 @@ class DownloadService {
             onProgress(DownloadProgress(
               state: DownloadState.downloading,
               progress: receivedBytes.length / totalBytes,
-            ));
+            )));
+
           }
         },
         onDone: () async {
@@ -85,7 +84,8 @@ class DownloadService {
             final file = File(zipPath);
             await file.writeAsBytes(receivedBytes);
 
-            onProgress(const DownloadProgress(state: DownloadState.extracting));
+            onProgress(const DownloadProgress(state: DownloadState.extracting)));
+
             final bytes = file.readAsBytesSync();
             final archive = ZipDecoder().decodeBytes(bytes);
 
@@ -104,9 +104,8 @@ class DownloadService {
               } else {
                 Directory(entryPath).createSync(recursive: true);
               }
-            }
-
-            final currentExe = Platform.resolvedExecutable;
+            
+final currentExe = Platform.resolvedExecutable;
             final installDir = File(currentExe).parent.path;
             final exeName = currentExe.split('\\').last;
 
@@ -133,13 +132,14 @@ class DownloadService {
                   }
                   entity.copySync(destPath);
                 } catch (_) {
-                  // File is locked (DLL) — skip, old one works fine
+                  // File is locked (DLL) â€” skip, old one works fine
                 }
               }
             }
 
             // Launch the new EXE and exit
-            onProgress(const DownloadProgress(state: DownloadState.launching));
+            onProgress(const DownloadProgress(state: DownloadState.launching)));
+
             await Process.start(currentExe, []);
             exit(0);
           } catch (e) {
