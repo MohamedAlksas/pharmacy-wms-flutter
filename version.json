@@ -1,11 +1,10 @@
 {
-  "latestVersion": "1.0.0",
-  "latestBuildNumber": 1,
+  "latestVersion": "1.0.1",
+  "latestBuildNumber": 2,
   "downloadUrl": "https://github.com/MohamedAlksas/pharmacy-wms-flutter/releases/latest/download/pharmacy-wms-windows.zip",
   "mandatory": false,
   "releaseNotes": [
-    "Initial release",
-    "Products CRUD with inventory management",
+    "Fix: materialSKU field name mismatch causing 'field required' error when adding materials",
     "Multi-step Add/Dispatch material wizards",
     "Orders tracking (add, export, edit requests)",
     "Notifications system with email support",
