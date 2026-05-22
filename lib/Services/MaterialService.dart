@@ -1,34 +1,23 @@
 import 'dart:collection';
 
-// MaterialService is a read-only compatibility shim.
-// ProductProvider owns mutations and passes the same live list reference here
-// so older status/filter helpers do not keep a separate product copy.
-
 import 'package:pharmacy_wms/Models/materialModel.dart';
 
 import 'package:pharmacy_wms/Services/thresholdService.dart';
 
 
 class MaterialService {
-  // The provider sets this after every load/mutation.
   static List<MaterialModel> _cache = [];
   static int _lowStockThreshold = 100;
   static int _expiringSoonDays = 30;
 
-  /// Called by ProductProvider every time _products changes.
   static void updateCache(List<MaterialModel> products) {
     _cache = products;
   }
-
-
-
 
   static Future<void> reloadThresholds() async {
     _lowStockThreshold = await ThresholdService.getLowStockThreshold();
     _expiringSoonDays = await ThresholdService.getExpiringSoonDays();
   }
-
-  //  Read-only helpers (UI compatibility) 
 
   static List<MaterialModel> getAllMaterials() => UnmodifiableListView(_cache);
 
@@ -39,8 +28,6 @@ class MaterialService {
       return null;
     }
   }
-
-
 
   static String getMaterialStatus(MaterialModel material) {
     try {
@@ -54,9 +41,6 @@ class MaterialService {
       return 'Unknown';
     }
   }
-
-
-
 
   static List<MaterialModel> getLowStockMaterials() =>
       _cache.where((m) => m.quantity < _lowStockThreshold).toList();
@@ -83,5 +67,3 @@ class MaterialService {
   static List<Map<String, dynamic>> getMaterialsAsMap() =>
       _cache.map((m) => m.toJson()).toList();
 }
-
-

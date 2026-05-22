@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -8,11 +9,9 @@ import 'package:fl_chart/fl_chart.dart';
 
 import 'package:pharmacy_wms/Models/ProductProvider.dart';
 
-import 'package:pharmacy_wms/Services/alertService.dart';
-
 import 'package:pharmacy_wms/Models/UserRoleModel.dart';
 
-import 'package:pharmacy_wms/Services/MaterialSerivce.dart';
+import 'package:pharmacy_wms/Services/MaterialService.dart';
 
 import 'package:pharmacy_wms/Services/notificationService.dart';
 
@@ -53,6 +52,7 @@ class _ReportsPageState extends State<ReportsPage>    with SingleTickerProviderS
   int _touchedPieIndex = -1;
   int _pageSize = 25;
   int _pageIndex = 0;
+  Timer? _searchDebounce;
   bool get isSupervisor => AuthService.isSupervisor;
   @override  void initState() {
     super.initState();
@@ -69,6 +69,7 @@ class _ReportsPageState extends State<ReportsPage>    with SingleTickerProviderS
   @override  void dispose() {
     _tabCtrl.dispose();
     _searchCtrl.dispose();
+    _searchDebounce?.cancel();
     NotificationService.changes.removeListener(_handleNotificationChange);
     super.dispose();
   
@@ -330,11 +331,10 @@ context.tr.categoriesLabel
     final catItems = [context.tr.allCategories, ...cats];
     final effectiveCat = catItems.contains(_selectedCategory)        ? _selectedCategory : context.tr.allCategories;
     return Row(      children: [        Expanded(          flex: 3,          child: Container(            decoration: BoxDecoration(            color: isDark ? const Color(0xFF1A2332) : Colors.white,            borderRadius: BorderRadius.circular(12),          ),          child: TextField(            controller: _searchCtrl,            onChanged: (_) {
- setState(() {
- _pageIndex = 0;
- 
-});
- 
+ _searchDebounce?.cancel();
+ _searchDebounce = Timer(const Duration(milliseconds: 300), () {
+   if (mounted) setState(() { _pageIndex = 0; });
+ });
 },              style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 14),              decoration: InputDecoration(                hintText: context.tr.searchByNameOrSku,                hintStyle: TextStyle(color: isDark ? Colors.white38 : Colors.black38, fontSize: 14),                prefixIcon: Icon(Icons.search, color: isDark ? Colors.white54 : Colors.black54, size: 20),                border: InputBorder.none,                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),              ),            ),          ),        ),        const SizedBox(width: 10),        _dropdown(isDark, effectiveCat, catItems, (v) {
           setState(() {
  _selectedCategory = v!;

@@ -1,10 +1,12 @@
 {
-  "latestVersion": "1.0.1",
-  "latestBuildNumber": 2,
+  "latestVersion": "1.0.2",
+  "latestBuildNumber": 3,
   "downloadUrl": "https://github.com/MohamedAlksas/pharmacy-wms-flutter/releases/latest/download/pharmacy-wms-windows.zip",
   "mandatory": false,
   "releaseNotes": [
-    "Fix: materialSKU field name mismatch causing 'field required' error when adding materials",
+    "Error handling: loadThresholds wrapped in try/catch, updateOrderStatus propagates errors",
+    "UX: search debouncing, logout confirmation, loading states in orders and wizards",
+    "Code quality: removed dead code, fixed MaterialSerivce typo, localized hardcoded strings",
     "Multi-step Add/Dispatch material wizards",
     "Orders tracking (add, export, edit requests)",
     "Notifications system with email support",

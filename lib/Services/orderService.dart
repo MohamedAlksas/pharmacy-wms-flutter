@@ -62,23 +62,21 @@ class OrderService {
 
 
   static Future<void> updateOrderStatus(String id, OrderStatus status) async {
-    try {
-      final response = await http
-          .patch(
-            Uri.parse('$_baseUrl/$id/status'),
-            headers: AuthService.authHeaders,
-            body: jsonEncode({'status': status.name}),
-          )
-          .timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        final index = _orders.indexWhere((order) => order.id == id);
-        if (index != -1) {
-          _orders[index] = _orders[index].copyWith(status: status);
-          changes.value++;
-        }
+    final response = await http
+        .patch(
+          Uri.parse('$_baseUrl/$id/status'),
+          headers: AuthService.authHeaders,
+          body: jsonEncode({'status': status.name}),
+        )
+        .timeout(const Duration(seconds: 15));
+    if (response.statusCode == 200) {
+      final index = _orders.indexWhere((order) => order.id == id);
+      if (index != -1) {
+        _orders[index] = _orders[index].copyWith(status: status);
+        changes.value++;
       }
-    } catch (e) {
-      debugPrint('[OrderService] Failed to update order status: $e');
+    } else {
+      throw Exception('Failed to update order status (${response.statusCode})');
     }
   }
 

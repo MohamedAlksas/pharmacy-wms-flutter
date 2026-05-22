@@ -16,20 +16,12 @@ class AlertService {
     _expiringSoonDays = await ThresholdService.getExpiringSoonDays();
   }
 
-  //  Init from a live list (called by ProductProvider after every fetch) 
   static void initializeAlertsFromModels(List<MaterialModel> materials) {
     _alerts.clear();
     for (final material in materials) {
       _checkAndCreateAlerts(material);
     }
   }
-
-  //  Legacy init kept for backward-compat 
-  static void initializeAlerts() {
-    // No-op when ProductProvider is in use; provider calls initializeAlertsFromModels.
-  }
-
-
 
   static void _checkAndCreateAlerts(MaterialModel material) {
     if (_isExpired(material.expiryDate)) {
@@ -66,8 +58,6 @@ class AlertService {
     }
   }
 
-
-
   static bool _isExpired(String expiryDate) {
     try {
       return DateTime.parse(expiryDate).isBefore(DateTime.now());
@@ -75,8 +65,6 @@ class AlertService {
       return false;
     }
   }
-
-
 
   static bool _isExpiringSoon(String expiryDate) {
     try {
@@ -87,8 +75,6 @@ class AlertService {
     }
   }
 
-
-
   static int _daysUntilExpiry(String expiryDate) {
     try {
       return DateTime.parse(expiryDate).difference(DateTime.now()).inDays;
@@ -96,9 +82,6 @@ class AlertService {
       return 0;
     }
   }
-
-
-
 
   static List<AlertModel> getAllAlerts() => List.unmodifiable(_alerts);
   static List<AlertModel> getAlertsByType(String type) =>
@@ -118,5 +101,5 @@ class AlertService {
   static void removeAlert(String id) =>
       _alerts.removeWhere((a) => a.id == id);
   static void clearAllAlerts() => _alerts.clear();
-  static void refreshAlerts() => initializeAlerts();
+  static void refreshAlerts() => initializeAlertsFromModels([]);
 }

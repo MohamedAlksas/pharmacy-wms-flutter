@@ -295,6 +295,14 @@ count == 1 ? '' : 's'
   String get finishSaveAll => isArabic ? 'إنهاء وحفظ الكل' : 'Finish & Save All';
     String get checkForUpdates => isArabic ? 'التحقق من التحديثات' : 'Check for Updates';
   String get upToDate => isArabic ? 'البرنامج محدث' : 'You\'re up to date';
+  String get logoutConfirmMsg => isArabic ? 'هل أنت متأكد أنك تريد تسجيل الخروج؟' : 'Are you sure you want to logout?';
+  String get discardChanges => isArabic ? 'تجاهل التغييرات؟' : 'Discard changes?';
+  String get discardChangesMsg => isArabic ? 'لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد تجاهلها؟' : 'You have unsaved changes. Are you sure you want to discard them?';
+  String get discard => isArabic ? 'تجاهل' : 'Discard';
+  String get selectedMaterialDetails => isArabic ? 'تفاصيل المادة المحددة' : 'Selected Material Details';
+  String get currentStock => isArabic ? 'المخزون الحالي' : 'Current Stock';
+  String get extractingUpdate => isArabic ? 'جارٍ فتح حزمة التحديث...' : 'Extracting update package...';
+  String get launchingInstaller => isArabic ? 'جارٍ تشغيل المثبت...' : 'Launching installer...';
   String noOfItems(int count) => isArabic ? '$count عنصر' : '$count items';
   String pageOf(int current, int total) => isArabic      ? 'صفحة $current من $total'      : 'Page $current of $total';
     String get addToDispatch => isArabic ? 'إضافة للصرف' : 'Add to Dispatch';

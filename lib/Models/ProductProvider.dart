@@ -8,7 +8,7 @@ import 'package:pharmacy_wms/Models/app_localizations.dart';
 
 import 'package:pharmacy_wms/Models/materialModel.dart';
 
-import 'package:pharmacy_wms/Services/MaterialSerivce.dart';
+import 'package:pharmacy_wms/Services/MaterialService.dart';
 
 import 'package:pharmacy_wms/Services/ProductService.dart';
 
@@ -56,7 +56,7 @@ class ProductProvider extends ChangeNotifier {
   int getCriticalAlertsCount() => expiredCount + expiringSoonCount;
   int get lowStockCount =>      _products.where((product) => product.quantity < _lowStockThreshold).length;
   Future<void> loadProducts() async {
-    await loadThresholds();
+    try { await loadThresholds(); } catch (_) {}
     if (!AuthService.isAuthenticated) {
       clear(notify: true);
       return;

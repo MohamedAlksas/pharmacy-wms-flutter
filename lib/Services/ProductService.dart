@@ -16,7 +16,6 @@ class ProductService {
   static Future<List<MaterialModel>> getAllProducts() async {
     final response = await _get(Uri.parse(_baseUrl));
     final decoded = _decodeBody(response.body);
-  print('RAW API RESPONSE: ${response.body}');
     if (response.statusCode == 200) {
       final items = _extractItems(decoded);
       return items.map(MaterialModel.fromJson).toList();
