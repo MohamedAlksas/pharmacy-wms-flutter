@@ -303,6 +303,7 @@ count == 1 ? '' : 's'
   String get currentStock => isArabic ? 'المخزون الحالي' : 'Current Stock';
   String get extractingUpdate => isArabic ? 'جارٍ فتح حزمة التحديث...' : 'Extracting update package...';
   String get launchingInstaller => isArabic ? 'جارٍ تشغيل المثبت...' : 'Launching installer...';
+  String get updateCheckFailed => isArabic ? 'تعذر التحقق من التحديثات. تحقق من اتصالك بالإنترنت.' : 'Failed to check for updates. Check your internet connection.';
   String noOfItems(int count) => isArabic ? '$count عنصر' : '$count items';
   String pageOf(int current, int total) => isArabic      ? 'صفحة $current من $total'      : 'Page $current of $total';
     String get addToDispatch => isArabic ? 'إضافة للصرف' : 'Add to Dispatch';
