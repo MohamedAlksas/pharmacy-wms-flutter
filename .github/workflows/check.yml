@@ -1,0 +1,13 @@
+name: Check Syntax
+on: workflow_dispatch
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+      - run: dart analyze lib/ 2>&1 || true
+      - run: dart format --output=none lib/ 2>&1 || true
