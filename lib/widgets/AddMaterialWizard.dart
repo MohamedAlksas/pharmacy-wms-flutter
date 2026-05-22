@@ -176,7 +176,7 @@ class _AddMaterialWizardState extends State<AddMaterialWizard> {
     if (qty <= 0 || name.isEmpty || sku.isEmpty) return false;
     if (_newExpiryDate == null) return false;
     final body = <String, dynamic>{
-      'materialName': name,      'material_SKU': sku,      'quantity': qty,      'unit': '',      'logNumber': '',      'expiryDate': _newExpiryDate!.toUtc().toIso8601String(),      'storageLocation': '',      'isAvailable': true,      'categoryId': 0,    
+      'materialName': name,      'materialSKU': sku,      'quantity': qty,      'unit': '',      'logNumber': '',      'expiryDate': _newExpiryDate!.toUtc().toIso8601String(),      'storageLocation': '',      'isAvailable': true,      'categoryId': 0,    
 };
     setState(() {
       _sessionMaterials.add(_SessionMaterial(        mode: 'new',        productId: null,        name: name,        sku: sku,        quantity: qty,        unit: '',        logNumber: '',        categoryId: 0,        expiryDate: _newExpiryDate!.toUtc().toIso8601String(),        body: body,      ));
