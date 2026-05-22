@@ -1,15 +1,20 @@
 import 'dart:convert';
+
+
 import 'package:pharmacy_wms/Models/UserRoleModel.dart';
+
 import 'package:pharmacy_wms/Models/materialModel.dart';
+
 import 'package:pharmacy_wms/Services/api_config.dart';
+
 import 'package:http/http.dart' as http;
+
 
 class ProductService {
   static String get _baseUrl => '${ApiConfig.baseUrl}/Products';
 
   static Future<List<MaterialModel>> getAllProducts() async {
-    final response = await _get(Uri.parse(_baseUrl)));
-
+    final response = await _get(Uri.parse(_baseUrl));
     final decoded = _decodeBody(response.body);
   print('RAW API RESPONSE: ${response.body}');
     if (response.statusCode == 200) {
@@ -17,12 +22,12 @@ class ProductService {
       return items.map(MaterialModel.fromJson).toList();
     }
 
-    throw Exception(await _extractError(response.statusCode, decoded)));
+    throw Exception(await _extractError(response.statusCode, decoded));
+  }
 
-  
-static Future<List<MaterialModel>> getAdminProducts() async {
-    final response = await _get(Uri.parse('$_baseUrl/AdminProducts')));
 
+  static Future<List<MaterialModel>> getAdminProducts() async {
+    final response = await _get(Uri.parse('$_baseUrl/AdminProducts'));
     final decoded = _decodeBody(response.body);
 
     if (response.statusCode == 200) {
@@ -30,10 +35,11 @@ static Future<List<MaterialModel>> getAdminProducts() async {
       return items.map(MaterialModel.fromJson).toList();
     }
 
-    throw Exception(await _extractError(response.statusCode, decoded)));
+    throw Exception(await _extractError(response.statusCode, decoded));
+  }
 
-  
-static Future<void> addProduct(Map<String, dynamic> body) async {
+
+  static Future<void> addProduct(Map<String, dynamic> body) async {
     final response = await _post(Uri.parse(_baseUrl), body);
     final decoded = _decodeBody(response.body);
 
@@ -41,21 +47,24 @@ static Future<void> addProduct(Map<String, dynamic> body) async {
       return;
     }
 
-    throw Exception(await _extractError(response.statusCode, decoded)));
+    throw Exception(await _extractError(response.statusCode, decoded));
+  }
 
-  
-static Future<void> updateProduct(
+
+  static Future<void> updateProduct(
     String id,
     Map<String, dynamic> body,
   ) async {
     // Try PATCH first; if the server returns 405 (Method Not Allowed) fall
-    // back to PUT â€” ASP.NET backends vary in which verb they expose.
+    // back to PUT — ASP.NET backends vary in which verb they expose.
     http.Response response = await _patch(Uri.parse('$_baseUrl/$id'), body);
 
     if (response.statusCode == 405) {
       response = await _put(Uri.parse('$_baseUrl/$id'), body);
-    
-final decoded = _decodeBody(response.body);
+    }
+
+
+    final decoded = _decodeBody(response.body);
 
     if (response.statusCode == 200 ||
         response.statusCode == 201 ||
@@ -63,59 +72,67 @@ final decoded = _decodeBody(response.body);
       return;
     }
 
-    throw Exception(await _extractError(response.statusCode, decoded)));
+    throw Exception(await _extractError(response.statusCode, decoded));
+  }
 
-  
-static Future<String?> deleteProduct(String id) async {
+
+  static Future<String?> deleteProduct(String id) async {
     try {
-      final response = await _delete(Uri.parse('$_baseUrl/$id')));
-
+      final response = await _delete(Uri.parse('$_baseUrl/$id'));
       final decoded = _decodeBody(response.body);
 
       if (response.statusCode == 200 ||
           response.statusCode == 202 ||
           response.statusCode == 204) {
         return null;
-      
-return await _extractError(response.statusCode, decoded);
+      }
+
+      return await _extractError(response.statusCode, decoded);
     } catch (e) {
       return e.toString().replaceFirst('Exception: ', '');
     }
-  
-static Future<List<MaterialModel>> fetchAllProducts() => getAllProducts();
+  }
+
+
+  static Future<List<MaterialModel>> fetchAllProducts() => getAllProducts();
   static Future<List<MaterialModel>> fetchAdminProducts() => getAdminProducts();
 
   static Future<http.Response> _get(Uri uri) {
     return http
         .get(uri, headers: AuthService.authHeaders)
-        .timeout(const Duration(seconds: 15)));
+        .timeout(const Duration(seconds: 15));
+  }
 
-  
-static Future<http.Response> _post(Uri uri, Map<String, dynamic> body) {
+
+  static Future<http.Response> _post(Uri uri, Map<String, dynamic> body) {
     return http
         .post(uri, headers: AuthService.authHeaders, body: jsonEncode(body))
-        .timeout(const Duration(seconds: 15)));
+        .timeout(const Duration(seconds: 15));
+  }
 
-  
-static Future<http.Response> _patch(Uri uri, Map<String, dynamic> body) {
+
+  static Future<http.Response> _patch(Uri uri, Map<String, dynamic> body) {
     return http
         .patch(uri, headers: AuthService.authHeaders, body: jsonEncode(body))
-        .timeout(const Duration(seconds: 15)));
+        .timeout(const Duration(seconds: 15));
+  }
 
-  
-static Future<http.Response> _put(Uri uri, Map<String, dynamic> body) {
+
+  static Future<http.Response> _put(Uri uri, Map<String, dynamic> body) {
     return http
         .put(uri, headers: AuthService.authHeaders, body: jsonEncode(body))
-        .timeout(const Duration(seconds: 15)));
+        .timeout(const Duration(seconds: 15));
+  }
 
-  
-static Future<http.Response> _delete(Uri uri) {
+
+  static Future<http.Response> _delete(Uri uri) {
     return http
         .delete(uri, headers: AuthService.authHeaders)
-        .timeout(const Duration(seconds: 15)));
+        .timeout(const Duration(seconds: 15));
+  }
 
-  
-static dynamic _decodeBody(String body) {
+
+  static dynamic _decodeBody(String body) {
     if (body.trim().isEmpty) {
       return null;
     }
@@ -125,8 +142,10 @@ static dynamic _decodeBody(String body) {
     } catch (_) {
       return body;
     }
-  
-static List<Map<String, dynamic>> _extractItems(dynamic decoded) {
+  }
+
+
+  static List<Map<String, dynamic>> _extractItems(dynamic decoded) {
     final rawItems = _extractRawItems(decoded);
     final normalizedItems = <Map<String, dynamic>>[];
 
@@ -136,10 +155,13 @@ static List<Map<String, dynamic>> _extractItems(dynamic decoded) {
           item.map((key, value) => MapEntry(key.toString(), value)),
         );
       }
-    
-return normalizedItems;
-  
-static List<dynamic> _extractRawItems(dynamic decoded) {
+    }
+
+    return normalizedItems;
+  }
+
+
+  static List<dynamic> _extractRawItems(dynamic decoded) {
     if (decoded is List) {
       return List<dynamic>.from(decoded);
     }
@@ -157,14 +179,19 @@ static List<dynamic> _extractRawItems(dynamic decoded) {
           return List<dynamic>.from(candidate);
         }
       }
-    
-return const [];
-  
-static Future<String> _extractError(int statusCode, dynamic body) async {
+    }
+
+    return const [];
+  }
+
+
+  static Future<String> _extractError(int statusCode, dynamic body) async {
     if (statusCode == 401) {
       await AuthService.expireSession();
-    
-final fallback = switch (statusCode) {
+    }
+
+
+    final fallback = switch (statusCode) {
       400 => 'Please check the product data and try again.',
       401 => 'Your session has expired. Please sign in again.',
       404 => 'The requested product could not be found.',
@@ -184,11 +211,12 @@ final fallback = switch (statusCode) {
             .toList();
 
         if (messages.isNotEmpty) {
-          return messages.join('
-');
+          return messages.join('\n');
         }
-      
-final message = (body['message'] ?? body['error'] ?? body['title'] ?? '')
+      }
+
+
+      final message = (body['message'] ?? body['error'] ?? body['title'] ?? '')
           .toString()
           .trim();
 
@@ -204,9 +232,10 @@ final message = (body['message'] ?? body['error'] ?? body['title'] ?? '')
     if (body is String && body.trim().isNotEmpty) {
       if (body.toLowerCase().contains('invoiceitem')) {
         return 'This product cannot be deleted because it is linked to invoice items.';
-      
-return body;
-    
-return fallback;
+      }
+      return body;
+    }
+
+    return fallback;
   }
 }

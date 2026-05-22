@@ -1,9 +1,16 @@
 import 'dart:convert';
+
+
 import 'package:flutter/foundation.dart';
+
 import 'package:pharmacy_wms/Models/UserRoleModel.dart';
+
 import 'package:pharmacy_wms/Services/api_config.dart';
+
 import 'package:http/http.dart' as http;
+
 import 'package:shared_preferences/shared_preferences.dart';
+
 
 class ThresholdService {
   static String get _baseUrl => '${ApiConfig.baseUrl}/Settings/thresholds';
@@ -20,8 +27,10 @@ class ThresholdService {
     } catch (_) {
       return 100;
     }
-  
-static Future<int> getExpiringSoonDays() async {
+  }
+
+
+  static Future<int> getExpiringSoonDays() async {
     final prefs = await SharedPreferences.getInstance();
     final cached = prefs.getInt(_kExpiringSoonDays);
     if (cached != null) return cached;
@@ -31,8 +40,10 @@ static Future<int> getExpiringSoonDays() async {
     } catch (_) {
       return 30;
     }
-  
-static Future<void> setLowStockThreshold(int value) async {
+  }
+
+
+  static Future<void> setLowStockThreshold(int value) async {
     try {
       final response = await http
           .put(
@@ -40,8 +51,7 @@ static Future<void> setLowStockThreshold(int value) async {
             headers: AuthService.authHeaders,
             body: jsonEncode({'lowStockThreshold': value}),
           )
-          .timeout(const Duration(seconds: 15)));
-
+          .timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setInt(_kLowStock, value);
@@ -49,8 +59,10 @@ static Future<void> setLowStockThreshold(int value) async {
     } catch (e) {
       debugPrint('[ThresholdService] Failed to save low stock threshold: $e');
     }
-  
-static Future<void> setExpiringSoonDays(int value) async {
+  }
+
+
+  static Future<void> setExpiringSoonDays(int value) async {
     try {
       final response = await http
           .put(
@@ -58,8 +70,7 @@ static Future<void> setExpiringSoonDays(int value) async {
             headers: AuthService.authHeaders,
             body: jsonEncode({'expiringSoonDays': value}),
           )
-          .timeout(const Duration(seconds: 15)));
-
+          .timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setInt(_kExpiringSoonDays, value);
@@ -67,13 +78,14 @@ static Future<void> setExpiringSoonDays(int value) async {
     } catch (e) {
       debugPrint('[ThresholdService] Failed to save expiring soon days: $e');
     }
-  
-static Future<void> _fetchThresholds() async {
+  }
+
+
+  static Future<void> _fetchThresholds() async {
     try {
       final response = await http
           .get(Uri.parse(_baseUrl), headers: AuthService.authHeaders)
-          .timeout(const Duration(seconds: 15)));
-
+          .timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         final prefs = await SharedPreferences.getInstance();

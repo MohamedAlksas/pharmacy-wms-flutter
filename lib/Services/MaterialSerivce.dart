@@ -5,7 +5,9 @@ import 'dart:collection';
 // so older status/filter helpers do not keep a separate product copy.
 
 import 'package:pharmacy_wms/Models/materialModel.dart';
+
 import 'package:pharmacy_wms/Services/thresholdService.dart';
+
 
 class MaterialService {
   // The provider sets this after every load/mutation.
@@ -16,13 +18,15 @@ class MaterialService {
   /// Called by ProductProvider every time _products changes.
   static void updateCache(List<MaterialModel> products) {
     _cache = products;
-  
-static Future<void> reloadThresholds() async {
+  }
+
+
+  static Future<void> reloadThresholds() async {
     _lowStockThreshold = await ThresholdService.getLowStockThreshold();
     _expiringSoonDays = await ThresholdService.getExpiringSoonDays();
   }
 
-  // â”€â”€ Read-only helpers (UI compatibility) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  //  Read-only helpers (UI compatibility) 
 
   static List<MaterialModel> getAllMaterials() => UnmodifiableListView(_cache);
 
@@ -32,8 +36,10 @@ static Future<void> reloadThresholds() async {
     } catch (_) {
       return null;
     }
-  
-static String getMaterialStatus(MaterialModel material) {
+  }
+
+
+  static String getMaterialStatus(MaterialModel material) {
     try {
       final expiry = DateTime.parse(material.expiryDate);
       final now = DateTime.now();
@@ -44,14 +50,15 @@ static String getMaterialStatus(MaterialModel material) {
     } catch (_) {
       return 'Unknown';
     }
-  
-static List<MaterialModel> getLowStockMaterials() =>
+  }
+
+
+  static List<MaterialModel> getLowStockMaterials() =>
       _cache.where((m) => m.quantity < _lowStockThreshold).toList();
 
   static List<MaterialModel> getExpiredMaterials() => _cache.where((m) {
     try {
-      return DateTime.parse(m.expiryDate).isBefore(DateTime.now()));
-
+      return DateTime.parse(m.expiryDate).isBefore(DateTime.now());
     } catch (_) {
       return false;
     }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
+
 enum AppLanguage {
  en, ar 
-
+}
 final ValueNotifier<AppLanguage> languageNotifier =    ValueNotifier(AppLanguage.en);
 const _kLangKey = 'app_language';
 Future<void> initLanguage() async {
@@ -12,15 +14,16 @@ Future<void> initLanguage() async {
     languageNotifier.value = AppLanguage.ar;
   
 }
-
+}
 Future<void> saveLanguage(AppLanguage lang) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setString(_kLangKey, lang.name);
 
+}
 extension LocalizationContext on BuildContext {
   AppLocalizations get tr => AppLocalizations.of(languageNotifier.value);
 
-
+}
 class AppLocalizations {
   final AppLanguage language;
   const AppLocalizations._(this.language);

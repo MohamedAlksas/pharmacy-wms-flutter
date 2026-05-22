@@ -1,6 +1,9 @@
 import 'package:pharmacy_wms/Models/alertModel.dart';
+
 import 'package:pharmacy_wms/Models/materialModel.dart';
+
 import 'package:pharmacy_wms/Services/thresholdService.dart';
+
 
 class AlertService {
   static final List<AlertModel> _alerts = [];
@@ -13,7 +16,7 @@ class AlertService {
     _expiringSoonDays = await ThresholdService.getExpiringSoonDays();
   }
 
-  // â”€â”€ Init from a live list (called by ProductProvider after every fetch) â”€â”€
+  //  Init from a live list (called by ProductProvider after every fetch) 
   static void initializeAlertsFromModels(List<MaterialModel> materials) {
     _alerts.clear();
     for (final material in materials) {
@@ -21,11 +24,13 @@ class AlertService {
     }
   }
 
-  // â”€â”€ Legacy init kept for backward-compat â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  //  Legacy init kept for backward-compat 
   static void initializeAlerts() {
     // No-op when ProductProvider is in use; provider calls initializeAlertsFromModels.
-  
-static void _checkAndCreateAlerts(MaterialModel material) {
+  }
+
+
+  static void _checkAndCreateAlerts(MaterialModel material) {
     if (_isExpired(material.expiryDate)) {
       _alerts.add(AlertModel(
         id: 'alert_expired_${material.id}',
@@ -34,8 +39,7 @@ static void _checkAndCreateAlerts(MaterialModel material) {
             '${material.name} has expired on ${material.expiryDate}. Remove from inventory immediately.',
         material: material,
         createdAt: DateTime.now(),
-      )));
-
+      ));
     } else if (_isExpiringSoon(material.expiryDate)) {
       final daysLeft = _daysUntilExpiry(material.expiryDate);
       _alerts.add(AlertModel(
@@ -45,8 +49,7 @@ static void _checkAndCreateAlerts(MaterialModel material) {
             '${material.name} will expire in $daysLeft days on ${material.expiryDate}.',
         material: material,
         createdAt: DateTime.now(),
-      )));
-
+      ));
     }
 
     if (material.quantity < _lowStockThreshold) {
@@ -57,34 +60,40 @@ static void _checkAndCreateAlerts(MaterialModel material) {
             '${material.name} is running low. Current stock: ${material.quantity} units.',
         material: material,
         createdAt: DateTime.now(),
-      )));
-
+      ));
     }
-  
-static bool _isExpired(String expiryDate) {
-    try {
-      return DateTime.parse(expiryDate).isBefore(DateTime.now()));
+  }
 
+
+  static bool _isExpired(String expiryDate) {
+    try {
+      return DateTime.parse(expiryDate).isBefore(DateTime.now());
     } catch (_) {
       return false;
     }
-  
-static bool _isExpiringSoon(String expiryDate) {
+  }
+
+
+  static bool _isExpiringSoon(String expiryDate) {
     try {
       final diff = DateTime.parse(expiryDate).difference(DateTime.now()).inDays;
       return diff > 0 && diff <= _expiringSoonDays;
     } catch (_) {
       return false;
     }
-  
-static int _daysUntilExpiry(String expiryDate) {
+  }
+
+
+  static int _daysUntilExpiry(String expiryDate) {
     try {
       return DateTime.parse(expiryDate).difference(DateTime.now()).inDays;
     } catch (_) {
       return 0;
     }
-  
-static List<AlertModel> getAllAlerts() => List.unmodifiable(_alerts);
+  }
+
+
+  static List<AlertModel> getAllAlerts() => List.unmodifiable(_alerts);
   static List<AlertModel> getAlertsByType(String type) =>
       _alerts.where((a) => a.alertType == type).toList();
   static List<AlertModel> getCriticalAlerts() => _alerts

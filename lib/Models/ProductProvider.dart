@@ -1,13 +1,23 @@
 import 'dart:collection';
+
 import 'package:flutter/material.dart';
+
 import 'package:pharmacy_wms/Models/UserRoleModel.dart';
+
 import 'package:pharmacy_wms/Models/app_localizations.dart';
+
 import 'package:pharmacy_wms/Models/materialModel.dart';
+
 import 'package:pharmacy_wms/Services/MaterialSerivce.dart';
+
 import 'package:pharmacy_wms/Services/ProductService.dart';
+
 import 'package:pharmacy_wms/Services/TransliterationService.dart';
+
 import 'package:pharmacy_wms/Services/alertService.dart';
+
 import 'package:pharmacy_wms/Services/thresholdService.dart';
+
 class ProductProvider extends ChangeNotifier {
   List<MaterialModel> _products = [];
   bool _loading = false;
@@ -18,16 +28,17 @@ class ProductProvider extends ChangeNotifier {
     _lowStockThreshold = await ThresholdService.getLowStockThreshold();
     _expiringSoonDays = await ThresholdService.getExpiringSoonDays();
   
+}
+ final Map<String, Map<String, dynamic>> _pendingOverrides = {
 
-final Map<String, Map<String, dynamic>> _pendingOverrides = {};
+};
   List<MaterialModel> get products => UnmodifiableListView(_products);
   bool get loading => _loading;
   String? get error => _error;
   int get totalProducts => _products.length;
   int get expiredCount => _products.where((product) {
     final expiry = product.expiryDateValue;
-    return expiry != null && expiry.isBefore(DateTime.now()));
-
+    return expiry != null && expiry.isBefore(DateTime.now());
   
 }).length;
   int get expiringSoonCount => _products.where((product) {
@@ -35,8 +46,8 @@ final Map<String, Map<String, dynamic>> _pendingOverrides = {};
     if (expiry == null) {
       return false;
     
-
-final days = expiry.difference(DateTime.now()).inDays;
+}
+    final days = expiry.difference(DateTime.now()).inDays;
     return days > 0 && days <= _expiringSoonDays;
   
 }).length;
@@ -60,8 +71,8 @@ final days = expiry.difference(DateTime.now()).inDays;
 }    _loading = false;
     notifyListeners();
   
-
-Future<String?> addProduct(Map<String, dynamic> body) async {
+}
+  Future<String?> addProduct(Map<String, dynamic> body) async {
     try {
       await ProductService.addProduct(body);
       await _refreshProductsAfterMutation();
@@ -71,8 +82,8 @@ Future<String?> addProduct(Map<String, dynamic> body) async {
       return _handleMutationError(e);
     
 }  
-
-Future<String?> updateProduct(String id, Map<String, dynamic> body) async {
+}
+  Future<String?> updateProduct(String id, Map<String, dynamic> body) async {
     try {
       await ProductService.updateProduct(id, body);
       final expectedQty = body['quantity'] as int?;
@@ -90,8 +101,8 @@ Future<String?> updateProduct(String id, Map<String, dynamic> body) async {
       return _handleMutationError(e);
     
 }  
-
-Future<String?> deleteProduct(String id) async {
+}
+  Future<String?> deleteProduct(String id) async {
     try {
       final error = await ProductService.deleteProduct(id);
       if (error != null) {
@@ -130,8 +141,8 @@ Future<String?> deleteProduct(String id) async {
       return null;
     
 }  
-
-void clear({
+}
+  void clear({
 bool notify = false
 }) {
     _products = [];
@@ -143,25 +154,25 @@ bool notify = false
       notifyListeners();
     
 }  
-
-void _syncDerivedState() {
+}
+  void _syncDerivedState() {
     MaterialService.updateCache(_products);
     AlertService.initializeAlertsFromModels(_products);
   
-
-Future<List<MaterialModel>> _fetchProductsFromApi() {
+}
+  Future<List<MaterialModel>> _fetchProductsFromApi() {
     return ProductService.getAllProducts();
   
-
-Future<void> _replaceProductsFromApi() async {
+}
+  Future<void> _replaceProductsFromApi() async {
     _products = await _fetchProductsFromApi();
     _applyPendingOverrides();
     await AlertService.reloadThresholds();
     await MaterialService.reloadThresholds();
     _syncDerivedState();
   
-
-Future<void> _translateProductNames() async {
+}
+  Future<void> _translateProductNames() async {
     if (languageNotifier.value != AppLanguage.ar) return;
     if (_products.isEmpty) return;
     final allStrings = <String>{
@@ -173,16 +184,15 @@ Future<void> _translateProductNames() async {
         allStrings.add(p.category);
       
 }    
-
-final map = TransliterationService.transliterateAll(allStrings.toList()));
-
+}
+    final map = TransliterationService.transliterateAll(allStrings.toList());
     _products = _products.map((p) {
       return p.copyWith(        name: map[p.name] ?? p.name,        category: map[p.category] ?? p.category,      );
     
 }).toList();
   
-
-void _applyPendingOverrides() {
+}
+  void _applyPendingOverrides() {
     if (_pendingOverrides.isEmpty) return;
     for (int i = 0;
  i < _products.length;
@@ -201,21 +211,22 @@ void _applyPendingOverrides() {
         );
       }
     }
-  
-Future<void> _refreshProductsAfterMutation() async {
+  }
+
+  Future<void> _refreshProductsAfterMutation() async {
     _error = null;
     await _replaceProductsFromApi();
     notifyListeners();
   
-
-String _handleMutationError(Object error) {
+}
+  String _handleMutationError(Object error) {
     final message = error.toString().replaceFirst('Exception: ', '');
     _error = message;
     notifyListeners();
     return message;
   
-
-static ProductProvider of(BuildContext context, {
+}
+  static ProductProvider of(BuildContext context, {
 bool listen = true
 }) {
     if (listen) {
@@ -223,14 +234,14 @@ bool listen = true
       assert(        inherited != null,        'ProductProviderScope is missing above this widget.',      );
       return inherited!.provider;
     
-
-final element = context        .getElementForInheritedWidgetOfExactType<_ProductProviderInherited>();
+}
+    final element = context        .getElementForInheritedWidgetOfExactType<_ProductProviderInherited>();
     final widget = element?.widget;
     assert(      widget != null,      'ProductProviderScope is missing above this widget.',    );
     return (widget as _ProductProviderInherited).provider;
   
 }
-
+}
 class ProductProviderScope extends StatefulWidget {
   final Widget child;
   const ProductProviderScope({
@@ -238,7 +249,7 @@ super.key, required this.child
 });
   @override  State<ProductProviderScope> createState() => _ProductProviderScopeState();
 
-
+}
 class _ProductProviderScopeState extends State<ProductProviderScope> {
   final ProductProvider _provider = ProductProvider();
   @override  void initState() {
@@ -247,14 +258,15 @@ class _ProductProviderScopeState extends State<ProductProviderScope> {
     languageNotifier.addListener(_handleLanguageChange);
     _handleSessionChange();
   
-}  @override  void dispose() {
+}
+  @override  void dispose() {
     AuthService.sessionChanges.removeListener(_handleSessionChange);
     languageNotifier.removeListener(_handleLanguageChange);
     _provider.dispose();
     super.dispose();
   
-
-void _handleSessionChange() {
+}
+  void _handleSessionChange() {
     if (AuthService.isAuthenticated) {
       _provider.loadProducts();
     
@@ -268,14 +280,15 @@ void _handleSessionChange() {
       _provider.loadProducts();
     
 }  
-}  @override  Widget build(BuildContext context) {
+}
+  @override  Widget build(BuildContext context) {
     return AnimatedBuilder(      animation: _provider,      builder: (context, _) {
         return _ProductProviderInherited(          provider: _provider,          child: widget.child,        );
       
 },    );
   
 }
-
+}
 class _ProductProviderInherited extends InheritedWidget {
   final ProductProvider provider;
   const _ProductProviderInherited({
