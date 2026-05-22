@@ -36,6 +36,7 @@ class AppNotification {
 }
 
 
+
 class NotificationService {
   static String get _baseUrl => ApiConfig.baseUrl;
   static const String fallbackSupervisorEmail = 'supervisor@pharmacy-wms.local';
@@ -47,6 +48,8 @@ class NotificationService {
     if (!_loaded) await _fetchNotifications();
     return List.unmodifiable(_notifications);
   }
+
+
 
 
   static Future<void> addNotification(AppNotification notification) async {
@@ -77,10 +80,14 @@ class NotificationService {
   }
 
 
+
+
   static Future<List<AppNotification>> getUnread() async {
     if (!_loaded) await _fetchNotifications();
     return _notifications.where((n) => !n.isRead).toList();
   }
+
+
 
 
   static Future<void> markAllRead() async {
@@ -99,6 +106,8 @@ class NotificationService {
     }
     changes.value++;
   }
+
+
 
 
   static Future<void> markRead(String id) async {
@@ -120,6 +129,8 @@ class NotificationService {
     }
     changes.value++;
   }
+
+
 
 
   static Future<void> sendEditRequestEmail({
@@ -149,6 +160,8 @@ class NotificationService {
   }
 
 
+
+
   static Future<List<String>> _getSupervisorEmails() async {
     try {
       final response = await http
@@ -161,6 +174,7 @@ class NotificationService {
         return const [fallbackSupervisorEmail];
       }
 
+
       final decoded = _decodeBody(response.body);
       final emails = _extractEmails(decoded).toSet().toList();
       if (emails.isEmpty) return const [fallbackSupervisorEmail];
@@ -170,6 +184,8 @@ class NotificationService {
       return const [fallbackSupervisorEmail];
     }
   }
+
+
 
 
   static Future<void> _sendEditRequestEmail({
@@ -197,6 +213,8 @@ class NotificationService {
       );
     }
   }
+
+
 
 
   static Future<void> _fetchNotifications() async {
@@ -233,10 +251,13 @@ class NotificationService {
   }
 
 
+
   static dynamic _decodeBody(String body) {
     if (body.trim().isEmpty) return null;
     try { return jsonDecode(body); } catch (_) { return body; }
   }
+
+
 
 
   static List<String> _extractEmails(dynamic decoded) {

@@ -51,7 +51,7 @@ class _ReportsPageState extends State<ReportsPage>    with SingleTickerProviderS
   int _sortCol = -1;
   bool _sortAsc = true;
   int _touchedPieIndex = -1;
-  on  int _pageSize = 25;
+  int _pageSize = 25;
   int _pageIndex = 0;
   bool get isSupervisor => AuthService.isSupervisor;
   @override  void initState() {
@@ -73,12 +73,14 @@ class _ReportsPageState extends State<ReportsPage>    with SingleTickerProviderS
     super.dispose();
   
 }
+
   void _handleNotificationChange() {
     if (mounted) setState(() {
 
 });
   
 }
+
   String _trStatus(String status) {
     switch (status) {
       case 'Good': return context.tr.statusGood;
@@ -89,6 +91,7 @@ class _ReportsPageState extends State<ReportsPage>    with SingleTickerProviderS
     
 }  
 }
+
   List<MaterialModel> _filteredList(ProductProvider provider) {
     final all = provider.products;
     final cats = all.map((m) => m.category).toSet().toList()..sort();
@@ -114,6 +117,7 @@ class _ReportsPageState extends State<ReportsPage>    with SingleTickerProviderS
 }).toList();
   
 }
+
   void _sort<T>(int col, Comparable<T> Function(MaterialModel) getter) {
     setState(() {
       if (_sortCol == col) {
@@ -127,6 +131,7 @@ class _ReportsPageState extends State<ReportsPage>    with SingleTickerProviderS
 });
   
 }
+
   List<PieChartSectionData> _categoryPieData(List<MaterialModel> list) {
     if (list.isEmpty) return [];
     final Map<String, int> counts = {
@@ -137,6 +142,7 @@ class _ReportsPageState extends State<ReportsPage>    with SingleTickerProviderS
       counts[cat] = (counts[cat] ?? 0) + 1;
     
 }
+
     final colors = _pieColors;
     return counts.entries.toList().asMap().entries.map((e) {
       final i = e.key;
@@ -147,6 +153,7 @@ class _ReportsPageState extends State<ReportsPage>    with SingleTickerProviderS
 }).toList();
   
 }
+
   List<BarChartGroupData> _statusBarData(List<MaterialModel> list) {
     int good = 0, expiring = 0, expired = 0, low = 0;
     for (final m in list) {
@@ -163,7 +170,8 @@ class _ReportsPageState extends State<ReportsPage>    with SingleTickerProviderS
 }    
 }    return [      BarChartGroupData(x: 0, barRods: [_barRod(good, Colors.green)]),      BarChartGroupData(x: 1, barRods: [_barRod(expiring, Colors.orange)]),      BarChartGroupData(x: 2, barRods: [_barRod(expired, Colors.red)]),      BarChartGroupData(x: 3, barRods: [_barRod(low, Colors.amber)]),    ];
   
-}  BarChartRodData _barRod(int y, Color color) => BarChartRodData(    toY: y.toDouble(), color: color, width: 24, borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),  );
+}
+  BarChartRodData _barRod(int y, Color color) => BarChartRodData(    toY: y.toDouble(), color: color, width: 24, borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),  );
   List<BarChartGroupData> _expiryTimelineData(List<MaterialModel> list) {
     final now = DateTime.now();
     final Map<int, int> months = {
@@ -209,29 +217,36 @@ class _ReportsPageState extends State<ReportsPage>    with SingleTickerProviderS
 });
     
 }
+
     final totalPages = (filtered.length / _pageSize).ceil().clamp(1, 999);
     _pageIndex = _pageIndex.clamp(0, totalPages - 1);
     final pageStart = _pageIndex * _pageSize;
     final paged = filtered.skip(pageStart).take(_pageSize).toList();
     return Container(      padding: const EdgeInsets.all(18),      color: isDark ? const Color(0xFF0E1621) : const Color(0xFFF5F5F5),      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          Row(            mainAxisAlignment: MainAxisAlignment.spaceBetween,            children: [              Text(                context.tr.reportsAndAnalytics,                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold,                    color: isDark ? Colors.white : Colors.black),              ),              Row(mainAxisSize: MainAxisSize.min, children: [                if (isSupervisor) _notificationBell(),                ElevatedButton.icon(                  onPressed: () => _printReport(provider),                  icon: const Icon(Icons.picture_as_pdf, size: 18),                  label: Text(context.tr.exportReport),                  style: ElevatedButton.styleFrom(                    backgroundColor: const Color(0xFF0D6EFD),                    foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),                  ),                ),                const SizedBox(width: 8),                ElevatedButton.icon(                  onPressed: () => _exportToExcel(provider),                  icon: const Icon(Icons.table_chart_outlined, size: 18),                  label: Text(context.tr.export),                  style: ElevatedButton.styleFrom(                    backgroundColor: const Color(0xFF198754),                    foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),                  ),                ),              ]),            ],          ),          const SizedBox(height: 16),          if (provider.loading)            const Expanded(child: ReportsSkeleton())          else            Expanded(              child: Column(                children: [                  _buildTabBar(isDark),                  const SizedBox(height: 12),                  Expanded(                    child: TabBarView(                      controller: _tabCtrl,                      children: [                        _overviewTab(isDark, provider, all),                        _inventoryTab(isDark, provider, filtered, paged, totalPages),                        _expiryTab(isDark, provider, all),                      ],                    ),                  ),                ],              ),            ),        ],      ),    );
   
-}  Widget _buildTabBar(bool isDark) {
+}
+  Widget _buildTabBar(bool isDark) {
     return Container(      decoration: BoxDecoration(        color: isDark ? const Color(0xFF1A2332) : Colors.white,        borderRadius: BorderRadius.circular(12),      ),      child: TabBar(        controller: _tabCtrl,        indicator: BoxDecoration(          color: const Color(0xFF0D6EFD),          borderRadius: BorderRadius.circular(10),        ),        labelColor: Colors.white,        unselectedLabelColor: isDark ? Colors.white60 : Colors.black54,        indicatorSize: TabBarIndicatorSize.tab,        dividerColor: Colors.transparent,        tabs: [          Tab(text: context.tr.overview, icon: const Icon(Icons.dashboard, size: 18)),          Tab(text: context.tr.inventoryTitle, icon: const Icon(Icons.inventory_2, size: 18)),          Tab(text: context.tr.expiryAnalysis, icon: const Icon(Icons.date_range, size: 18)),        ],      ),    );
   
-}  Widget _overviewTab(bool isDark, ProductProvider provider, List<MaterialModel> all) {
+}
+  Widget _overviewTab(bool isDark, ProductProvider provider, List<MaterialModel> all) {
     return SingleChildScrollView(      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          _buildKpiRow(isDark, provider),          const SizedBox(height: 20),          Row(            crossAxisAlignment: CrossAxisAlignment.start,            children: [              Expanded(child: _chartCard(isDark, context.tr.categoryBreakdown,                  _buildPieChart(isDark, all))),              const SizedBox(width: 16),              Expanded(child: _chartCard(isDark, context.tr.statusDistribution,                  _buildStatusChart(isDark, all))),            ],          ),          const SizedBox(height: 20),          _analyticsSection(isDark, provider, all),        ],      ),    );
   
-}  Widget _buildKpiRow(bool isDark, ProductProvider provider) {
+}
+  Widget _buildKpiRow(bool isDark, ProductProvider provider) {
     return Row(      children: [        _kpiCard(isDark, Icons.inventory_2, context.tr.totalMaterials,            provider.totalProducts.toString(), const Color(0xFF0D6EFD), null),        const SizedBox(width: 14),        _kpiCard(isDark, Icons.warning_amber_rounded, context.tr.statusExpiringSoon,            provider.expiringSoonCount.toString(), const Color(0xFFFFA500), null),        const SizedBox(width: 14),        _kpiCard(isDark, Icons.inbox, context.tr.statusLowStock,            provider.lowStockCount.toString(), const Color(0xFFDC3545), null),        const SizedBox(width: 14),        _kpiCard(isDark, Icons.error_outline, context.tr.criticalAlertsTitle,            provider.getCriticalAlertsCount().toString(), const Color(0xFFDC3545),            provider.getCriticalAlertsCount() > 0),      ],    );
   
-}  Widget _kpiCard(bool isDark, IconData icon, String title, String value,      Color accent, bool? highlight) {
+}
+  Widget _kpiCard(bool isDark, IconData icon, String title, String value,      Color accent, bool? highlight) {
     final useHighlight = highlight ?? false;
     return Expanded(      child: Container(        padding: const EdgeInsets.all(18),        decoration: BoxDecoration(          gradient: useHighlight ? LinearGradient(            colors: [accent.withOpacity(0.15), accent.withOpacity(0.05)],            begin: Alignment.topLeft, end: Alignment.bottomRight,          ) : null,          color: useHighlight ? null : (isDark ? const Color(0xFF1A2332) : Colors.white),          borderRadius: BorderRadius.circular(12),          border: Border.all(color: accent.withOpacity(0.3)),        ),        child: Row(          children: [            Container(              padding: const EdgeInsets.all(10),              decoration: BoxDecoration(                color: accent.withOpacity(0.15),                borderRadius: BorderRadius.circular(12),              ),              child: Icon(icon, color: accent, size: 26),            ),            const SizedBox(width: 14),            Expanded(              child: Column(                crossAxisAlignment: CrossAxisAlignment.start,                children: [                  Text(title, style: TextStyle(fontSize: 12,                      color: isDark ? Colors.white60 : Colors.black54)),                  const SizedBox(height: 4),                  Text(value, style: TextStyle(fontSize: 26,                      fontWeight: FontWeight.bold,                      color: isDark ? Colors.white : Colors.black)),                ],              ),            ),          ],        ),      ),    );
   
-}  Widget _chartCard(bool isDark, String title, Widget chart) {
+}
+  Widget _chartCard(bool isDark, String title, Widget chart) {
     return Container(      padding: const EdgeInsets.all(18),      decoration: BoxDecoration(        color: isDark ? const Color(0xFF1A2332) : Colors.white,        borderRadius: BorderRadius.circular(12),        border: Border.all(color: isDark ? const Color(0xFF2A3F5F) : Colors.grey.shade200),      ),      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold,              color: isDark ? Colors.white : Colors.black)),          const SizedBox(height: 12),          SizedBox(height: 200, child: chart),        ],      ),    );
   
-}  Widget _buildPieChart(bool isDark, List<MaterialModel> all) {
+}
+  Widget _buildPieChart(bool isDark, List<MaterialModel> all) {
     if (all.isEmpty) return Center(child: Text(context.tr.noData,        style: TextStyle(color: isDark ? Colors.white60 : Colors.black38)));
     final Map<String, int> counts = {
 
@@ -241,6 +256,7 @@ class _ReportsPageState extends State<ReportsPage>    with SingleTickerProviderS
       counts[cat] = (counts[cat] ?? 0) + 1;
     
 }
+
     final entries = counts.entries.toList();
     return Stack(      alignment: Alignment.center,      children: [        PieChart(PieChartData(          sections: List.generate(entries.length, (i) {
             final entry = entries[i];
@@ -256,6 +272,7 @@ pct.toStringAsFixed(0)
                 return;
               
 }
+
               final idx = response.touchedSection!.touchedSectionIndex;
               if (idx != _touchedPieIndex) setState(() => _touchedPieIndex = idx);
             
@@ -263,7 +280,8 @@ pct.toStringAsFixed(0)
 all.length
 }', style: TextStyle(fontSize: 16,            fontWeight: FontWeight.bold,            color: isDark ? Colors.white : Colors.black)),      ],    );
   
-}  Widget _buildStatusChart(bool isDark, List<MaterialModel> all) {
+}
+  Widget _buildStatusChart(bool isDark, List<MaterialModel> all) {
     final data = _statusBarData(all);
     final maxY = data.fold(0.0, (p, g) => p > g.barRods.first.toY ? p : g.barRods.first.toY);
     return BarChart(BarChartData(      alignment: BarChartAlignment.spaceAround,      maxY: maxY == 0 ? 10 : maxY * 1.2,      barGroups: data,      gridData: FlGridData(show: false),      titlesData: FlTitlesData(        leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),        rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),        bottomTitles: AxisTitles(sideTitles: SideTitles(          showTitles: true, getTitlesWidget: (v, meta) {
@@ -272,7 +290,8 @@ all.length
           
 },        )),      ),      borderData: FlBorderData(show: false),    ));
   
-}  Widget _analyticsSection(bool isDark, ProductProvider provider, List<MaterialModel> all) {
+}
+  Widget _analyticsSection(bool isDark, ProductProvider provider, List<MaterialModel> all) {
     final totalUnits = all.fold<int>(0, (s, m) => s + m.quantity);
     final cats = <String, int>{
 
@@ -282,6 +301,7 @@ all.length
       cats[c] = (cats[c] ?? 0) + 1;
     
 }
+
     final sortedCats = cats.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
     return Container(      padding: const EdgeInsets.all(18),      decoration: BoxDecoration(        color: isDark ? const Color(0xFF1A2332) : Colors.white,        borderRadius: BorderRadius.circular(12),        border: Border.all(color: isDark ? const Color(0xFF2A3F5F) : Colors.grey.shade200),      ),      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          Text(context.tr.analytics, style: TextStyle(fontSize: 16,              fontWeight: FontWeight.bold,              color: isDark ? Colors.white : Colors.black)),          const SizedBox(height: 16),          Row(            children: [              _statTile(isDark, context.tr.totalStock, '$totalUnits ${
 context.tr.unit
@@ -295,13 +315,16 @@ context.tr.categoriesLabel
 (e.value / (all.isEmpty ? 1 : all.length) * 100).toStringAsFixed(0)
 }%',                  style: TextStyle(fontSize: 11,                      color: isDark ? Colors.white60 : Colors.black54))),              ],            ),          )),        ],      ),    );
   
-}  Widget _statTile(bool isDark, String label, String value) {
+}
+  Widget _statTile(bool isDark, String label, String value) {
     return Column(      crossAxisAlignment: CrossAxisAlignment.start,      children: [        Text(label, style: TextStyle(fontSize: 12,            color: isDark ? Colors.white60 : Colors.black54)),        const SizedBox(height: 2),        Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,            color: isDark ? Colors.white : Colors.black)),      ],    );
   
-}  Widget _inventoryTab(bool isDark, ProductProvider provider,      List<MaterialModel> filtered, List<MaterialModel> paged, int totalPages) {
+}
+  Widget _inventoryTab(bool isDark, ProductProvider provider,      List<MaterialModel> filtered, List<MaterialModel> paged, int totalPages) {
     return Column(      children: [        _filterRow(isDark, provider),        const SizedBox(height: 12),        Expanded(child: _dataTable(isDark, provider, paged, filtered.length)),        if (totalPages > 1) _pagination(isDark, totalPages, filtered.length),      ],    );
   
-}  Widget _filterRow(bool isDark, ProductProvider provider) {
+}
+  Widget _filterRow(bool isDark, ProductProvider provider) {
     final all = provider.products;
     final cats = all.map((m) => m.category).toSet().toList()..sort();
     final catItems = [context.tr.allCategories, ...cats];
@@ -328,10 +351,12 @@ context.tr.categoriesLabel
  
 }),        const SizedBox(width: 10),        _dateFilter(isDark),      ],    );
   
-}  Widget _dropdown(bool isDark, String value, List<String> items,      void Function(String?) onChanged) {
+}
+  Widget _dropdown(bool isDark, String value, List<String> items,      void Function(String?) onChanged) {
     return Container(      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),      decoration: BoxDecoration(        color: isDark ? const Color(0xFF1A2332) : Colors.white,        borderRadius: BorderRadius.circular(12),        border: Border.all(color: isDark ? const Color(0xFF2A3F5F) : Colors.grey.shade300),      ),      child: DropdownButtonHideUnderline(        child: DropdownButton<String>(          value: items.contains(value) ? value : items.first,          dropdownColor: isDark ? const Color(0xFF1A2332) : Colors.white,          icon: Icon(Icons.keyboard_arrow_down,              color: isDark ? Colors.white70 : Colors.black54, size: 20),          style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 13),          items: items.map((i) => DropdownMenuItem(value: i, child: Text(i))).toList(),          onChanged: onChanged,        ),      ),    );
   
-}  Widget _dateFilter(bool isDark) {
+}
+  Widget _dateFilter(bool isDark) {
     return Row(mainAxisSize: MainAxisSize.min, children: [      _dateBtn(isDark, _dateFrom, context.tr.filterByDate, () async {
         final p = await showDatePicker(context: context,            initialDate: _dateFrom ?? DateTime.now(),            firstDate: DateTime(2020), lastDate: DateTime(2035));
         if (p != null) setState(() => _dateFrom = p);
@@ -346,7 +371,8 @@ context.tr.categoriesLabel
  
 }),          visualDensity: VisualDensity.compact,        ),    ]);
   
-}  Widget _dateBtn(bool isDark, DateTime? date, String hint, VoidCallback onTap) {
+}
+  Widget _dateBtn(bool isDark, DateTime? date, String hint, VoidCallback onTap) {
     final textColor = isDark ? Colors.white : Colors.black;
     final hintColor = isDark ? Colors.white38 : Colors.black38;
     return InkWell(      onTap: onTap,      borderRadius: BorderRadius.circular(12),      child: Container(        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),        decoration: BoxDecoration(          color: isDark ? const Color(0xFF1A2332) : Colors.white,          borderRadius: BorderRadius.circular(12),          border: Border.all(color: isDark ? const Color(0xFF2A3F5F) : Colors.grey.shade300),        ),        child: Row(mainAxisSize: MainAxisSize.min, children: [          Icon(Icons.calendar_today, size: 14, color: hintColor),          const SizedBox(width: 4),          Text(            date == null ? hint : '${
@@ -357,12 +383,14 @@ date.month
 date.year
 }',            style: TextStyle(fontSize: 12, color: date == null ? hintColor : textColor),          ),        ]),      ),    );
   
-}  Widget _dataTable(bool isDark, ProductProvider provider,      List<MaterialModel> paged, int totalCount) {
+}
+  Widget _dataTable(bool isDark, ProductProvider provider,      List<MaterialModel> paged, int totalCount) {
     return Container(      decoration: BoxDecoration(        color: isDark ? const Color(0xFF1A2332) : Colors.white,        borderRadius: BorderRadius.circular(12),        border: Border.all(color: isDark ? const Color(0xFF2A3F5F) : Colors.grey.shade200),      ),      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          Padding(            padding: const EdgeInsets.fromLTRB(18, 14, 18, 6),            child: Text(              '${
 context.tr.inventoryTitle
 }  ($totalCount)',              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold,                  color: isDark ? Colors.white : Colors.black),            ),          ),          Expanded(            child: ListView(              children: [                _tableHeader(isDark),                if (paged.isEmpty)                  Padding(                    padding: const EdgeInsets.all(40),                    child: Center(child: Text(context.tr.noProductsFiltered,                        style: TextStyle(color: isDark ? Colors.white60 : Colors.black54))),                  )                else                  ...paged.asMap().entries.map((e) =>                    _tableRow(isDark, e.value, e.key % 2 == 0)),              ],            ),          ),        ],      ),    );
   
-}  Widget _tableHeader(bool isDark) {
+}
+  Widget _tableHeader(bool isDark) {
     final cols = [      (context.tr.materialName, 0),      (context.tr.category, 1),      (context.tr.quantity, 2),      (context.tr.expiryDate, 3),      (context.tr.status, 4),    ];
     return Container(      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),      decoration: BoxDecoration(        color: isDark ? const Color(0xFF233044) : const Color(0xFFF8F9FA),        border: Border(bottom: BorderSide(            color: isDark ? const Color(0xFF2A3F5F) : Colors.grey.shade200)),      ),      child: Row(        children: cols.map((c) {
           final (label, idx) = c;
@@ -385,11 +413,13 @@ context.tr.inventoryTitle
         
 }).toList(),      ),    );
   
-}  Widget _tableRow(bool isDark, MaterialModel m, bool even) {
+}
+  Widget _tableRow(bool isDark, MaterialModel m, bool even) {
     final status = MaterialService.getMaterialStatus(m);
     return Container(      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),      color: even          ? (isDark ? const Color(0xFF151E2C) : const Color(0xFFFAFBFC))          : null,      child: Row(        children: [          Expanded(flex: 3, child: Text(m.name,              style: TextStyle(fontSize: 13, color: isDark ? Colors.white : Colors.black))),          Expanded(flex: 2, child: Text(m.category,              style: TextStyle(fontSize: 12, color: isDark ? Colors.white60 : Colors.black54))),          Expanded(flex: 1, child: Text(m.quantity.toString(),              style: TextStyle(fontSize: 13, color: isDark ? Colors.white : Colors.black))),          Expanded(flex: 2, child: Text(m.expiryDate,              style: TextStyle(fontSize: 12, color: isDark ? Colors.white60 : Colors.black54))),          Expanded(flex: 2, child: _statusBadge(status, isDark)),        ],      ),    );
   
-}  Widget _statusBadge(String status, bool isDark) {
+}
+  Widget _statusBadge(String status, bool isDark) {
     Color bg, text;
     String display;
     switch (status) {
@@ -413,16 +443,19 @@ context.tr.inventoryTitle
         bg = Colors.grey.withOpacity(0.15);
         text = Colors.grey;
     
-}    return Container(      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(4)),      child: Text(display, style: TextStyle(color: text,          fontWeight: FontWeight.w600, fontSize: 11)),    );
+}
+    return Container(      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(4)),      child: Text(display, style: TextStyle(color: text,          fontWeight: FontWeight.w600, fontSize: 11)),    );
   
-}  Widget _pagination(bool isDark, int totalPages, int totalCount) {
+}
+  Widget _pagination(bool isDark, int totalPages, int totalCount) {
     return Container(      padding: const EdgeInsets.symmetric(vertical: 8),      child: Row(        mainAxisAlignment: MainAxisAlignment.center,        children: [          IconButton(            icon: const Icon(Icons.skip_previous, size: 20),            onPressed: _pageIndex == 0 ? null : () => setState(() => _pageIndex = 0),            color: isDark ? Colors.white60 : Colors.black54,          ),          IconButton(            icon: const Icon(Icons.chevron_left, size: 20),            onPressed: _pageIndex == 0 ? null : () => setState(() => _pageIndex--),            color: isDark ? Colors.white60 : Colors.black54,          ),          Text('${
 _pageIndex + 1
 } / $totalPages',              style: TextStyle(fontSize: 13,                  color: isDark ? Colors.white70 : Colors.black54)),          IconButton(            icon: const Icon(Icons.chevron_right, size: 20),            onPressed: _pageIndex >= totalPages - 1 ? null                : () => setState(() => _pageIndex++),            color: isDark ? Colors.white60 : Colors.black54,          ),          IconButton(            icon: const Icon(Icons.skip_next, size: 20),            onPressed: _pageIndex >= totalPages - 1 ? null                : () => setState(() => _pageIndex = totalPages - 1),            color: isDark ? Colors.white60 : Colors.black54,          ),          const SizedBox(width: 12),          Text('$totalCount ${
 context.tr.itemsLabel
 }',              style: TextStyle(fontSize: 12,                  color: isDark ? Colors.white38 : Colors.black38)),        ],      ),    );
   
-}  is Tab   Widget _expiryTab(bool isDark, ProductProvider provider, List<MaterialModel> all) {
+}
+  Widget _expiryTab(bool isDark, ProductProvider provider, List<MaterialModel> all) {
     final now = DateTime.now();
     final expiringSoon = all.where((m) {
       final exp = m.expiryDateValue;
@@ -437,7 +470,8 @@ expiringSoon.length
 context.tr.itemsLabel
 }',                        style: TextStyle(fontSize: 12,                            color: isDark ? Colors.white60 : Colors.black54)),                  ],                ),                const SizedBox(height: 12),                if (expiringSoon.isEmpty)                  Padding(                    padding: const EdgeInsets.all(20),                    child: Center(child: Text(context.tr.noData,                        style: TextStyle(color: isDark ? Colors.white60 : Colors.black54))),                  )                else                  ...expiringSoon.take(20).map((m) => Padding(                    padding: const EdgeInsets.symmetric(vertical: 4),                    child: Row(                      children: [                        Expanded(                          child: Text(m.name,                              style: TextStyle(fontSize: 13,                                  color: isDark ? Colors.white : Colors.black)),                        ),                        Text(m.expiryDate,                            style: TextStyle(fontSize: 12,                                color: isDark ? Colors.white60 : Colors.black54)),                        const SizedBox(width: 12),                        _statusBadge(MaterialService.getMaterialStatus(m), isDark),                      ],                    ),                  )),              ],            ),          ),        ],      ),    );
   
-}  Widget _buildExpiryChart(bool isDark, List<MaterialModel> all) {
+}
+  Widget _buildExpiryChart(bool isDark, List<MaterialModel> all) {
     final data = _expiryTimelineData(all);
     final maxY = data.fold(0.0, (p, g) => p > g.barRods.first.toY        ? p : g.barRods.first.toY);
     return BarChart(BarChartData(      alignment: BarChartAlignment.spaceAround,      maxY: maxY == 0 ? 10 : maxY * 1.2,      barGroups: data,      gridData: FlGridData(        show: true, drawVerticalLine: false,        horizontalInterval: maxY == 0 ? 2 : (maxY * 1.2 / 4).clamp(1, 999),        getDrawingHorizontalLine: (_) => FlLine(          color: isDark ? Colors.white10 : Colors.grey.shade200, strokeWidth: 1),      ),      titlesData: FlTitlesData(        leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true,            reservedSize: 28,            getTitlesWidget: (v, _) => Text('${
@@ -448,11 +482,13 @@ v.toInt()
           
 },        )),        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),        rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),      ),      borderData: FlBorderData(show: false),      barTouchData: BarTouchData(enabled: true),    ));
   
-}  on Bell   Widget _notificationBell() {
+}
+  Widget _notificationBell() {
     final unreadCount = NotificationService.getUnread().length;
     return Stack(clipBehavior: Clip.none, children: [      IconButton(        tooltip: context.tr.editRequests,        onPressed: _showOrderNotifications,        icon: const Icon(Icons.notifications_none),      ),      if (unreadCount > 0)        Positioned(          right: 4, top: 4,          child: Container(            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),            decoration: BoxDecoration(              color: Colors.red, borderRadius: BorderRadius.circular(10),            ),            child: Text(unreadCount.toString(),                style: const TextStyle(color: Colors.white, fontSize: 10,                    fontWeight: FontWeight.bold)),          ),        ),    ]);
   
 }
+
   void _showOrderNotifications() {
     final t = context.tr;
     showDialog(      context: context,      builder: (ctx) => StatefulBuilder(        builder: (context, setDialogState) {
@@ -498,6 +534,7 @@ item.managerName ?? '-'
 },      ),    );
   
 }
+
   String _formatRawDate(String raw) {
     final parsed = DateTime.tryParse(raw);
     if (parsed == null) return raw.isEmpty ? '-' : raw;
@@ -508,6 +545,8 @@ parsed.year
 }-$month-$day';
   
 }
+
+
   Future<void> _printReport(ProductProvider provider) async {
     try {
       final t = context.tr;
@@ -541,6 +580,7 @@ context.tr.errorGeneratingPdf
     return pw.Container(      padding: const pw.EdgeInsets.all(10),      decoration: pw.BoxDecoration(        border: pw.Border.all(color: PdfColors.grey),        borderRadius: pw.BorderRadius.circular(5),      ),      child: pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [        pw.Text(title, style: const pw.TextStyle(fontSize: 10)),        pw.SizedBox(height: 5),        pw.Text(value, style: pw.TextStyle(            fontSize: 16, fontWeight: pw.FontWeight.bold)),      ]),    );
   
 }
+
   void _showPrintOptionsDialog(pw.Document pdf) {
     final t = context.tr;
     showDialog(      context: context,      builder: (context) => AlertDialog(        title: Text(t.exportReport),        content: Text(t.chooseExportMethod),        actions: [          TextButton.icon(            onPressed: () async {
@@ -554,6 +594,8 @@ context.tr.errorGeneratingPdf
 },            icon: const Icon(Icons.share), label: Text(t.saveOrShare),          ),          TextButton(onPressed: () => Navigator.pop(context), child: Text(t.cancel)),        ],      ),    );
   
 }
+
+
   Future<void> _printPdf(pw.Document pdf) async {
     try {
  await Printing.layoutPdf(onLayout: (PdfPageFormat fmt) async => pdf.save());
@@ -565,6 +607,8 @@ context.tr.error
  
 }  
 }
+
+
   Future<void> _sharePdf(pw.Document pdf) async {
     try {
       await Printing.sharePdf(        bytes: await pdf.save(),        filename: 'inventory_report_${
@@ -578,10 +622,13 @@ context.tr.error
  
 }  
 }
+
   void _showErrorDialog(String message) {
     showDialog(      context: context,      builder: (context) => AlertDialog(        title: Text(context.tr.error),        content: Text(message),        actions: [TextButton(onPressed: () => Navigator.pop(context),            child: Text(context.tr.close))],      ),    );
   
 }
+
+
   Future<void> _exportToExcel(ProductProvider provider) async {
     try {
       final all = provider.products;
@@ -598,6 +645,7 @@ context.tr.error
         sheet.cell(CellIndex.indexByColumnRow(            columnIndex: i, rowIndex: 0)).cellStyle = headerStyle;
       
 }
+
       final statusColors = <String, String>{
         'Good': '28A745', 'Expiring Soon': 'FFA500',        'Expired': 'DC3545', 'Low Stock': 'FF8C00',      
 };
@@ -620,6 +668,7 @@ context.tr.error
         sheet.cell(CellIndex.indexByColumnRow(            columnIndex: i, rowIndex: sumRowIdx)).cellStyle = CellStyle(          bold: true, backgroundColorHex: ExcelColor.fromInt(0xFFF0F0F0),        );
       
 }
+
       final dir = await getTemporaryDirectory();
       final path = '${
 dir.path
@@ -649,6 +698,7 @@ context.tr.errorGeneratingPdf
 }    
 }  
 }
+
   void _autoWidth(Sheet sheet, int cols, List<MaterialModel> data) {
     for (int c = 0;
  c < cols;
@@ -665,6 +715,7 @@ context.tr.errorGeneratingPdf
     
 }  
 }
+
   String _formatDate(String raw) {
     try {
       final date = DateTime.parse(raw).toLocal();

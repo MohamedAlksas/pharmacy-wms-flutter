@@ -14,6 +14,7 @@ import 'package:path_provider/path_provider.dart';
 enum DownloadState { idle, downloading, extracting, launching, done, error }
 
 
+
 class DownloadProgress {
   final DownloadState state;
   final double progress;
@@ -41,6 +42,7 @@ class DownloadProgress {
     );
   }
 }
+
 
 
 class DownloadService {
@@ -72,6 +74,7 @@ class DownloadService {
         onProgress(err);
         return err;
       }
+
 
 
       final totalBytes = response.contentLength ?? -1;
@@ -114,6 +117,7 @@ class DownloadService {
                 Directory(entryPath).createSync(recursive: true);
               }
             }
+
 
 
             final currentExe = Platform.resolvedExecutable;

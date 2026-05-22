@@ -24,12 +24,16 @@ class OrderService {
   }
 
 
+
+
   static Future<List<OrderModel>> getPendingOrders() async {
     if (!_loaded) await _fetchOrders();
     return _orders
         .where((order) => order.status == OrderStatus.pending)
         .toList(growable: false);
   }
+
+
 
 
   static Future<void> addOrder(OrderModel order) async {
@@ -51,6 +55,8 @@ class OrderService {
       changes.value++;
     }
   }
+
+
 
 
   static Future<void> updateOrderStatus(String id, OrderStatus status) async {
@@ -75,11 +81,15 @@ class OrderService {
   }
 
 
+
+
   static Future<void> clearOrders() async {
     _orders.clear();
     _loaded = false;
     changes.value++;
   }
+
+
 
 
   static Future<void> _fetchOrders() async {

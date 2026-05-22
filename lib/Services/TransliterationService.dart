@@ -50,6 +50,7 @@ class TransliterationService {
   }
 
 
+
   static String _convertWord(String word) {
     final key = word.toLowerCase();
     if (_pharmaDict.containsKey(key)) return _pharmaDict[key]!;
@@ -119,6 +120,7 @@ class TransliterationService {
   }
 
 
+
   static bool _isVowel(String c) => 'aeiou'.contains(c);
 
   static String _leadingVowel(String c, String next) {
@@ -131,6 +133,7 @@ class TransliterationService {
       default:  return 'أ';
     }
   }
+
 
 
   static const Map<String, String> _vowelMap = {

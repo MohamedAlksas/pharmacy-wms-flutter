@@ -29,6 +29,7 @@ class ProductProvider extends ChangeNotifier {
     _expiringSoonDays = await ThresholdService.getExpiringSoonDays();
   
 }
+
  final Map<String, Map<String, dynamic>> _pendingOverrides = {
 
 };
@@ -47,6 +48,7 @@ class ProductProvider extends ChangeNotifier {
       return false;
     
 }
+
     final days = expiry.difference(DateTime.now()).inDays;
     return days > 0 && days <= _expiringSoonDays;
   
@@ -72,6 +74,8 @@ class ProductProvider extends ChangeNotifier {
     notifyListeners();
   
 }
+
+
   Future<String?> addProduct(Map<String, dynamic> body) async {
     try {
       await ProductService.addProduct(body);
@@ -83,6 +87,8 @@ class ProductProvider extends ChangeNotifier {
     
 }  
 }
+
+
   Future<String?> updateProduct(String id, Map<String, dynamic> body) async {
     try {
       await ProductService.updateProduct(id, body);
@@ -93,7 +99,8 @@ class ProductProvider extends ChangeNotifier {
           if (expectedQty != null) 'quantity': expectedQty,          if (expectedAvail != null) 'isAvailable': expectedAvail,        
 };
       
-}      await _replaceProductsFromApi();
+}
+      await _replaceProductsFromApi();
       notifyListeners();
       return null;
     
@@ -102,13 +109,16 @@ class ProductProvider extends ChangeNotifier {
     
 }  
 }
+
+
   Future<String?> deleteProduct(String id) async {
     try {
       final error = await ProductService.deleteProduct(id);
       if (error != null) {
         return error;
       
-}      await _refreshProductsAfterMutation();
+}
+      await _refreshProductsAfterMutation();
       return null;
     
 } catch (e) {
@@ -142,6 +152,7 @@ class ProductProvider extends ChangeNotifier {
     
 }  
 }
+
   void clear({
 bool notify = false
 }) {
@@ -155,15 +166,19 @@ bool notify = false
     
 }  
 }
+
   void _syncDerivedState() {
     MaterialService.updateCache(_products);
     AlertService.initializeAlertsFromModels(_products);
   
 }
+
   Future<List<MaterialModel>> _fetchProductsFromApi() {
     return ProductService.getAllProducts();
   
 }
+
+
   Future<void> _replaceProductsFromApi() async {
     _products = await _fetchProductsFromApi();
     _applyPendingOverrides();
@@ -172,6 +187,8 @@ bool notify = false
     _syncDerivedState();
   
 }
+
+
   Future<void> _translateProductNames() async {
     if (languageNotifier.value != AppLanguage.ar) return;
     if (_products.isEmpty) return;
@@ -185,6 +202,7 @@ bool notify = false
       
 }    
 }
+
     final map = TransliterationService.transliterateAll(allStrings.toList());
     _products = _products.map((p) {
       return p.copyWith(        name: map[p.name] ?? p.name,        category: map[p.category] ?? p.category,      );
@@ -192,6 +210,7 @@ bool notify = false
 }).toList();
   
 }
+
   void _applyPendingOverrides() {
     if (_pendingOverrides.isEmpty) return;
     for (int i = 0;
@@ -213,12 +232,15 @@ bool notify = false
     }
   }
 
+
+
   Future<void> _refreshProductsAfterMutation() async {
     _error = null;
     await _replaceProductsFromApi();
     notifyListeners();
   
 }
+
   String _handleMutationError(Object error) {
     final message = error.toString().replaceFirst('Exception: ', '');
     _error = message;
@@ -226,6 +248,7 @@ bool notify = false
     return message;
   
 }
+
   static ProductProvider of(BuildContext context, {
 bool listen = true
 }) {
@@ -235,6 +258,7 @@ bool listen = true
       return inherited!.provider;
     
 }
+
     final element = context        .getElementForInheritedWidgetOfExactType<_ProductProviderInherited>();
     final widget = element?.widget;
     assert(      widget != null,      'ProductProviderScope is missing above this widget.',    );
@@ -266,6 +290,7 @@ class _ProductProviderScopeState extends State<ProductProviderScope> {
     super.dispose();
   
 }
+
   void _handleSessionChange() {
     if (AuthService.isAuthenticated) {
       _provider.loadProducts();
@@ -274,7 +299,8 @@ class _ProductProviderScopeState extends State<ProductProviderScope> {
       _provider.clear(notify: true);
     
 }  
-}  /get translated  /void _handleLanguageChange() {
+}
+  void _handleLanguageChange() {
     if (AuthService.isAuthenticated) {
       TransliterationService.clearCache();
       _provider.loadProducts();

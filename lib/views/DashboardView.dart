@@ -47,6 +47,7 @@ class _DashboardPageState extends State<DashboardPage> {
     super.dispose();
   
 }
+
   void _handleNotificationChange() {
     if (mounted) setState(() {
 
@@ -84,17 +85,20 @@ tr.unit.toLowerCase()
       cats[c] = (cats[c] ?? 0) + 1;
     
 }
+
     final sorted = cats.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
     return sorted.take(8).toList();
   
 }
+
   static const _chartColors = [    Color(0xFF4CAF50), Color(0xFF2196F3), Color(0xFFFF9800),    Color(0xFF9C27B0), Color(0xFFF44336), Color(0xFF00BCD4),    Color(0xFFFFEB3B), Color(0xFF795548),  ];
   Widget _buildCategoryChart(BuildContext context, List<MaterialModel> all) {
     final data = _categoryData(all);
     if (data.isEmpty) {
       return Center(child: Text(context.tr.noData,          style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white60 : Colors.black38)));
     
-}    return PieChart(PieChartData(      sections: List.generate(data.length, (i) {
+}
+    return PieChart(PieChartData(      sections: List.generate(data.length, (i) {
         final pct = data[i].value / all.length * 100;
         return PieChartSectionData(          value: data[i].value.toDouble(),          color: _chartColors[i % _chartColors.length],          radius: 48,          title: '${
 pct.toStringAsFixed(0)
@@ -103,6 +107,7 @@ pct.toStringAsFixed(0)
 }),      centerSpaceRadius: 28,      sectionsSpace: 2,    ));
   
 }
+
   List<Widget> _chartLegend(BuildContext context) {
     final data = _categoryData(ProductProvider.of(context).products);
     return data.map((e) => Padding(      padding: const EdgeInsets.symmetric(vertical: 2),      child: Row(        mainAxisSize: MainAxisSize.min,        children: [          Container(width: 10, height: 10,              decoration: BoxDecoration(                  color: _chartColors[data.indexOf(e) % _chartColors.length],                  shape: BoxShape.circle)),          const SizedBox(width: 6),          Text('${
@@ -111,29 +116,35 @@ e.key
 e.value
 })',              style: TextStyle(fontSize: 11,                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black54)),        ],      ),    )).toList();
   
-}  Widget _kpiCard(    BuildContext context,    String title,    String value, {
+}
+  Widget _kpiCard(    BuildContext context,    String title,    String value, {
     required IconData icon,    Color? color,  
 }) {
     return Container(      width: 180,      padding: const EdgeInsets.all(14),      decoration: BoxDecoration(        borderRadius: BorderRadius.circular(12),        color: Theme.of(context).cardColor,        border:            color != null ? Border.all(color: color.withOpacity(0.3)) : null,      ),      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          Icon(icon, color: color),          const SizedBox(height: 8),          Text(            title,            style: TextStyle(              color: Theme.of(context).brightness == Brightness.dark                  ? Colors.grey[400]                  : Colors.grey[600],            ),          ),          const SizedBox(height: 6),          Text(            value,            style: TextStyle(              fontSize: 22,              fontWeight: FontWeight.bold,              color: color,            ),          ),        ],      ),    );
   
-}  Widget _alertCard(    BuildContext context,    String title,    String body,    IconData icon,    Color color,  ) {
+}
+  Widget _alertCard(    BuildContext context,    String title,    String body,    IconData icon,    Color color,  ) {
     return Container(      padding: const EdgeInsets.all(12),      decoration: BoxDecoration(        borderRadius: BorderRadius.circular(12),        color: Theme.of(context).cardColor,      ),      child: Row(        children: [          Container(            padding: const EdgeInsets.all(8),            decoration: BoxDecoration(              color: color.withOpacity(0.15),              borderRadius: BorderRadius.circular(12),            ),            child: Icon(icon, color: color),          ),          const SizedBox(width: 10),          Expanded(            child: Column(              crossAxisAlignment: CrossAxisAlignment.start,              children: [                Text(title,                    style: const TextStyle(fontWeight: FontWeight.w700)),                const SizedBox(height: 6),                Text(                  body,                  style: TextStyle(                    color:                        Theme.of(context).brightness == Brightness.dark                            ? Colors.grey[400]                            : Colors.grey[600],                    fontSize: 12,                  ),                  maxLines: 2,                  overflow: TextOverflow.ellipsis,                ),              ],            ),          ),        ],      ),    );
   
 }
+
   List<MaterialModel> _recentMaterials(List<MaterialModel> products) {
     final materials = products.toList()      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return materials.take(5).toList();
   
-}  Widget _materialRow(    String name,    String quantity,    String expiryDate,    String category,  ) {
+}
+  Widget _materialRow(    String name,    String quantity,    String expiryDate,    String category,  ) {
     return Padding(      padding: const EdgeInsets.symmetric(vertical: 6.0),      child: Row(        children: [          Expanded(flex: 3, child: Text(name)),          Expanded(flex: 2, child: Text(quantity)),          Expanded(flex: 2, child: Text(expiryDate)),          Expanded(flex: 2, child: Text(category)),        ],      ),    );
   
 }
+
   String _profileInitial() {
     final name = AuthService.currentUser?.fullName.trim() ?? '';
     if (name.isEmpty) return '?';
     return name.substring(0, 1).toUpperCase();
   
 }
+
   void _showNotifications() {
     final tr = context.tr;
     if (AuthService.isSupervisor) {
@@ -170,6 +181,7 @@ item.createdAt.toLocal().toString().substring(0, 16)
       return;
     
 }
+
     final alerts = AlertService.getCriticalAlerts();
     showDialog(      context: context,      builder: (ctx) => AlertDialog(        title: Row(          children: [            const Icon(Icons.notifications_active, color: Colors.red),            const SizedBox(width: 12),            Text('${
 tr.notifications
@@ -182,6 +194,7 @@ alerts.length
 },                ),        ),        actions: [          TextButton(            onPressed: () => Navigator.pop(ctx),            child: Text(tr.close),          ),        ],      ),    );
   
 }
+
   void _showProfilePopup() {
     final tr = context.tr;
     final user = AuthService.currentUser;

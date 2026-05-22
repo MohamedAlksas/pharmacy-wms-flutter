@@ -58,13 +58,15 @@ class TranslationService {
     }
 
 
+
     final results = <String, String>{};
     final toFetch = <String>[];
 
     for (final text in texts) {
       if (text.trim().isEmpty) {
         results[text] = text;
-      } else if (_cache.containsKey(text)) {
+      }
+ else if (_cache.containsKey(text)) {
         results[text] = _cache[text]!;
       } else {
         toFetch.add(text);
@@ -129,10 +131,13 @@ class TranslationService {
     }
 
 
+
     final decoded = jsonDecode(response.body) as Map<String, dynamic>;
     final content = decoded['content'] as List<dynamic>;
     return (content.first['text'] as String).trim();
   }
+
+
 
 
   static Future<List<String>> _doTranslateBatch(List<String> texts) async {
@@ -167,6 +172,7 @@ class TranslationService {
     if (response.statusCode != 200) {
       throw Exception('HTTP ${response.statusCode}');
     }
+
 
 
     final decoded = jsonDecode(response.body) as Map<String, dynamic>;

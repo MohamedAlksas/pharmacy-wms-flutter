@@ -30,6 +30,7 @@ class AlertService {
   }
 
 
+
   static void _checkAndCreateAlerts(MaterialModel material) {
     if (_isExpired(material.expiryDate)) {
       _alerts.add(AlertModel(
@@ -40,7 +41,8 @@ class AlertService {
         material: material,
         createdAt: DateTime.now(),
       ));
-    } else if (_isExpiringSoon(material.expiryDate)) {
+    }
+ else if (_isExpiringSoon(material.expiryDate)) {
       final daysLeft = _daysUntilExpiry(material.expiryDate);
       _alerts.add(AlertModel(
         id: 'alert_expiring_${material.id}',
@@ -65,6 +67,7 @@ class AlertService {
   }
 
 
+
   static bool _isExpired(String expiryDate) {
     try {
       return DateTime.parse(expiryDate).isBefore(DateTime.now());
@@ -72,6 +75,7 @@ class AlertService {
       return false;
     }
   }
+
 
 
   static bool _isExpiringSoon(String expiryDate) {
@@ -84,6 +88,7 @@ class AlertService {
   }
 
 
+
   static int _daysUntilExpiry(String expiryDate) {
     try {
       return DateTime.parse(expiryDate).difference(DateTime.now()).inDays;
@@ -91,6 +96,8 @@ class AlertService {
       return 0;
     }
   }
+
+
 
 
   static List<AlertModel> getAllAlerts() => List.unmodifiable(_alerts);

@@ -13,6 +13,7 @@ import 'package:pharmacy_wms/Services/api_config.dart';
 enum UserRole { warehouseManager, supervisor }
 
 
+
 class UserModel {
   final String id;
   final String email;
@@ -44,6 +45,7 @@ class UserModel {
   }
 
 
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -54,6 +56,7 @@ class UserModel {
       'token': token,
     };
   }
+
 
   UserModel copyWith({
     String? id,
@@ -74,6 +77,7 @@ class UserModel {
   }
 
 
+
   static String _extractRoleText(Map<String, dynamic> json) {
     final roleCandidate =
         json['role'] ??
@@ -89,6 +93,7 @@ class UserModel {
     return (roleCandidate ?? '').toString();
   }
 }
+
 
 
 class AuthResponseModel {
@@ -127,6 +132,7 @@ class AuthResponseModel {
   }
 
 
+
   static String _extractToken(Map<String, dynamic> json) {
     final nestedData = json['data'];
     final nestedUser = json['user'];
@@ -141,6 +147,8 @@ class AuthResponseModel {
             '')
         .toString();
   }
+
+
 
 
   static Map<String, dynamic> _extractUserMap(Map<String, dynamic> json) {
@@ -162,6 +170,7 @@ class AuthResponseModel {
     return json;
   }
 }
+
 
 
 class AuthService {
@@ -188,6 +197,8 @@ class AuthService {
   }
 
 
+
+
   static Future<void> initialize() async {
     final prefs = await SharedPreferences.getInstance();
     final storedUser = prefs.getString(_userKey);
@@ -211,6 +222,8 @@ class AuthService {
   }
 
 
+
+
   static Future<String?> login(String email, String password) async {
     try {
       final response = await http
@@ -229,6 +242,7 @@ class AuthService {
         }
 
 
+
         final auth = AuthResponseModel.fromJson(
           decoded,
           fallbackEmail: email.trim(),
@@ -238,15 +252,19 @@ class AuthService {
           return 'Login succeeded but no access token was returned.';
         }
 
+
         await _saveSession(auth.user.copyWith(token: auth.token));
         return null;
       }
+
 
       return _extractErrorMessage(response.statusCode, decoded);
     } catch (e) {
       return 'Unable to sign in right now. Please check your connection and try again.';
     }
   }
+
+
 
 
   static Future<String?> registerAdmin({
@@ -265,6 +283,8 @@ class AuthService {
   }
 
 
+
+
   static Future<String?> registerUser({
     required String email,
     required String password,
@@ -279,6 +299,8 @@ class AuthService {
       phoneNumber: phoneNumber,
     );
   }
+
+
 
 
   static Future<String?> _register({
@@ -307,11 +329,14 @@ class AuthService {
         return null;
       }
 
+
       return _extractErrorMessage(response.statusCode, decoded);
     } catch (_) {
       return 'Unable to complete registration right now. Please try again.';
     }
   }
+
+
 
 
   static Future<void> logout() async {
@@ -323,15 +348,21 @@ class AuthService {
   }
 
 
+
+
   static Future<void> updateCurrentUser(UserModel updated) async {
     final tokenValue = updated.token.isNotEmpty ? updated.token : token;
     await _saveSession(updated.copyWith(token: tokenValue));
   }
 
 
+
+
   static Future<void> expireSession() async {
     await logout();
   }
+
+
 
 
   static Future<void> _saveSession(UserModel user) async {
@@ -341,6 +372,7 @@ class AuthService {
     await prefs.setString(_userKey, jsonEncode(user.toJson()));
     sessionChanges.value++;
   }
+
 
 
   static dynamic _decodeBody(String body) {
@@ -354,6 +386,7 @@ class AuthService {
       return body;
     }
   }
+
 
 
   static String _extractErrorMessage(int statusCode, dynamic body) {
@@ -390,6 +423,7 @@ class AuthService {
   }
 }
 
+
 UserRole _roleFromString(String rawRole) {
   final normalized = rawRole.toLowerCase();
   if (normalized.contains('admin') || normalized.contains('manager')) {
@@ -411,6 +445,7 @@ String? _extractRoleFromToken(String token) {
     }
 
 
+
     final payload = utf8.decode(
       base64Url.decode(base64Url.normalize(parts[1])),
     );
@@ -418,6 +453,7 @@ String? _extractRoleFromToken(String token) {
     if (decoded is! Map<String, dynamic>) {
       return null;
     }
+
 
 
     final role =

@@ -30,6 +30,8 @@ class ThresholdService {
   }
 
 
+
+
   static Future<int> getExpiringSoonDays() async {
     final prefs = await SharedPreferences.getInstance();
     final cached = prefs.getInt(_kExpiringSoonDays);
@@ -41,6 +43,8 @@ class ThresholdService {
       return 30;
     }
   }
+
+
 
 
   static Future<void> setLowStockThreshold(int value) async {
@@ -62,6 +66,8 @@ class ThresholdService {
   }
 
 
+
+
   static Future<void> setExpiringSoonDays(int value) async {
     try {
       final response = await http
@@ -79,6 +85,8 @@ class ThresholdService {
       debugPrint('[ThresholdService] Failed to save expiring soon days: $e');
     }
   }
+
+
 
 
   static Future<void> _fetchThresholds() async {

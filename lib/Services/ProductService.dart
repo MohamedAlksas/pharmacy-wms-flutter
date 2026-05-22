@@ -22,8 +22,11 @@ class ProductService {
       return items.map(MaterialModel.fromJson).toList();
     }
 
+
     throw Exception(await _extractError(response.statusCode, decoded));
   }
+
+
 
 
   static Future<List<MaterialModel>> getAdminProducts() async {
@@ -35,8 +38,11 @@ class ProductService {
       return items.map(MaterialModel.fromJson).toList();
     }
 
+
     throw Exception(await _extractError(response.statusCode, decoded));
   }
+
+
 
 
   static Future<void> addProduct(Map<String, dynamic> body) async {
@@ -47,8 +53,11 @@ class ProductService {
       return;
     }
 
+
     throw Exception(await _extractError(response.statusCode, decoded));
   }
+
+
 
 
   static Future<void> updateProduct(
@@ -64,6 +73,7 @@ class ProductService {
     }
 
 
+
     final decoded = _decodeBody(response.body);
 
     if (response.statusCode == 200 ||
@@ -72,8 +82,11 @@ class ProductService {
       return;
     }
 
+
     throw Exception(await _extractError(response.statusCode, decoded));
   }
+
+
 
 
   static Future<String?> deleteProduct(String id) async {
@@ -94,6 +107,8 @@ class ProductService {
   }
 
 
+
+
   static Future<List<MaterialModel>> fetchAllProducts() => getAllProducts();
   static Future<List<MaterialModel>> fetchAdminProducts() => getAdminProducts();
 
@@ -104,11 +119,15 @@ class ProductService {
   }
 
 
+
+
   static Future<http.Response> _post(Uri uri, Map<String, dynamic> body) {
     return http
         .post(uri, headers: AuthService.authHeaders, body: jsonEncode(body))
         .timeout(const Duration(seconds: 15));
   }
+
+
 
 
   static Future<http.Response> _patch(Uri uri, Map<String, dynamic> body) {
@@ -118,6 +137,8 @@ class ProductService {
   }
 
 
+
+
   static Future<http.Response> _put(Uri uri, Map<String, dynamic> body) {
     return http
         .put(uri, headers: AuthService.authHeaders, body: jsonEncode(body))
@@ -125,11 +146,14 @@ class ProductService {
   }
 
 
+
+
   static Future<http.Response> _delete(Uri uri) {
     return http
         .delete(uri, headers: AuthService.authHeaders)
         .timeout(const Duration(seconds: 15));
   }
+
 
 
   static dynamic _decodeBody(String body) {
@@ -143,6 +167,8 @@ class ProductService {
       return body;
     }
   }
+
+
 
 
   static List<Map<String, dynamic>> _extractItems(dynamic decoded) {
@@ -159,6 +185,8 @@ class ProductService {
 
     return normalizedItems;
   }
+
+
 
 
   static List<dynamic> _extractRawItems(dynamic decoded) {
@@ -185,10 +213,13 @@ class ProductService {
   }
 
 
+
+
   static Future<String> _extractError(int statusCode, dynamic body) async {
     if (statusCode == 401) {
       await AuthService.expireSession();
     }
+
 
 
     final fallback = switch (statusCode) {
@@ -214,6 +245,7 @@ class ProductService {
           return messages.join('\n');
         }
       }
+
 
 
       final message = (body['message'] ?? body['error'] ?? body['title'] ?? '')

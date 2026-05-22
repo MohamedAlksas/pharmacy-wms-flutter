@@ -22,16 +22,22 @@ class UpdateService {
   }
 
 
+
+
   static Future<String> get currentVersion async {
     final info = await packageInfo;
     return info.version;
   }
 
 
+
+
   static Future<int> get currentBuildNumber async {
     final info = await packageInfo;
     return int.tryParse(info.buildNumber) ?? 0;
   }
+
+
 
 
   static Future<AppVersion?> fetchLatestVersion() async {
@@ -52,6 +58,8 @@ class UpdateService {
       return _cachedRemote;
     }
   }
+
+
 
 
   static Future<bool> isUpdateAvailable() async {

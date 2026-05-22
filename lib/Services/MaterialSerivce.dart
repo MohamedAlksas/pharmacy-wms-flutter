@@ -21,6 +21,8 @@ class MaterialService {
   }
 
 
+
+
   static Future<void> reloadThresholds() async {
     _lowStockThreshold = await ThresholdService.getLowStockThreshold();
     _expiringSoonDays = await ThresholdService.getExpiringSoonDays();
@@ -39,6 +41,7 @@ class MaterialService {
   }
 
 
+
   static String getMaterialStatus(MaterialModel material) {
     try {
       final expiry = DateTime.parse(material.expiryDate);
@@ -51,6 +54,8 @@ class MaterialService {
       return 'Unknown';
     }
   }
+
+
 
 
   static List<MaterialModel> getLowStockMaterials() =>

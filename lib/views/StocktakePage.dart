@@ -26,7 +26,8 @@ class _StocktakePageState extends State<StocktakePage> {
     final grouped = _groupByLocation(products);
     return Padding(      padding: const EdgeInsets.all(18),      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          Text(            context.tr.stocktake,            style: Theme.of(context).textTheme.headlineSmall?.copyWith(                  fontWeight: FontWeight.bold,                ),          ),          const SizedBox(height: 6),          Text(            context.tr.stocktakeDesc,            style: TextStyle(              color: Theme.of(context).brightness == Brightness.dark                  ? Colors.white60                  : Colors.black54,              fontSize: 14,            ),          ),          const SizedBox(height: 24),          Expanded(            child: _buildContent(context, products, grouped),          ),        ],      ),    );
   
-}  Widget _buildContent(    BuildContext context,    List<MaterialModel> products,    Map<String, List<MaterialModel>> grouped,  ) {
+}
+  Widget _buildContent(    BuildContext context,    List<MaterialModel> products,    Map<String, List<MaterialModel>> grouped,  ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(      children: [        Container(          width: double.infinity,          padding: const EdgeInsets.all(20),          decoration: BoxDecoration(            color: isDark ? const Color(0xFF1A2F35) : Colors.white,            borderRadius: BorderRadius.circular(12),          ),          child: Row(            children: [              Container(                padding: const EdgeInsets.all(12),                decoration: BoxDecoration(                  color: Colors.blue.withOpacity(0.12),                  borderRadius: BorderRadius.circular(12),                ),                child: const Icon(Icons.inventory, color: Colors.blue, size: 32),              ),              const SizedBox(width: 16),              Expanded(                child: Column(                  crossAxisAlignment: CrossAxisAlignment.start,                  children: [                    Text('${
 products.length
@@ -41,7 +42,8 @@ context.tr.storageLocationsLabel
             
 }).toList(),          ),        ),      ],    );
   
-}  Widget _locationGroup(    BuildContext context,    String location,    List<MaterialModel> items,    bool isDark,  ) {
+}
+  Widget _locationGroup(    BuildContext context,    String location,    List<MaterialModel> items,    bool isDark,  ) {
     final label = location.isEmpty ? context.tr.unspecified : location;
     return Card(      margin: const EdgeInsets.only(bottom: 12),      color: isDark ? const Color(0xFF1A2F35) : Colors.white,      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          Container(            width: double.infinity,            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),            decoration: BoxDecoration(              color: (isDark ? Colors.white10 : Colors.black)                  .withOpacity(0.04),              borderRadius:                  const BorderRadius.vertical(top: Radius.circular(12)),            ),            child: Row(              children: [                Icon(Icons.location_on_outlined,                    size: 18, color: isDark ? Colors.white54 : Colors.black54),                const SizedBox(width: 8),                Text(                  label,                  style: TextStyle(                    fontWeight: FontWeight.bold,                    fontSize: 15,                    color: isDark ? Colors.white : Colors.black87,                  ),                ),                const Spacer(),                Text(                  '${
 items.length
@@ -58,6 +60,8 @@ item.quantity
 }',                    style: TextStyle(                        fontWeight: FontWeight.w600,                        color: isDark ? Colors.white70 : Colors.black87)),              )),        ],      ),    );
   
 }
+
+
   Future<void> _generateStocktakePdf(    BuildContext context,    List<MaterialModel> products,  ) async {
     try {
       final pdf = pw.Document();
@@ -81,7 +85,7 @@ context.tr.itemsLabel
                       0: const pw.FixedColumnWidth(30),                      1: const pw.FixedColumnWidth(80),                      2: const pw.FixedColumnWidth(140),                      3: const pw.FixedColumnWidth(50),                      4: const pw.FixedColumnWidth(40),                      5: const pw.FixedColumnWidth(70),                      6: const pw.FixedColumnWidth(100),                      7: const pw.FixedColumnWidth(80),                    
 },                    headers: [                      context.tr.pdfColumnNum,                      context.tr.sku,                      context.tr.pdfColumnProductName,                      context.tr.quantity,                      context.tr.unit,                      context.tr.expiryDate,                      context.tr.storageLocation,                      context.tr.pdfColumnActualCount,                    ],                    data: List.generate(items.length, (i) {
                       final m = items[i];
-                      return [                        (i + 1).toString(),                        m.sku,                        m.name,                        m.quantity.toString(),                        m.unit.isEmpty ? '-' : m.unit,                        _formatExpiry(m.expiryDate),                        m.location.isEmpty ? '-' : m.location,                        '', for manual count                      ];
+                      return [                        (i + 1).toString(),                        m.sku,                        m.name,                        m.quantity.toString(),                        m.unit.isEmpty ? '-' : m.unit,                        _formatExpiry(m.expiryDate),                        m.location.isEmpty ? '-' : m.location,                        '',                      ];
                     
 }),                  ),                  pw.SizedBox(height: 20),                ];
               
@@ -100,6 +104,7 @@ context.tr.errorGeneratingPdf
 }    
 }  
 }
+
   void _showPrintOptions(BuildContext context, pw.Document pdf) {
     showDialog(      context: context,      builder: (ctx) => AlertDialog(        title: Text(context.tr.stocktakeSheet),        content: Text(context.tr.chooseExportMethod),        actions: [          TextButton.icon(            onPressed: () {
               Navigator.pop(ctx);
@@ -130,6 +135,7 @@ DateTime.now().millisecondsSinceEpoch
 }    return map;
   
 }
+
   String _formatExpiry(String raw) {
     try {
       final d = DateTime.parse(raw).toLocal();
