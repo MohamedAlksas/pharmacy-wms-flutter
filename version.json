@@ -1,0 +1,21 @@
+{
+  "latestVersion": "1.0.0",
+  "latestBuildNumber": 1,
+  "downloadUrl": "https://github.com/MohamedAlksas/pharmacy-wms-flutter/releases/latest/download/pharmacy-wms-windows.zip",
+  "mandatory": false,
+  "releaseNotes": [
+    "Initial release",
+    "Products CRUD with inventory management",
+    "Multi-step Add/Dispatch material wizards",
+    "Orders tracking (add, export, edit requests)",
+    "Notifications system with email support",
+    "Configurable low stock / expiry thresholds",
+    "Pagination and search in inventory",
+    "Interactive dashboard with charts",
+    "Professional reports page",
+    "Stocktake sheet generation",
+    "Multi-language support (EN/AR)",
+    "Dark mode",
+    "In-app update mechanism"
+  ]
+}
