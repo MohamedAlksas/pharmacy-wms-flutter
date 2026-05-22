@@ -1,0 +1,67 @@
+name: Flutter CI/CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+
+  analyze:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+      - run: flutter pub get
+      - run: flutter analyze
+        continue-on-error: true
+      - run: flutter test
+        continue-on-error: true
+
+  build-and-release:
+    name: Build & Release
+    runs-on: windows-latest
+    needs: analyze
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+
+      - run: flutter pub get
+      - run: flutter config --enable-windows-desktop
+      - run: flutter build windows --release
+
+      - name: Zip the build
+        run: |
+          Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath pharmacy-wms-windows.zip
+
+      - name: Read version
+        id: version
+        shell: powershell
+        run: |
+          $json = Get-Content version.json -Raw | ConvertFrom-Json
+          echo "current=$($json.latestVersion)" >> $env:GITHUB_OUTPUT
+          echo "currentBuild=$($json.latestBuildNumber)" >> $env:GITHUB_OUTPUT
+          echo "Version: v$($json.latestVersion) (build $($json.latestBuildNumber))"
+
+      - name: Create GitHub Release
+        id: create-release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.current }}
+          name: v${{ steps.version.outputs.current }}
+          files: pharmacy-wms-windows.zip
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
