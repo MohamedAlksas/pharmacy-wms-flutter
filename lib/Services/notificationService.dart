@@ -44,8 +44,11 @@ class NotificationService {
   static final ValueNotifier<int> changes = ValueNotifier<int>(0);
   static bool _loaded = false;
 
-  static Future<List<AppNotification>> getAll() async {
+  static Future<void> init() async {
     if (!_loaded) await _fetchNotifications();
+  }
+
+  static List<AppNotification> getAll() {
     return List.unmodifiable(_notifications);
   }
 
@@ -82,8 +85,7 @@ class NotificationService {
 
 
 
-  static Future<List<AppNotification>> getUnread() async {
-    if (!_loaded) await _fetchNotifications();
+  static List<AppNotification> getUnread() {
     return _notifications.where((n) => !n.isRead).toList();
   }
 

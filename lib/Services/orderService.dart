@@ -18,16 +18,18 @@ class OrderService {
   static final ValueNotifier<int> changes = ValueNotifier<int>(0);
   static bool _loaded = false;
 
-  static Future<List<OrderModel>> getAllOrders() async {
+  static Future<void> init() async {
     if (!_loaded) await _fetchOrders();
+  }
+
+  static List<OrderModel> getAllOrders() {
     return List.unmodifiable(_orders);
   }
 
 
 
 
-  static Future<List<OrderModel>> getPendingOrders() async {
-    if (!_loaded) await _fetchOrders();
+  static List<OrderModel> getPendingOrders() {
     return _orders
         .where((order) => order.status == OrderStatus.pending)
         .toList(growable: false);
