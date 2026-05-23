@@ -11,7 +11,7 @@ import 'package:pharmacy_wms/Models/app_version.dart';
 
 class UpdateService {
   static const String _versionUrl =
-      'https://raw.githubusercontent.com/MohamedAlksas/pharmacy-wms-flutter/main/version.json';
+      'https://raw.githubusercontent.com/test-pharm/pharmacy-wms-flutter/main/version.json';
 
   static AppVersion? _cachedRemote;
   static PackageInfo? _packageInfo;
