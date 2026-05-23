@@ -214,7 +214,7 @@ class _AddMaterialWizardState extends State<AddMaterialWizard> {
       
 }
 
-      final order = OrderModel(        productId: sessionItem.productId,        productName: sessionItem.name,        productSku: sessionItem.sku,        quantity: sessionItem.quantity,        unit: sessionItem.unit,        logNumber: sessionItem.logNumber,        categoryId: sessionItem.categoryId,        type: OrderType.add,        status: OrderStatus.completed,        createdBy: AuthService.currentUser?.fullName ?? '',        notes: invoiceNum.isNotEmpty ? 'Invoice: $invoiceNum' : null,      );
+      final order = OrderModel(        productId: sessionItem.productId,        productName: sessionItem.name,        productSku: sessionItem.sku,        quantity: sessionItem.quantity,        unit: sessionItem.unit,        logNumber: sessionItem.logNumber,        categoryId: sessionItem.categoryId,        type: OrderType.add,        status: OrderStatus.completed,        createdBy: AuthService.currentUser?.fullName ?? '',        invoiceNumber: invoiceNum.isNotEmpty ? invoiceNum : null,        expiryDate: sessionItem.expiryDate.isNotEmpty ? sessionItem.expiryDate : null,      );
       OrderService.addOrder(order);
     
 }

@@ -1,26 +1,14 @@
 {
-  "latestVersion": "1.0.5",
-  "latestBuildNumber": 6,
+  "latestVersion": "1.0.6",
+  "latestBuildNumber": 7,
   "downloadUrl": "https://github.com/test-pharm/pharmacy-wms-flutter/releases/latest/download/pharmacy-wms-windows.zip",
   "mandatory": false,
   "releaseNotes": [
-    "Fix: update check URL now points to test-pharm org — auto-update will work again",
-    "Audit Log: every action is now recorded with who, what, when — viewable by all users, auto-deleted after 30 days",
-    "Auto-deploy: backend CI/CD now deploys to somee.com on every push to main",
-    "UX: version displayed under Check for Updates button in sidebar",
-    "Error handling: loadThresholds wrapped in try/catch, updateOrderStatus propagates errors",
-    "UX: search debouncing, logout confirmation, loading states in orders and wizards",
-    "Code quality: removed dead code, fixed MaterialSerivce typo, localized hardcoded strings",
-    "Multi-step Add/Dispatch material wizards",
-    "Orders tracking (add, export, edit requests)",
-    "Notifications system with email support",
-    "Configurable low stock / expiry thresholds",
-    "Pagination and search in inventory",
-    "Interactive dashboard with charts",
-    "Professional reports page",
-    "Stocktake sheet generation",
-    "Multi-language support (EN/AR)",
-    "Dark mode",
-    "In-app update mechanism"
+    "Invoices tab: grouped order view with material details and expiry dates",
+    "Invoice number now stored as proper database column instead of notes field",
+    "Invoice detail dialog shows materials, quantities, EXP dates",
+    "Search and filter invoices by date range",
+    "New backend endpoints: GET /api/orders/invoices and GET /api/orders/invoices/{number}",
+    "Backward compatible: existing orders with Invoice: in notes still work"
   ]
 }
