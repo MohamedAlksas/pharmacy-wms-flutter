@@ -1,11 +1,7 @@
 import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
-
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-
-import 'package:package_info_plus/package_info_plus.dart';
-
 import 'package:pharmacy_wms/Models/app_version.dart';
 import 'package:pharmacy_wms/Services/api_config.dart';
 
@@ -14,21 +10,23 @@ class UpdateService {
       'https://raw.githubusercontent.com/test-pharm/pharmacy-wms-flutter/main/version.json';
 
   static AppVersion? _cachedRemote;
-  static PackageInfo? _packageInfo;
+  static Map<String, dynamic>? _bundledVersion;
 
-  static Future<PackageInfo> get packageInfo async {
-    _packageInfo ??= await PackageInfo.fromPlatform();
-    return _packageInfo!;
+  static Future<Map<String, dynamic>> get _versionJson async {
+    if (_bundledVersion != null) return _bundledVersion!;
+    final jsonStr = await rootBundle.loadString('assets/version.json');
+    _bundledVersion = jsonDecode(jsonStr) as Map<String, dynamic>;
+    return _bundledVersion!;
   }
 
   static Future<String> get currentVersion async {
-    final info = await packageInfo;
-    return info.version;
+    final json = await _versionJson;
+    return (json['latestVersion'] ?? '0.0.0').toString();
   }
 
   static Future<int> get currentBuildNumber async {
-    final info = await packageInfo;
-    return int.tryParse(info.buildNumber) ?? 0;
+    final json = await _versionJson;
+    return (json['latestBuildNumber'] ?? 0) as int;
   }
 
   static Future<AppVersion?> _fetchFrom(String url) async {
