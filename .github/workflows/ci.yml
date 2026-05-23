@@ -69,12 +69,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit version bump
-        shell: powershell
+        shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add version.json assets/version.json pubspec.yaml
-          git diff --cached --quiet && Write-Output "Nothing to commit" && exit 0
+          git diff --cached --quiet && echo "Nothing to commit" && exit 0
           git commit -m "Auto-bump to v${{ steps.bump.outputs.newVersion }} [skip ci]"
-          git pull --rebase origin main
-          git push
+          git push origin main
