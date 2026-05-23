@@ -61,6 +61,26 @@ class OrderService {
 
 
 
+  static Future<Map<String, dynamic>?> dispatchFefo(Map<String, dynamic> body) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$_baseUrl/export'),
+            headers: AuthService.authHeaders,
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 15));
+      final decoded = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return decoded is Map<String, dynamic> ? decoded : null;
+      }
+      final msg = decoded is Map ? (decoded['message'] ?? 'Dispatch failed ($response.statusCode)').toString() : 'Dispatch failed';
+      throw Exception(msg);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   static Future<void> updateOrderStatus(String id, OrderStatus status) async {
     final response = await http
         .patch(

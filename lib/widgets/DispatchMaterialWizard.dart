@@ -18,22 +18,8 @@ class _DispatchMaterialWizardState extends State<DispatchMaterialWizard> {  int 
     final nextQty = product.quantity - qty;    final nextAvail = nextQty > 0;    final body = <String, dynamic>{      'materialName': product.name,      'materialSKU': product.sku,      'quantity': nextQty,      'unit': product.unit,      'logNumber': product.lot,      'expiryDate': product.expiryDate,      'storageLocation': product.location,      'isAvailable': nextAvail,      if (product.categoryId > 0) 'categoryId': product.categoryId,      if (product.category.isNotEmpty &&          product.category != 'Uncategorized')        'categoryName': product.category,    };    setState(() {      _sessionItems.add(_DispatchSessionItem(        productId: product.id,        name: product.name,        sku: product.sku,        qty: qty,        stockBefore: product.quantity,        unit: product.unit,        logNumber: product.lot,        categoryId: product.categoryId,        category: product.category,        body: body,      ));      _clearForm();    });  }
 
 
-  Future<void> _finishAndDispatch() async {    final tr = context.tr;    if (_sessionItems.isEmpty) return;    setState(() => _saving = true);    String? error;    int totalQty = 0;    for (final item in _sessionItems) {      final err = await widget.provider.updateProduct(        item.productId,        item.body,      );      if (err != null && error == null) error = err;            final invNum = _invoiceController.text.trim();
-      OrderService.addOrder(
-        OrderModel(
-          productId: item.productId,
-          productName: item.name,
-          productSku: item.sku,
-          quantity: item.qty,
-          unit: item.unit,
-          logNumber: item.logNumber,
-          categoryId: item.categoryId,
-          type: OrderType.export,
-          status: OrderStatus.completed,
-          createdBy: AuthService.currentUser?.fullName ?? tr.unknownUser,
-          invoiceNumber: invNum.isNotEmpty ? invNum : null,
-        ),
-      );      totalQty += item.qty;    }
+  Future<void> _finishAndDispatch() async {    final tr = context.tr;    if (_sessionItems.isEmpty) return;    setState(() => _saving = true);    String? error;    int totalQty = 0;    final createdBy = AuthService.currentUser?.fullName ?? tr.unknownUser;    final invNum = _invoiceController.text.trim();    for (final item in _sessionItems) {      try {        final result = await OrderService.dispatchFefo({          'productId': int.tryParse(item.productId),          'quantity': item.qty,          'invoiceNumber': invNum.isNotEmpty ? invNum : null,          'createdBy': createdBy,        });        if (result != null) {          totalQty += item.qty;        }      } catch (e) {        if (error == null) error = e.toString().replaceFirst('Exception: ', '');      }    }
+    await widget.provider.loadProducts();
     setState(() => _saving = false);    if (error != null) {      showToast(context, error, backgroundColor: Colors.red);    } else {      showToast(context, tr.unitsDispatchedSummary(totalQty, _sessionItems.length));    }    if (context.mounted) Navigator.of(context).pop(true);  }
 
   void _clearForm() {    _searchController.clear();    _qtyController.clear();    _selectedProduct = null;    _query = '';    _inlineError = null;  }

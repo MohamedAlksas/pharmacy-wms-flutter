@@ -108,6 +108,45 @@ class ProductService {
 
 
 
+  static Future<List<Map<String, dynamic>>> getBatches(String productId) async {
+    final response = await _get(Uri.parse('$_baseUrl/$productId/batches'));
+    final decoded = _decodeBody(response.body);
+    if (response.statusCode == 200) {
+      final items = _extractItems(decoded);
+      return items;
+    }
+    throw Exception(await _extractError(response.statusCode, decoded));
+  }
+
+  static Future<Map<String, dynamic>> receiveStock(
+    String productId,
+    int quantity,
+    String? expiryDate,
+  ) async {
+    final response = await _post(Uri.parse('$_baseUrl/$productId/batches/receive'), {
+      'quantity': quantity,
+      if (expiryDate != null && expiryDate.isNotEmpty) 'expiryDate': expiryDate,
+    });
+    final decoded = _decodeBody(response.body);
+    if (response.statusCode == 200) {
+      return decoded is Map<String, dynamic> ? decoded : {};
+    }
+    throw Exception(await _extractError(response.statusCode, decoded));
+  }
+
+  static Future<Map<String, dynamic>> getFefoPlan(
+    String productId,
+    int quantity,
+  ) async {
+    final response =
+        await _get(Uri.parse('$_baseUrl/$productId/batches/fefo?quantity=$quantity'));
+    final decoded = _decodeBody(response.body);
+    if (response.statusCode == 200) {
+      return decoded is Map<String, dynamic> ? decoded : {};
+    }
+    throw Exception(await _extractError(response.statusCode, decoded));
+  }
+
   static Future<List<MaterialModel>> fetchAllProducts() => getAllProducts();
   static Future<List<MaterialModel>> fetchAdminProducts() => getAdminProducts();
 
