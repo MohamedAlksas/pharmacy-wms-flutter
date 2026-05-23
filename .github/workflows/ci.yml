@@ -5,7 +5,6 @@ on:
     branches: [ main ]
 
 jobs:
-
   build-and-release:
     permissions:
       contents: write
@@ -17,6 +16,34 @@ jobs:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Auto-bump version
+        id: bump
+        shell: powershell
+        run: |
+          $json = Get-Content version.json -Raw | ConvertFrom-Json
+          $parts = $json.latestVersion -split '\.'
+          $patch = [int]$parts[2] + 1
+          $newVersion = "$($parts[0]).$($parts[1]).$patch"
+          $newBuild = $json.latestBuildNumber + 1
+
+          Write-Output "Bumping from v$($json.latestVersion) (build $($json.latestBuildNumber)) to v$newVersion (build $newBuild)"
+
+          # Update version.json
+          $json.latestVersion = $newVersion
+          $json.latestBuildNumber = $newBuild
+          $json | ConvertTo-Json -Depth 10 | Set-Content version.json
+
+          # Update assets/version.json
+          $json | ConvertTo-Json -Depth 10 | Set-Content assets/version.json
+
+          # Update pubspec.yaml
+          $pubspec = Get-Content pubspec.yaml -Raw
+          $pubspec = $pubspec -replace '(?<=^version: ).+', "$newVersion+$newBuild"
+          $pubspec | Set-Content pubspec.yaml
+
+          "newVersion=$newVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "newBuild=$newBuild" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - uses: subosito/flutter-action@v2
         with:
@@ -31,22 +58,23 @@ jobs:
         run: |
           Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath pharmacy-wms-windows.zip
 
-      - name: Read version
-        id: version
-        shell: powershell
-        run: |
-          $json = Get-Content version.json -Raw | ConvertFrom-Json
-          echo "current=$($json.latestVersion)" >> $env:GITHUB_OUTPUT
-          echo "currentBuild=$($json.latestBuildNumber)" >> $env:GITHUB_OUTPUT
-          echo "Version: v$($json.latestVersion) (build $($json.latestBuildNumber))"
-
       - name: Create GitHub Release
-        id: create-release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.version.outputs.current }}
-          name: v${{ steps.version.outputs.current }}
+          tag_name: v${{ steps.bump.outputs.newVersion }}
+          name: v${{ steps.bump.outputs.newVersion }}
           files: pharmacy-wms-windows.zip
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit version bump
+        shell: powershell
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add version.json assets/version.json pubspec.yaml
+          git diff --cached --quiet && Write-Output "Nothing to commit" && exit 0
+          git commit -m "Auto-bump to v${{ steps.bump.outputs.newVersion }} [skip ci]"
+          git pull --rebase origin main
+          git push
