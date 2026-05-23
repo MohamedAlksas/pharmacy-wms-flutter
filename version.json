@@ -1,14 +1,13 @@
 {
-  "latestVersion": "1.0.6",
-  "latestBuildNumber": 7,
+  "latestVersion": "1.0.7",
+  "latestBuildNumber": 1,
   "downloadUrl": "https://github.com/test-pharm/pharmacy-wms-flutter/releases/latest/download/pharmacy-wms-windows.zip",
   "mandatory": false,
   "releaseNotes": [
-    "Invoices tab: grouped order view with material details and expiry dates",
-    "Invoice number now stored as proper database column instead of notes field",
-    "Invoice detail dialog shows materials, quantities, EXP dates",
-    "Search and filter invoices by date range",
-    "New backend endpoints: GET /api/orders/invoices and GET /api/orders/invoices/{number}",
-    "Backward compatible: existing orders with Invoice: in notes still work"
+    "Root fix: update info now served from backend (no GitHub dependency)",
+    "Invoices tab with grouped order view and detail dialog",
+    "Audit log tab restored in sidebar",
+    "Fixed order creation (productId type mismatch resolved)",
+    "Database migration for InvoiceNumber/ExpiryDate columns"
   ]
 }
