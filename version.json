@@ -1,9 +1,12 @@
 {
-  "latestVersion": "1.0.2",
-  "latestBuildNumber": 3,
+  "latestVersion": "1.0.3",
+  "latestBuildNumber": 4,
   "downloadUrl": "https://github.com/MohamedAlksas/pharmacy-wms-flutter/releases/latest/download/pharmacy-wms-windows.zip",
   "mandatory": false,
   "releaseNotes": [
+    "Audit Log: every action is now recorded with who, what, when — viewable by all users, auto-deleted after 30 days",
+    "Auto-deploy: backend CI/CD now deploys to somee.com on every push to main",
+    "UX: version displayed under Check for Updates button in sidebar",
     "Error handling: loadThresholds wrapped in try/catch, updateOrderStatus propagates errors",
     "UX: search debouncing, logout confirmation, loading states in orders and wizards",
     "Code quality: removed dead code, fixed MaterialSerivce typo, localized hardcoded strings",

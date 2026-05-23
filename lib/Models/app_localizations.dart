@@ -293,7 +293,11 @@ count == 1 ? '' : 's'
   String get currentInfo => isArabic ? 'المعلومات الحالية' : 'Current Information';
   String get materialsAdded => isArabic ? 'المواد المضافة في هذه الجلسة' : 'Materials Added in This Session';
   String get finishSaveAll => isArabic ? 'إنهاء وحفظ الكل' : 'Finish & Save All';
-    String get checkForUpdates => isArabic ? 'التحقق من التحديثات' : 'Check for Updates';
+    String get auditLog => isArabic ? 'سجل التدقيق' : 'Audit Log';
+  String get searchAuditLog => isArabic ? 'ابحث في سجل التدقيق...' : 'Search audit log...';
+  String get noAuditLogs => isArabic ? 'لا توجد سجلات تدقيق' : 'No audit logs found';
+
+  String get checkForUpdates => isArabic ? 'التحقق من التحديثات' : 'Check for Updates';
   String get upToDate => isArabic ? 'البرنامج محدث' : 'You\'re up to date';
   String get logoutConfirmMsg => isArabic ? 'هل أنت متأكد أنك تريد تسجيل الخروج؟' : 'Are you sure you want to logout?';
   String get discardChanges => isArabic ? 'تجاهل التغييرات؟' : 'Discard changes?';
