@@ -6,7 +6,7 @@ import 'package:pharmacy_wms/Models/UserRoleModel.dart';
 import 'package:pharmacy_wms/Models/materialModel.dart';
 
 import 'package:pharmacy_wms/Services/api_config.dart';
-
+import 'package:pharmacy_wms/Services/http_client.dart';
 import 'package:http/http.dart' as http;
 
 
@@ -157,11 +157,18 @@ class ProductService {
   static Future<List<MaterialModel>> fetchAllProducts() => getAllProducts();
   static Future<List<MaterialModel>> fetchAdminProducts() => getAdminProducts();
 
-  static Future<http.Response> _get(Uri uri) {
-    return http
-        .get(uri, headers: AuthService.authHeaders)
-        .timeout(const Duration(seconds: 15));
-  }
+  static Future<http.Response> _get(Uri uri) => ApiClient.get(uri);
+
+  static Future<http.Response> _post(Uri uri, Map<String, dynamic> body) =>
+      ApiClient.post(uri, body);
+
+  static Future<http.Response> _patch(Uri uri, Map<String, dynamic> body) =>
+      ApiClient.patch(uri, body);
+
+  static Future<http.Response> _put(Uri uri, Map<String, dynamic> body) =>
+      ApiClient.put(uri, body);
+
+  static Future<http.Response> _delete(Uri uri) => ApiClient.delete(uri);
 
 
 

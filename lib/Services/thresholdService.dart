@@ -6,8 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:pharmacy_wms/Models/UserRoleModel.dart';
 
 import 'package:pharmacy_wms/Services/api_config.dart';
-
-import 'package:http/http.dart' as http;
+import 'package:pharmacy_wms/Services/http_client.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -49,13 +48,7 @@ class ThresholdService {
 
   static Future<void> setLowStockThreshold(int value) async {
     try {
-      final response = await http
-          .put(
-            Uri.parse(_baseUrl),
-            headers: AuthService.authHeaders,
-            body: jsonEncode({'lowStockThreshold': value}),
-          )
-          .timeout(const Duration(seconds: 15));
+      final response = await ApiClient.put(Uri.parse(_baseUrl), {'lowStockThreshold': value});
       if (response.statusCode == 200) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setInt(_kLowStock, value);
@@ -70,13 +63,7 @@ class ThresholdService {
 
   static Future<void> setExpiringSoonDays(int value) async {
     try {
-      final response = await http
-          .put(
-            Uri.parse(_baseUrl),
-            headers: AuthService.authHeaders,
-            body: jsonEncode({'expiringSoonDays': value}),
-          )
-          .timeout(const Duration(seconds: 15));
+      final response = await ApiClient.put(Uri.parse(_baseUrl), {'expiringSoonDays': value});
       if (response.statusCode == 200) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setInt(_kExpiringSoonDays, value);
@@ -91,9 +78,7 @@ class ThresholdService {
 
   static Future<void> _fetchThresholds() async {
     try {
-      final response = await http
-          .get(Uri.parse(_baseUrl), headers: AuthService.authHeaders)
-          .timeout(const Duration(seconds: 15));
+      final response = await ApiClient.get(Uri.parse(_baseUrl));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         final prefs = await SharedPreferences.getInstance();
