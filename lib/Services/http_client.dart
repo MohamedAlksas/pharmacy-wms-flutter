@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import 'api_config.dart';
-import 'UserRoleModel.dart';
+import 'package:pharmacy_wms/Models/UserRoleModel.dart';
 
 class ApiClient {
   static const Duration _timeout = Duration(seconds: 45);
