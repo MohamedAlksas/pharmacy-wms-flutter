@@ -75,7 +75,7 @@ class _EditRequestsPageState extends State<EditRequestsPage> {
         children: [
           Row(
             children: [
-              Text('Edit Requests',
+              Text(context.tr.editRequests,
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: textColor)),
               const Spacer(),
               if (_loading)
@@ -83,7 +83,7 @@ class _EditRequestsPageState extends State<EditRequestsPage> {
               IconButton(
                 icon: const Icon(Icons.refresh),
                 onPressed: _loading ? null : _load,
-                tooltip: 'Refresh',
+                tooltip: context.tr.refresh,
               ),
             ],
           ),
@@ -104,7 +104,7 @@ class _EditRequestsPageState extends State<EditRequestsPage> {
             const SizedBox(height: 12),
             Text(_error!, style: const TextStyle(color: Colors.red)),
             const SizedBox(height: 12),
-            ElevatedButton(onPressed: _load, child: const Text('Retry')),
+            ElevatedButton(onPressed: _load, child: Text(context.tr.retry)),
           ],
         ),
       );
@@ -125,7 +125,7 @@ class _EditRequestsPageState extends State<EditRequestsPage> {
           children: [
             Icon(Icons.edit_note, size: 64, color: isDark ? Colors.white24 : Colors.black12),
             const SizedBox(height: 16),
-            Text('No edit requests',
+            Text(context.tr.noEditRequests,
                 style: TextStyle(color: isDark ? Colors.white60 : Colors.black45, fontSize: 16)),
           ],
         ),
@@ -139,14 +139,14 @@ class _EditRequestsPageState extends State<EditRequestsPage> {
           headingRowHeight: 54,
           dataRowMinHeight: 56,
           dataRowMaxHeight: 56,
-          columns: const [
-            DataColumn(label: Text('Product Name')),
-            DataColumn(label: Text('Old Expiry')),
-            DataColumn(label: Text('New Expiry')),
-            DataColumn(label: Text('Status')),
-            DataColumn(label: Text('Requested By')),
-            DataColumn(label: Text('Date')),
-            DataColumn(label: Text('Source')),
+          columns: [
+            DataColumn(label: Text(context.tr.product)),
+            DataColumn(label: Text(context.tr.oldExpiry)),
+            DataColumn(label: Text(context.tr.newExpiryDate)),
+            DataColumn(label: Text(context.tr.status)),
+            DataColumn(label: Text(context.tr.requestedBy)),
+            DataColumn(label: Text(context.tr.date)),
+            DataColumn(label: Text(context.tr.source)),
           ],
           rows: [
             ...allNew.map((a) {
@@ -170,12 +170,12 @@ class _EditRequestsPageState extends State<EditRequestsPage> {
                   )),
                   DataCell(Text((a['requestedBy'] ?? a['createdBy'] ?? a['requestedByName'] ?? '').toString())),
                   DataCell(Text(_formatDate((a['requestedAt'] ?? a['createdAt'] ?? '').toString()))),
-                  DataCell(Text('Approval', style: TextStyle(fontSize: 11, color: Colors.blue))),
+                  DataCell(Text(context.tr.approvalSource, style: TextStyle(fontSize: 11, color: Colors.blue))),
                 ],
               );
             }),
             ...allOld.map((o) {
-              final status = o.status == OrderStatus.completed ? 'Approved' : (o.status == OrderStatus.canceled ? 'Rejected' : 'Pending');
+              final status = o.status == OrderStatus.completed ? context.tr.approved : (o.status == OrderStatus.canceled ? context.tr.rejected : context.tr.orderStatusPending);
               return DataRow(
                 color: WidgetStatePropertyAll(_statusColor(status).withOpacity(0.05)),
                 cells: [
@@ -192,7 +192,7 @@ class _EditRequestsPageState extends State<EditRequestsPage> {
                   )),
                   DataCell(Text(o.createdBy)),
                   DataCell(Text(_formatDate(o.createdAt.toIso8601String()))),
-                  DataCell(Text('Order', style: TextStyle(fontSize: 11, color: Colors.orange))),
+                  DataCell(Text(context.tr.orderSource, style: TextStyle(fontSize: 11, color: Colors.orange))),
                 ],
               );
             }),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pharmacy_wms/Models/app_localizations.dart';
 import 'package:pharmacy_wms/Services/ApprovalService.dart';
 import 'package:pharmacy_wms/Models/UserRoleModel.dart';
 
@@ -35,7 +36,7 @@ class _ApprovalsPageState extends State<ApprovalsPage> {
     try {
       await ApprovalService.approveRequest(id);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Request approved')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tr.requestApproved)));
       _load();
     } catch (e) {
       if (!mounted) return;
@@ -50,21 +51,21 @@ class _ApprovalsPageState extends State<ApprovalsPage> {
     final notes = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Reject Request'),
+        title: Text(context.tr.rejectRequest),
         content: TextField(
           controller: notesCtrl,
           maxLines: 3,
-          decoration: const InputDecoration(
-            hintText: 'Optional rejection notes',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            hintText: context.tr.rejectionNotes,
+            border: const OutlineInputBorder(),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(context.tr.cancel)),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, notesCtrl.text.trim()),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Reject', style: TextStyle(color: Colors.white)),
+            child: Text(context.tr.reject, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -73,7 +74,7 @@ class _ApprovalsPageState extends State<ApprovalsPage> {
     try {
       await ApprovalService.rejectRequest(id, notes: notes.isEmpty ? null : notes);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Request rejected')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tr.requestRejected)));
       _load();
     } catch (e) {
       if (!mounted) return;
@@ -104,7 +105,7 @@ class _ApprovalsPageState extends State<ApprovalsPage> {
         children: [
           Row(
             children: [
-              Text('Pending Approvals',
+              Text(context.tr.pendingApprovals,
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: textColor)),
               const Spacer(),
               if (_loading)
@@ -112,7 +113,7 @@ class _ApprovalsPageState extends State<ApprovalsPage> {
               IconButton(
                 icon: const Icon(Icons.refresh),
                 onPressed: _loading ? null : _load,
-                tooltip: 'Refresh',
+                tooltip: context.tr.refresh,
               ),
             ],
           ),
@@ -133,7 +134,7 @@ class _ApprovalsPageState extends State<ApprovalsPage> {
             const SizedBox(height: 12),
             Text(_error!, style: const TextStyle(color: Colors.red)),
             const SizedBox(height: 12),
-            ElevatedButton(onPressed: _load, child: const Text('Retry')),
+            ElevatedButton(onPressed: _load, child: Text(context.tr.retry)),
           ],
         ),
       );
@@ -151,7 +152,7 @@ class _ApprovalsPageState extends State<ApprovalsPage> {
             Icon(Icons.check_circle_outline, size: 64,
                 color: isDark ? Colors.white24 : Colors.black12),
             const SizedBox(height: 16),
-            Text('No pending approvals',
+            Text(context.tr.noPendingApprovals,
                 style: TextStyle(color: isDark ? Colors.white60 : Colors.black45, fontSize: 16)),
           ],
         ),
@@ -166,14 +167,14 @@ class _ApprovalsPageState extends State<ApprovalsPage> {
           dataRowMinHeight: 56,
           dataRowMaxHeight: 56,
           columns: [
-            const DataColumn(label: Text('Product Name')),
-            const DataColumn(label: Text('Batch ID')),
-            const DataColumn(label: Text('Old Expiry')),
-            const DataColumn(label: Text('New Expiry')),
-            const DataColumn(label: Text('Requested By')),
-            const DataColumn(label: Text('Reason')),
-            const DataColumn(label: Text('Status')),
-            const DataColumn(label: Text('Actions')),
+            DataColumn(label: Text(context.tr.product)),
+            DataColumn(label: Text(context.tr.batchId)),
+            DataColumn(label: Text(context.tr.oldExpiry)),
+            DataColumn(label: Text(context.tr.newExpiryDate)),
+            DataColumn(label: Text(context.tr.requestedBy)),
+            DataColumn(label: Text(context.tr.reason)),
+            DataColumn(label: Text(context.tr.status)),
+            DataColumn(label: Text(context.tr.actions)),
           ],
           rows: _approvals!.map((a) {
             final id = a['id'] is int ? a['id'] : int.tryParse(a['id'].toString()) ?? 0;
@@ -220,7 +221,7 @@ class _ApprovalsPageState extends State<ApprovalsPage> {
                           child: ElevatedButton.icon(
                             onPressed: () => _approve(id),
                             icon: const Icon(Icons.check, size: 16),
-                            label: const Text('Approve', style: TextStyle(fontSize: 11)),
+                            label: Text(context.tr.approve, style: const TextStyle(fontSize: 11)),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green,
                               foregroundColor: Colors.white,
@@ -234,7 +235,7 @@ class _ApprovalsPageState extends State<ApprovalsPage> {
                           child: ElevatedButton.icon(
                             onPressed: () => _reject(id),
                             icon: const Icon(Icons.close, size: 16),
-                            label: const Text('Reject', style: TextStyle(fontSize: 11)),
+                            label: Text(context.tr.reject, style: const TextStyle(fontSize: 11)),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.red,
                               foregroundColor: Colors.white,

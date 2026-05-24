@@ -77,7 +77,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
       if (!mounted) return;
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        _showSnack('Unable to update profile.', isError: true);
+        _showSnack(context.tr.unableToUpdateProfile, isError: true);
         return;
       }
 
@@ -89,9 +89,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
       );
       if (!mounted) return;
       setState(() => _isEditing = false);
-      _showSnack('Profile updated successfully');
+      _showSnack(context.tr.profileUpdated);
     } catch (e) {
-      if (mounted) _showSnack('Unable to update profile.', isError: true);
+      if (mounted) _showSnack(context.tr.unableToUpdateProfile, isError: true);
     }
  finally {
       if (mounted) setState(() => _saving = false);
@@ -252,11 +252,11 @@ class _UserInfoPageState extends State<UserInfoPage> {
                       context: context,
                       builder: (_) => AlertDialog(
                         title: Text(context.tr.privacySecurity),
-                        content: const Text('Privacy settings coming soon.'),
+                        content: Text(context.tr.privacyComingSoon),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: const Text('OK'),
+                            child: Text(context.tr.yes),
                           ),
                         ],
                       ),
@@ -319,8 +319,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
                 const SizedBox(height: 8),
                 Text(
                   isManager
-                      ? 'Scope: Dashboard, Inventory, Reports, Orders, Settings'
-                      : 'Scope: Orders and Reports',
+                      ? context.tr.managerScope
+                      : context.tr.supervisorScope,
                   style: TextStyle(
                     color: isDark ? Colors.white60 : Colors.black54,
                     fontSize: 12,
@@ -529,24 +529,24 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
           controlsBuilder: (context, details) => const SizedBox.shrink(),
           steps: [
             Step(
-              title: const Text('Send Code'),
+              title: Text(context.tr.sendCode),
               isActive: _step >= 0,
               state: _stepState(0),
               content: _stepContent(
                 children: [
-                  const Text(
-                    'Send a password reset verification code to your registered email address.',
+                  Text(
+                    context.tr.sendVerificationCode,
                   ),
                   const SizedBox(height: 12),
                   ElevatedButton(
                     onPressed: _loading ? null : _sendCode,
-                    child: const Text('Send Verification Code'),
+                    child: Text(context.tr.sendVerificationCode),
                   ),
                 ],
               ),
             ),
             Step(
-              title: const Text('Verify Code'),
+              title: Text(context.tr.verifyCode),
               isActive: _step >= 1,
               state: _stepState(1),
               content: _stepContent(
@@ -554,20 +554,20 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
                   TextField(
                     controller: _codeCtrl,
                     maxLength: 6,
-                    decoration: const InputDecoration(
-                      labelText: '6-digit code',
+                    decoration: InputDecoration(
+                      labelText: context.tr.sixDigitCode,
                     ),
                   ),
                   const SizedBox(height: 12),
                   ElevatedButton(
                     onPressed: _loading ? null : _verifyCode,
-                    child: const Text('Verify Code'),
+                    child: Text(context.tr.verifyCode),
                   ),
                 ],
               ),
             ),
             Step(
-              title: const Text('New Password'),
+              title: Text(context.tr.newPassword),
               isActive: _step >= 2,
               state: _stepState(2),
               content: _stepContent(
@@ -575,8 +575,8 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
                   TextField(
                     controller: _newPasswordCtrl,
                     obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'New Password',
+                    decoration: InputDecoration(
+                      labelText: context.tr.newPassword,
                     ),
                   ),
                   TextField(
@@ -637,7 +637,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
   Future<void> _sendCode() async {
     final email = _registeredEmail;
     if (email.isEmpty) {
-      setState(() => _error = 'No registered email address was found.');
+      setState(() => _error = context.tr.resetNoEmail);
       return;
     }
 
@@ -646,8 +646,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
       {'email': email},
       onSuccess: () => setState(() {
         _step = 1;
-        _success =
-            'A verification code has been sent to your registered email address.';
+        _success = context.tr.verificationCodeSent;
       }),
     );
   }
@@ -667,7 +666,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
 
   Future<void> _changePassword() async {
     if (_newPasswordCtrl.text.length < 6) {
-      setState(() => _error = 'New password must be at least 6 characters.');
+      setState(() => _error = context.tr.passwordMinChars);
       return;
     }
     if (_newPasswordCtrl.text != _confirmPasswordCtrl.text) {
@@ -684,7 +683,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
       },
       onSuccess: () {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password changed successfully')),
+          SnackBar(content: Text(context.tr.passwordChangedSuccess)),
         );
         setState(() {
           _step = 0;
@@ -725,18 +724,16 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
         setState(() => _error = _extractError(response));
       }
     } catch (_) {
-      if (mounted) setState(() => _error = 'Request failed. Please try again.');
+      if (mounted) setState(() => _error = context.tr.requestFailedRetry);
     }
- finally {
+  finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
-
-
   String _extractError(http.Response response) {
     if (response.body.trim().isEmpty) {
-      return 'Request failed (${response.statusCode}).';
+      return '${context.tr.requestFailedRetry} (${response.statusCode}).';
     }
 
     try {
@@ -764,6 +761,6 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
       if (response.body.trim().isNotEmpty) return response.body;
     }
 
-    return 'Request failed (${response.statusCode}).';
+    return '${context.tr.requestFailedRetry} (${response.statusCode}).';
   }
 }

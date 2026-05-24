@@ -104,22 +104,22 @@ class _InvoicesPageState extends State<InvoicesPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Invoice #${group.invoiceNumber}'),
+        title: Text('${context.tr.invoiceHash}${group.invoiceNumber}'),
         content: SizedBox(
           width: 640,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _detailRow('Materials', group.orders.length.toString()),
-              _detailRow('Total Quantity', group.totalQuantity.toString()),
-              _detailRow('Date Range',
+              _detailRow(context.tr.materials, group.orders.length.toString()),
+              _detailRow(context.tr.totalQuantity, group.totalQuantity.toString()),
+              _detailRow(context.tr.dateRange,
                   '${_formatDate(group.dateFrom)} - ${_formatDate(group.dateTo)}'),
               const SizedBox(height: 16),
               const Divider(height: 1),
               const SizedBox(height: 8),
               Text(
-                'Materials:',
+                '${context.tr.materials}:',
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
               ),
               const SizedBox(height: 8),
@@ -169,12 +169,12 @@ class _InvoicesPageState extends State<InvoicesPage> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'SKU: ${order.productSku}  |  Qty: ${order.quantity} ${order.unit}',
+                  '${context.tr.skuPrefix}${order.productSku}  |  ${context.tr.quantity}: ${order.quantity} ${order.unit}',
                   style: TextStyle(fontSize: 12, color: isDark ? Colors.white60 : Colors.black54),
                 ),
                 if (expiry != null && expiry.isNotEmpty)
                   Text(
-                    'EXP: ${_formatExpiry(expiry)}',
+                    '${context.tr.expPrefix}${_formatExpiry(expiry)}',
                     style: TextStyle(fontSize: 12, color: isDark ? Colors.white60 : Colors.black54),
                   ),
               ],
@@ -188,7 +188,7 @@ class _InvoicesPageState extends State<InvoicesPage> {
                 child: OutlinedButton.icon(
                   onPressed: () => _showRefundDialog(context, order, onRefresh: onRefresh),
                   icon: const Icon(Icons.replay, size: 14),
-                  label: const Text('Refund', style: TextStyle(fontSize: 11)),
+                  label: Text(context.tr.refundLabel, style: const TextStyle(fontSize: 11)),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.purple,
                     side: const BorderSide(color: Colors.purple),
@@ -197,7 +197,7 @@ class _InvoicesPageState extends State<InvoicesPage> {
                 ),
               ),
             ),
-          _badge(order.type.name, typeColor),
+          _badge(_localizedOrderType(order.type), typeColor),
         ],
       ),
     );
@@ -211,7 +211,7 @@ class _InvoicesPageState extends State<InvoicesPage> {
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
-        label[0].toUpperCase() + label.substring(1),
+        label,
         style: TextStyle(color: color, fontWeight: FontWeight.w600, fontSize: 11),
       ),
     );
@@ -259,7 +259,7 @@ class _InvoicesPageState extends State<InvoicesPage> {
                 _loading
                     ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
                     : Text(
-                        'Invoices',
+                        context.tr.invoicesTitle,
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -283,7 +283,7 @@ class _InvoicesPageState extends State<InvoicesPage> {
                   (v) {
                     if (v != null) setState(() => _selectedDateFilter = v);
                   },
-                  _dateFilterDisplay,
+                  (v) => _dateFilterDisplay(v, tr),
                 ),
               ],
             ),
@@ -292,7 +292,7 @@ class _InvoicesPageState extends State<InvoicesPage> {
               child: groups.isEmpty
                   ? Center(
                       child: Text(
-                        _loading ? '' : 'No invoices found',
+                        _loading ? '' : context.tr.noInvoicesFound,
                         style: TextStyle(
                           color: isDark ? Colors.white54 : Colors.black45,
                           fontSize: 16,
@@ -330,7 +330,7 @@ class _InvoicesPageState extends State<InvoicesPage> {
         },
         style: TextStyle(color: isDark ? Colors.white : Colors.black),
         decoration: InputDecoration(
-          hintText: 'Search by invoice number...',
+          hintText: context.tr.searchByInvoice,
           hintStyle: TextStyle(color: isDark ? Colors.white38 : Colors.black38),
           prefixIcon: Icon(Icons.search, color: isDark ? Colors.white54 : Colors.black54),
           border: InputBorder.none,
@@ -394,7 +394,7 @@ class _InvoicesPageState extends State<InvoicesPage> {
                       Icon(Icons.receipt, size: 18, color: const Color(0xFF1CA0A5)),
                       const SizedBox(width: 8),
                       Text(
-                        'Invoice #${group.invoiceNumber}',
+                        '${context.tr.invoiceHash}${group.invoiceNumber}',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -405,7 +405,7 @@ class _InvoicesPageState extends State<InvoicesPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${group.orders.length} materials  |  Total: ${group.totalQuantity} units',
+                    '${context.tr.materialsCount(group.orders.length)}  |  ${context.tr.totalUnits(group.totalQuantity)}',
                     style: TextStyle(
                       fontSize: 13,
                       color: isDark ? Colors.white70 : Colors.black87,
@@ -436,10 +436,23 @@ class _InvoicesPageState extends State<InvoicesPage> {
     );
   }
 
-  String _dateFilterDisplay(String value) {
+  String _dateFilterDisplay(String value, AppLocalizations tr) {
     switch (value) {
-      case 'Filter by Date': return 'Filter by Date';
+      case 'Filter by Date': return tr.filterByDate;
+      case 'Today': return tr.today;
+      case 'This Week': return tr.thisWeek;
+      case 'This Month': return tr.thisMonth;
+      case 'This Year': return tr.thisYear;
       default: return value;
+    }
+  }
+
+  String _localizedOrderType(OrderType type) {
+    switch (type) {
+      case OrderType.add: return context.tr.orderTypeAdd;
+      case OrderType.export: return context.tr.orderTypeExport;
+      case OrderType.edit: return context.tr.orderTypeEdit;
+      case OrderType.refund: return context.tr.orderTypeRefund;
     }
   }
 
@@ -456,20 +469,20 @@ class _InvoicesPageState extends State<InvoicesPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Refund - ${order.productName}'),
+        title: Text('${context.tr.refundLabel} - ${order.productName}'),
         content: SizedBox(
           width: 300,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Available to refund: ${order.quantity} ${order.unit}'),
+              Text('${context.tr.availableToRefund}: ${order.quantity} ${order.unit}'),
               const SizedBox(height: 12),
               TextField(
                 controller: qtyCtrl,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: 'Quantity to refund',
+                  labelText: context.tr.quantityToRefund,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -481,21 +494,21 @@ class _InvoicesPageState extends State<InvoicesPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(context.tr.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
               final qty = int.tryParse(qtyCtrl.text.trim());
               if (qty == null || qty <= 0 || qty > order.quantity) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Enter a valid quantity')),
+                  SnackBar(content: Text(context.tr.enterValidQuantity)),
                 );
                 return;
               }
               final pid = order.productId;
               if (pid == null) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Cannot refund: product ID missing')),
+                  SnackBar(content: Text(context.tr.cannotRefund)),
                 );
                 return;
               }
@@ -510,20 +523,20 @@ class _InvoicesPageState extends State<InvoicesPage> {
                 if (ctx.mounted) Navigator.pop(ctx);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Refunded $qty ${order.unit} of ${order.productName}')),
+                    SnackBar(content: Text(context.tr.refundSuccess(qty, order.unit, order.productName))),
                   );
                 }
                 onRefresh?.call();
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Refund failed: $e'), backgroundColor: Colors.red),
+                    SnackBar(content: Text(context.tr.refundFailedWithError('$e')), backgroundColor: Colors.red),
                   );
                 }
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.purple, foregroundColor: Colors.white),
-            child: const Text('Refund'),
+            child: Text(context.tr.refundLabel),
           ),
         ],
       ),

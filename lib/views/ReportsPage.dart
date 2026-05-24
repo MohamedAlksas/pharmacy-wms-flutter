@@ -139,7 +139,7 @@ class _ReportsPageState extends State<ReportsPage>    with SingleTickerProviderS
 
 };
     for (final m in list) {
-      final cat = m.category.isEmpty ? 'Uncategorized' : m.category;
+      final cat = m.category.isEmpty ? context.tr.uncategorizedLabel : m.category;
       counts[cat] = (counts[cat] ?? 0) + 1;
     
 }
@@ -253,7 +253,7 @@ class _ReportsPageState extends State<ReportsPage>    with SingleTickerProviderS
 
 };
     for (final m in all) {
-      final cat = m.category.isEmpty ? 'Uncategorized' : m.category;
+      final cat = m.category.isEmpty ? context.tr.uncategorizedLabel : m.category;
       counts[cat] = (counts[cat] ?? 0) + 1;
     
 }
@@ -298,7 +298,7 @@ all.length
 
 };
     for (final m in all) {
-      final c = m.category.isEmpty ? 'Uncategorized' : m.category;
+      final c = m.category.isEmpty ? context.tr.uncategorizedLabel : m.category;
       cats[c] = (cats[c] ?? 0) + 1;
     
 }
@@ -633,7 +633,7 @@ context.tr.error
       final excel = Excel.createExcel();
       final sheet = excel['Reports'];
       final headerStyle = CellStyle(        bold: true, backgroundColorHex: ExcelColor.fromInt(0xFF0D6EFD),        fontColorHex: ExcelColor.fromInt(0xFFFFFFFF),      );
-      final headers = ['Name', 'SKU', 'Category', 'Quantity', 'Unit',          'Expiry Date', 'Status', 'Storage Location'];
+      final headers = [context.tr.name, context.tr.sku, context.tr.category,          context.tr.quantity, context.tr.unit, context.tr.expiryDate,          context.tr.status, context.tr.storageLocation];
       final headerRow = headers.map((h) => TextCellValue(h) as CellValue).toList();
       sheet.appendRow(headerRow);
       for (int i = 0;
@@ -657,7 +657,7 @@ context.tr.error
       
 }      _autoWidth(sheet, headers.length, filtered);
       final totalQty = filtered.fold<int>(0, (s, m) => s + m.quantity);
-      sheet.appendRow([        TextCellValue(''), TextCellValue(''),        TextCellValue(''), TextCellValue(''),        TextCellValue(''), TextCellValue(''),        TextCellValue('TOTAL'),        TextCellValue(totalQty.toString()),      ]);
+      sheet.appendRow([        TextCellValue(''), TextCellValue(''),        TextCellValue(''), TextCellValue(''),        TextCellValue(''), TextCellValue(''),        TextCellValue(context.tr.total),        TextCellValue(totalQty.toString()),      ]);
       final sumRowIdx = sheet.maxRows - 1;
       for (int i = 0;
  i < 8;

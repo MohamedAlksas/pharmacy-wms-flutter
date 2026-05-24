@@ -34,8 +34,8 @@ class AppLocalizations {
   static AppLocalizations of(AppLanguage lang) =>      AppLocalizations._(lang);
   bool get isArabic => language == AppLanguage.ar;
   TextDirection get textDirection =>      isArabic ? TextDirection.rtl : TextDirection.ltr;
-    String get appTitle => isArabic ? 'نظام إدارة المستودعات' : 'Pharmacy Logistics';
-  String get appSubtitle => isArabic ? 'نظام إدارة المستودعات الصيدلانية' : 'WAREHOUSE MANAGEMENT SYSTEM';
+    String get appTitle => isArabic ? 'نظام إدارة المستودعات' : 'Pharmacy WMS';
+  String get appSubtitle => isArabic ? 'نظام إدارة المستودعات الصيدلانية' : 'Pharmacy WMS';
   String get loading => isArabic ? 'جارٍ التحميل...' : 'Loading...';
   String get cancel => isArabic ? 'إلغاء' : 'Cancel';
   String get save => isArabic ? 'حفظ' : 'Save';
@@ -138,8 +138,8 @@ count == 1 ? '' : 's'
   String get allCategories => isArabic ? 'كل الفئات' : 'All Categories';
   String get confirmDelete => isArabic ? 'تأكيد الحذف' : 'Confirm Delete';
   String get deleteConfirmMsg => isArabic      ? 'هل أنت متأكد أنك تريد حذف هذه المادة؟'      : 'Are you sure you want to delete this material?';
-  String get editProduct => isArabic ? 'تعديل المنتج' : 'Edit Product';
-  String get noProductsFound => isArabic ? 'لا توجد منتجات' : 'No products found';
+  String get editProduct => isArabic ? 'تعديل المادة' : 'Edit Material';
+  String get noProductsFound => isArabic ? 'لا توجد مواد' : 'No materials found';
   String get searchByNameOrSku => isArabic ? 'ابحث بالاسم أو الرمز' : 'Search by Name or SKU';
     String get statusGood => isArabic ? 'جيد' : 'Good';
   String get statusExpired => isArabic ? 'منتهي الصلاحية' : 'Expired';
@@ -159,17 +159,17 @@ count == 1 ? '' : 's'
   String get selectDate => isArabic ? 'اختر تاريخًا' : 'Select date';
   String get pleaseSelectDate => isArabic ? 'من فضلك اختر تاريخًا' : 'Please select an expiry date';
   String get addingProduct => isArabic ? 'جارٍ الإضافة...' : 'Adding...';
-  String get productAdded => isArabic ? 'تمت إضافة المنتج بنجاح' : 'Product added successfully';
+  String get productAdded => isArabic ? 'تمت إضافة المادة بنجاح' : 'Material added successfully';
     String get invoiceNumber => isArabic ? 'رقم الفاتورة' : 'Invoice Number';
-  String get exportProductTitle => isArabic ? 'صرف منتج' : 'Dispatch Product';
-  String get exportProductSubtitle => isArabic      ? 'سجّل مغادرة المنتج من مخزون المستودع.'      : 'Record product leaving warehouse inventory.';
+  String get exportProductTitle => isArabic ? 'صرف مادة' : 'Dispatch Material';
+  String get exportProductSubtitle => isArabic      ? 'سجّل مغادرة المادة من مخزون المستودع.'      : 'Record material leaving warehouse inventory.';
   String get exportProductBtn => isArabic ? 'صرف' : 'Dispatch';
-  String get productNotFound => isArabic ? 'المنتج غير موجود في المخزون' : 'Product not found in inventory';
+  String get productNotFound => isArabic ? 'المادة غير موجودة في المخزون' : 'Material not found in inventory';
   String get outOfStock => isArabic ? 'هذا الصنف نفد من المخزون' : 'This item is already out of stock';
-  String get exceedsStock => isArabic ? 'الكمية المُصدَّرة تتجاوز المخزون المتاح' : 'Export quantity exceeds available stock';
+  String get exceedsStock => isArabic ? 'الكمية المُصدَّرة تتجاوز المخزون المتاح' : 'Dispatch quantity exceeds available stock';
   String get typeHintSearch => isArabic ? 'اكتب اسم المادة أو الرمز' : 'Type material name or SKU';
     String get requestExpiryEdit => isArabic ? 'طلب تعديل تاريخ الانتهاء' : 'Request Expiry Edit';
-  String get product => isArabic ? 'المنتج' : 'Product';
+  String get product => isArabic ? 'المادة' : 'Material';
   String get sku => isArabic ? 'الرمز' : 'SKU';
   String get newExpiryDate => isArabic ? 'تاريخ الانتهاء الجديد' : 'New Expiry Date';
   String get requestEdit => isArabic ? 'طلب التعديل' : 'Request Edit';
@@ -184,7 +184,7 @@ count == 1 ? '' : 's'
   String get approve => isArabic ? 'قبول' : 'Approve';
   String get reject => isArabic ? 'رفض' : 'Reject';
   String get orderTypeAdd => isArabic ? 'إضافة' : 'Add';
-  String get orderTypeExport => isArabic ? 'تصدير' : 'Export';
+  String get orderTypeExport => isArabic ? 'صرف' : 'Dispatch';
   String get orderTypeEdit => isArabic ? 'تعديل' : 'Edit';
   String get orderTypeRefund => isArabic ? 'استرجاع' : 'Refund';
   String get orderStatusCompleted => isArabic ? 'مكتمل' : 'Completed';
@@ -227,26 +227,26 @@ count == 1 ? '' : 's'
   String get pdfInstructions => isArabic      ? 'تعليمات: تجول في كل موقع، واحسب الكمية الفعلية، واكتبها في عمود "العدد الفعلي". سجل أي اختلافات.'      : 'Instructions: Walk through each location, count the actual quantity, and write it in the "Actual Count" column. Note any discrepancies.';
   String get locationPrefix => isArabic ? 'الموقع: ' : 'Location: ';
   String get pdfColumnNum => isArabic ? '#' : '#';
-  String get pdfColumnProductName => isArabic ? 'اسم المنتج' : 'Product Name';
+  String get pdfColumnProductName => isArabic ? 'اسم المادة' : 'Material Name';
   String get pdfColumnActualCount => isArabic ? 'العدد الفعلي' : 'Actual Count';
   String get chooseExportMethod => isArabic ? 'اختر طريقة التصدير:' : 'Choose how to export:';
   String get saveOrShare => isArabic ? 'حفظ / مشاركة' : 'Save / Share';
   String get generatedPrefix => isArabic ? 'تم الإنشاء: ' : 'Generated: ';
   String get errorGeneratingPdf => isArabic ? 'خطأ في إنشاء ملف PDF' : 'Error generating PDF';
     String get refreshTooltip => isArabic ? 'تحديث' : 'Refresh';
-  String get addProduct => isArabic ? 'إضافة منتج' : 'Add Product';
+  String get addProduct => isArabic ? 'إضافة مادة' : 'Add Material';
   String get dispatchBtn => isArabic ? 'صرف' : 'Dispatch';
   String get retry => isArabic ? 'إعادة المحاولة' : 'Retry';
-  String get noProductsFiltered => isArabic      ? 'لا توجد منتجات تطابق الفلاتر الحالية.'      : 'No products found for the current filters.';
+  String get noProductsFiltered => isArabic      ? 'لا توجد مواد تطابق الفلاتر الحالية.'      : 'No materials found for the current filters.';
   String get availabilityColumn => isArabic ? 'التوفر' : 'Availability';
   String get viewDetailsTooltip => isArabic ? 'عرض التفاصيل' : 'View details';
-  String get deleteProductTooltip => isArabic ? 'حذف المنتج' : 'Delete product';
+  String get deleteProductTooltip => isArabic ? 'حذف المادة' : 'Delete material';
   String get stockUpdated => isArabic ? 'تم تحديث المخزون بنجاح.' : 'Stock updated successfully.';
   String unitsDispatched(int units, String product) => isArabic      ? '$units وحدة من $product تم صرفها.'      : '$units units of $product dispatched.';
   String outOfStockWarning(int units, String product) => isArabic      ? '$units وحدة من $product تم صرفها. الصنف نفد من المخزون وتم تعليمه كـ "غير متاح".'      : '$units units of $product dispatched. Item is now out of stock and marked Unavailable.';
   String get editRequestSubmitted => isArabic      ? 'تم تقديم طلب تعديل تاريخ الانتهاء.'      : 'Edit request submitted.';
   String get awaitingApproval => isArabic ? 'بإنتظار موافقة المشرف.' : 'Awaiting supervisor approval.';
-  String get deleteTitle => isArabic ? 'حذف المنتج' : 'Delete Product';
+  String get deleteTitle => isArabic ? 'حذف المادة' : 'Delete Material';
   String deleteConfirmNamed(String name) => isArabic      ? 'هل أنت متأكد أنك تريد حذف "$name"؟'      : 'Are you sure you want to delete "$name"?';
   String productDeleted(String name) => isArabic      ? 'تم حذف $name بنجاح.'      : '$name deleted successfully.';
   String get undo => isArabic ? 'تراجع' : 'Undo';
@@ -258,7 +258,7 @@ count == 1 ? '' : 's'
   String get noEditRequests => isArabic ? 'لا توجد طلبات تعديل' : 'No edit request notifications';
   String get goToOrders => isArabic ? 'انتقل إلى الطلبات' : 'Go to Orders';
   String get searchOrdersHint => isArabic      ? 'ابحث برقم الطلب أو المنتج أو الرمز...'      : 'Search by order ID, product, SKU, or user...';
-  String get productNotInInventory => isArabic      ? 'المنتج غير موجود في المخزون.'      : 'Product not found in inventory.';
+  String get productNotInInventory => isArabic      ? 'المادة غير موجودة في المخزون.'      : 'Material not found in inventory.';
   String get reportsAndAnalytics => isArabic ? 'التقارير والتحليلات' : 'Reports & Analytics';
   String get exportReport => isArabic ? 'تصدير التقرير' : 'Export Report';
   String get alertsLabel => isArabic ? 'التنبيهات' : 'Alerts';
@@ -316,4 +316,120 @@ count == 1 ? '' : 's'
   String get itemsToDispatch => isArabic ? 'المواد المراد صرفها' : 'Items to Dispatch';
   String unitsDispatchedSummary(int totalQuantity, int itemCount) => isArabic      ? 'تم صرف $totalQuantity وحدة من $itemCount مادة'      : 'Dispatched $totalQuantity units across $itemCount items';
 
+  // === ApprovalsView ===
+  String get pendingApprovals => isArabic ? 'الموافقات المعلقة' : 'Pending Approvals';
+  String get noPendingApprovals => isArabic ? 'لا توجد موافقات معلقة' : 'No pending approvals';
+  String get requestApproved => isArabic ? 'تمت الموافقة على الطلب' : 'Request approved';
+  String get rejectRequest => isArabic ? 'رفض الطلب' : 'Reject Request';
+  String get rejectionNotes => isArabic ? 'ملاحظات الرفض (اختياري)' : 'Optional rejection notes';
+  String get requestRejected => isArabic ? 'تم رفض الطلب' : 'Request rejected';
+  String get batchId => isArabic ? 'معرف الدفعة' : 'Batch ID';
+  String get oldExpiry => isArabic ? 'تاريخ الانتهاء القديم' : 'Old Expiry';
+  String get requestExpiryChange => isArabic ? 'طلب تغيير تاريخ الانتهاء' : 'Request Expiry Change';
+
+  // === EditRequestsView ===
+  String get requestedBy => isArabic ? 'مقدم الطلب' : 'Requested By';
+  String get source => isArabic ? 'المصدر' : 'Source';
+  String get reason => isArabic ? 'السبب' : 'Reason';
+  String get date => isArabic ? 'التاريخ' : 'Date';
+  String get approved => isArabic ? 'مقبول' : 'Approved';
+  String get rejected => isArabic ? 'مرفوض' : 'Rejected';
+  String get approvalSource => isArabic ? 'موافقة' : 'Approval';
+  String get orderSource => isArabic ? 'طلب' : 'Order';
+
+  // === ExpiryReportView ===
+  String get expiryReport => isArabic ? 'تقرير الصلاحية' : 'Expiry Report';
+  String get noExpiryData => isArabic ? 'لا توجد بيانات صلاحية' : 'No expiry data available';
+  String get valid => isArabic ? 'صالح' : 'Valid';
+
+  // === InvoicesView ===
+  String get invoiceDetails => isArabic ? 'تفاصيل الفاتورة' : 'Invoice Details';
+  String get totalQuantity => isArabic ? 'الكمية الإجمالية' : 'Total Quantity';
+  String get dateRange => isArabic ? 'النطاق الزمني' : 'Date Range';
+  String get invoicesTitle => isArabic ? 'الفواتير' : 'Invoices';
+  String get today => isArabic ? 'اليوم' : 'Today';
+  String get thisWeek => isArabic ? 'هذا الأسبوع' : 'This Week';
+  String get thisMonth => isArabic ? 'هذا الشهر' : 'This Month';
+  String get thisYear => isArabic ? 'هذه السنة' : 'This Year';
+  String get noInvoicesFound => isArabic ? 'لا توجد فواتير' : 'No invoices found';
+  String get searchByInvoice => isArabic ? 'ابحث برقم الفاتورة...' : 'Search by invoice number...';
+  String get materials => isArabic ? 'مواد' : 'Materials';
+  String get units => isArabic ? 'وحدة' : 'units';
+  String get refundLabel => isArabic ? 'استرجاع' : 'Refund';
+  String get quantityToRefund => isArabic ? 'الكمية المسترجعة' : 'Quantity to refund';
+  String get availableToRefund => isArabic ? 'متاح للاسترجاع' : 'Available to refund';
+  String get enterValidQuantity => isArabic ? 'أدخل كمية صالحة' : 'Enter a valid quantity';
+  String get cannotRefund => isArabic ? 'لا يمكن الاسترجاع: معرف المادة مفقود' : 'Cannot refund: product ID missing';
+  String get refundFailed => isArabic ? 'فشل الاسترجاع' : 'Refund failed';
+  String refundSuccess(int qty, String unit, String productName) => isArabic      ? 'تم استرجاع $qty $unit من $productName'      : 'Refunded $qty $unit of $productName';
+  String refundFailedWithError(String error) => isArabic      ? 'فشل الاسترجاع: $error'      : 'Refund failed: $error';
+  String get expPrefix => isArabic ? 'تاريخ الانتهاء: ' : 'EXP: ';
+  String get invoiceHash => isArabic ? 'رقم الفاتورة: ' : 'Invoice #';
+  String materialsCount(int count) => isArabic      ? '$count مواد'      : '$count materials';
+  String totalUnits(int count) => isArabic      ? 'المجموع: $count وحدة'      : 'Total: $count units';
+
+  // === OrdersView ===
+  String get orderId => isArabic ? 'رقم الطلب' : 'Order ID';
+  String get orderDate => isArabic ? 'تاريخ الطلب' : 'Order Date';
+
+  // === ReportsPage ===
+  String get allStatuses => isArabic ? 'جميع الحالات' : 'All Statuses';
+  String get uncategorized => isArabic ? 'غير مصنف' : 'Uncategorized';
+
+  // === UserInfo ===
+  String get unableToUpdateProfile => isArabic ? 'تعذر تحديث الملف الشخصي' : 'Unable to update profile.';
+  String get profileUpdated => isArabic ? 'تم تحديث الملف الشخصي بنجاح' : 'Profile updated successfully';
+  String get privacyComingSoon => isArabic ? 'إعدادات الخصوصية قريبًا' : 'Privacy settings coming soon.';
+  String get managerScope => isArabic ? 'النطاق: لوحة التحكم، المخزون، التقارير، الطلبات، الإعدادات' : 'Scope: Dashboard, Inventory, Reports, Orders, Settings';
+  String get supervisorScope => isArabic ? 'النطاق: الطلبات والتقارير' : 'Scope: Orders and Reports';
+  String get sendCode => isArabic ? 'إرسال الرمز' : 'Send Code';
+  String get sendVerificationCode => isArabic ? 'إرسال رمز التحقق' : 'Send Verification Code';
+  String get verifyCode => isArabic ? 'تحقق من الرمز' : 'Verify Code';
+  String get sixDigitCode => isArabic ? 'رمز من 6 أرقام' : '6-digit code';
+  String get newPassword => isArabic ? 'كلمة المرور الجديدة' : 'New Password';
+  String get resetNoEmail => isArabic ? 'لم يتم العثور على بريد إلكتروني مسجل' : 'No registered email address was found.';
+  String get verificationCodeSent => isArabic ? 'تم إرسال رمز التحقق إلى بريدك الإلكتروني المسجل' : 'A verification code has been sent to your registered email address.';
+  String get passwordMinChars => isArabic ? 'يجب أن تتكون كلمة المرور من 6 أحرف على الأقل' : 'New password must be at least 6 characters.';
+  String get passwordChangedSuccess => isArabic ? 'تم تغيير كلمة المرور بنجاح' : 'Password changed successfully';
+  String get requestFailedRetry => isArabic ? 'فشل الطلب. حاول مرة أخرى' : 'Request failed. Please try again.';
+
+  // === AddMaterialWizard ===
+  String get addToExistingDesc => isArabic ? 'إضافة إلى مادة موجودة في المخزون' : 'Add to existing material in stock';
+  String get addNewDesc => isArabic ? 'إضافة مادة جديدة بالكامل' : 'Add a completely new material';
+  String get hintMaterialName => isArabic ? 'مثال: باراسيتامول' : 'e.g. Paracetamol';
+  String get hintUnitExamples => isArabic ? 'علبة، قرص، زجاجة' : 'Box, Tablet, Bottle';
+  String get hintCategoryExample => isArabic ? 'مثال: مسكن ألم' : 'e.g. Pain Relief';
+  String get hintLocationExample => isArabic ? 'مثال: الرف A-12' : 'e.g. Shelf A-12';
+  String get pleaseSelectDate => isArabic ? 'من فضلك اختر تاريخًا' : 'Please select a date';
+
+  // === BatchDetailDialog ===
+  String get batchesLabel => isArabic ? 'الدفعات' : 'Batches';
+  String get noStockBatches => isArabic ? 'لا توجد دفعات مخزون لهذه المادة' : 'No stock batches for this product.';
+  String get totalStockLabel => isArabic ? 'إجمالي المخزون: ' : 'Total Stock: ';
+  String get batchesFefoOrder => isArabic ? 'الدفعات (ترتيب FEFO)' : 'Batches (FEFO order)';
+  String get expiredStatus => isArabic ? 'منتهي الصلاحية' : 'EXPIRED';
+  String get expiringSoonStatus => isArabic ? 'ينتهي قريبًا' : 'Expiring soon';
+  String get goodStatusLabel => isArabic ? 'جيد' : 'Good';
+  String get editExpiry => isArabic ? 'تعديل تاريخ الانتهاء' : 'Edit Expiry';
+  String get fefoInfo => isArabic ? 'FEFO: سيتم صرف الدفعة الأقرب للانتهاء أولاً.' : 'FEFO: Earliest expiry will be dispatched first.';
+
+  // === ExpiryChangeDialog ===
+  String get selectNewExpiry => isArabic ? 'من فضلك اختر تاريخ انتهاء جديد' : 'Please select a new expiry date';
+  String get enterReason => isArabic ? 'من فضلك أدخل سببًا' : 'Please enter a reason';
+  String get expiryChangeSubmitted => isArabic ? 'تم تقديم طلب تغيير تاريخ الانتهاء' : 'Expiry change request submitted';
+  String get currentExpiry => isArabic ? 'تاريخ الانتهاء الحالي' : 'Current Expiry';
+  String get tapToPickDate => isArabic ? 'اضغط لاختيار تاريخ' : 'Tap to pick a date';
+  String get whyChangeNeeded => isArabic ? 'لماذا هذا التغيير مطلوب؟' : 'Why is this change needed?';
+  String get submitRequest => isArabic ? 'إرسال الطلب' : 'Submit Request';
+
+  // === ProductEditDialog ===
+  String get materialNameRequired => isArabic ? 'اسم المادة مطلوب' : 'Material name is required';
+
+  // === DispatchMaterialWizard ===
+  String invoiceAlreadyExists(String invoice) => isArabic      ? 'رقم الفاتورة "$invoice" موجود بالفعل. استخدم رقمًا مختلفًا.'      : 'Invoice number "$invoice" already exists. Please use a different number.';
+
+  // === DashboardView ===
+  String get uncategorizedLabel => isArabic ? 'غير مصنف' : 'Uncategorized';
+  String get name => isArabic ? 'الاسم' : 'Name';
+  String get total => isArabic ? 'الإجمالي' : 'TOTAL';
 }

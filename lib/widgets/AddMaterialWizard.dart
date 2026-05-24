@@ -357,7 +357,7 @@ date.year
   
 }
   Widget _buildSelectionStep(AppLocalizations tr, bool isDark) {
-    return Column(      crossAxisAlignment: CrossAxisAlignment.start,      children: [        Row(          children: [            Expanded(              child: _buildSelectionCard(                icon: Icons.checklist,                label: tr.existingStock,                description: 'Add to existing material in stock',                color: const Color(0xFF3B82F6),                isDark: isDark,                selected: _selectionMode == 0,                onTap: () => _selectMode(0),              ),            ),            const SizedBox(width: 16),            Expanded(              child: _buildSelectionCard(                icon: Icons.add_box_outlined,                label: tr.newMaterial,                description: 'Add a completely new material',                color: const Color(0xFF22C55E),                isDark: isDark,                selected: _selectionMode == 1,                onTap: () => _selectMode(1),              ),            ),          ],        ),      ],    );
+    return Column(      crossAxisAlignment: CrossAxisAlignment.start,      children: [        Row(          children: [            Expanded(              child: _buildSelectionCard(                icon: Icons.checklist,                label: tr.existingStock,                description: tr.addToExistingDesc,                color: const Color(0xFF3B82F6),                isDark: isDark,                selected: _selectionMode == 0,                onTap: () => _selectMode(0),              ),            ),            const SizedBox(width: 16),            Expanded(              child: _buildSelectionCard(                icon: Icons.add_box_outlined,                label: tr.newMaterial,                description: tr.addNewDesc,                color: const Color(0xFF22C55E),                isDark: isDark,                selected: _selectionMode == 1,                onTap: () => _selectMode(1),              ),            ),          ],        ),      ],    );
   
 }
   Widget _buildSelectionCard({
@@ -409,7 +409,7 @@ p.sku
         _buildField(
           controller: _newNameController,
           label: tr.materialName,
-          hintText: 'e.g. Paracetamol',
+          hintText: tr.hintMaterialName,
           icon: Icons.medication_outlined,
           isDark: isDark,
           validator: _required,
@@ -418,7 +418,7 @@ p.sku
         _buildField(
           controller: _newSkuController,
           label: tr.materialSku,
-          hintText: 'MED-1001',
+          hintText: tr.skuHint,
           icon: Icons.qr_code_2_outlined,
           isDark: isDark,
           validator: _required,
@@ -427,7 +427,7 @@ p.sku
         _buildField(
           controller: _newUnitController,
           label: tr.unit,
-          hintText: 'Box, Tablet, Bottle',
+          hintText: tr.hintUnitExamples,
           icon: Icons.scale_outlined,
           isDark: isDark,
           width: 280,
@@ -435,7 +435,7 @@ p.sku
         _buildField(
           controller: _newCategoryController,
           label: tr.category,
-          hintText: 'e.g. Pain Relief',
+          hintText: tr.hintCategoryExample,
           icon: Icons.category_outlined,
           isDark: isDark,
           width: 280,
@@ -443,7 +443,7 @@ p.sku
         _buildField(
           controller: _newLocationController,
           label: tr.storageLocation,
-          hintText: 'Shelf A-12',
+          hintText: tr.hintLocationExample,
           icon: Icons.location_on_outlined,
           isDark: isDark,
           width: 280,
@@ -451,7 +451,7 @@ p.sku
         _buildField(
           controller: _newQuantityController,
           label: tr.quantity,
-          hintText: '1',
+          hintText: tr.quantityHint,
           icon: Icons.inventory_2_outlined,
           isDark: isDark,
           keyboardType: TextInputType.number,
@@ -477,7 +477,9 @@ p.sku
   Widget _buildExpiryPicker({
     required String label,    required bool isDark,    required DateTime? date,    required VoidCallback onTap,    double width = 280,  
 }) {
-    return SizedBox(      width: width,      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          Text(            label,            style: TextStyle(              fontSize: 13,              fontWeight: FontWeight.w600,              color: isDark ? Colors.white : Colors.black,            ),          ),          const SizedBox(height: 8),          InkWell(            onTap: onTap,            borderRadius: BorderRadius.circular(12),            child: InputDecorator(              decoration: InputDecoration(                prefixIcon: const Icon(Icons.calendar_today_outlined),                filled: true,                fillColor: isDark ? const Color(0xFF2A3441) : Colors.grey[100],                border: OutlineInputBorder(                  borderRadius: BorderRadius.circular(12),                  borderSide: BorderSide.none,                ),                errorText: _submitted && date == null                    ? 'Please select a date'                    : null,              ),              child: Text(                date == null                    ? context.tr.selectDate                    : _formatDate(date),                style:                    TextStyle(color: isDark ? Colors.white : Colors.black87),              ),            ),          ),        ],      ),    );
+    return SizedBox(      width: width,      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          Text(            label,            style: TextStyle(              fontSize: 13,              fontWeight: FontWeight.w600,              color: isDark ? Colors.white : Colors.black,            ),          ),          const SizedBox(height: 8),          InkWell(            onTap: onTap,            borderRadius: BorderRadius.circular(12),            child: InputDecorator(              decoration: InputDecoration(                prefixIcon: const Icon(Icons.calendar_today_outlined),                filled: true,                fillColor: isDark ? const Color(0xFF2A3441) : Colors.grey[100],                border: OutlineInputBorder(                  borderRadius: BorderRadius.circular(12),                  borderSide: BorderSide.none,                ),                                errorText: _submitted && date == null
+                    ? context.tr.pleaseSelectDate
+                    : null,              ),              child: Text(                date == null                    ? context.tr.selectDate                    : _formatDate(date),                style:                    TextStyle(color: isDark ? Colors.white : Colors.black87),              ),            ),          ),        ],      ),    );
   
 }
   Widget _buildSessionList(AppLocalizations tr, bool isDark) {

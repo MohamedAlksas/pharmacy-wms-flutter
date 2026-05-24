@@ -49,7 +49,7 @@ class _DispatchMaterialWizardState extends State<DispatchMaterialWizard> {  int 
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Invoice number "' + '$invoice' + '" already exists. Please use a different number.'),
+          content: Text(context.tr.invoiceAlreadyExists(invoice)),
           backgroundColor: Colors.red,
         ),
       );

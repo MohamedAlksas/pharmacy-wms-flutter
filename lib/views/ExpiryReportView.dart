@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:pharmacy_wms/Models/app_localizations.dart';
 import 'package:pharmacy_wms/Models/UserRoleModel.dart';
 import 'package:pharmacy_wms/Services/api_config.dart';
 
@@ -88,6 +89,15 @@ class _ExpiryReportPageState extends State<ExpiryReportPage> {
     }
   }
 
+  String _localizedStatus(String key) {
+    switch (key) {
+      case 'Expired': return context.tr.statusExpired;
+      case 'Expiring Soon': return context.tr.expiringSoonStatus;
+      case 'Valid': return context.tr.valid;
+      default: return context.tr.statusUnknown;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -100,14 +110,14 @@ class _ExpiryReportPageState extends State<ExpiryReportPage> {
         children: [
           Row(
             children: [
-              Text('Expiry Report', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: textColor)),
+              Text(context.tr.expiryReport, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: textColor)),
               const Spacer(),
               if (_loading)
                 const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2)),
               IconButton(
                 icon: const Icon(Icons.refresh),
                 onPressed: _loading ? null : _load,
-                tooltip: 'Refresh',
+                tooltip: context.tr.refresh,
               ),
             ],
           ),
@@ -128,7 +138,7 @@ class _ExpiryReportPageState extends State<ExpiryReportPage> {
             const SizedBox(height: 12),
             Text(_error!, style: const TextStyle(color: Colors.red)),
             const SizedBox(height: 12),
-            ElevatedButton(onPressed: _load, child: const Text('Retry')),
+            ElevatedButton(onPressed: _load, child: Text(context.tr.retry)),
           ],
         ),
       );
@@ -146,7 +156,7 @@ class _ExpiryReportPageState extends State<ExpiryReportPage> {
             Icon(Icons.inventory_2_outlined, size: 64,
                 color: isDark ? Colors.white24 : Colors.black12),
             const SizedBox(height: 16),
-            Text('No expiry data available',
+            Text(context.tr.noExpiryData,
                 style: TextStyle(color: isDark ? Colors.white60 : Colors.black45, fontSize: 16)),
           ],
         ),
@@ -160,12 +170,12 @@ class _ExpiryReportPageState extends State<ExpiryReportPage> {
           headingRowHeight: 54,
           dataRowMinHeight: 52,
           dataRowMaxHeight: 52,
-          columns: const [
-            DataColumn(label: Text('Product Name')),
-            DataColumn(label: Text('SKU')),
-            DataColumn(label: Text('Expiry Date')),
-            DataColumn(label: Text('Quantity'), numeric: true),
-            DataColumn(label: Text('Status')),
+          columns: [
+            DataColumn(label: Text(context.tr.product)),
+            DataColumn(label: Text(context.tr.sku)),
+            DataColumn(label: Text(context.tr.expiryDate)),
+            DataColumn(label: Text(context.tr.quantity), numeric: true),
+            DataColumn(label: Text(context.tr.status)),
           ],
           rows: _items!.map((item) {
             final expiryDate = (item['expiryDate'] ?? item['expiry'] ?? '').toString();
@@ -191,7 +201,7 @@ class _ExpiryReportPageState extends State<ExpiryReportPage> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
-                    status,
+                    _localizedStatus(status),
                     style: TextStyle(color: statusColor, fontWeight: FontWeight.w600, fontSize: 12),
                   ),
                 )),

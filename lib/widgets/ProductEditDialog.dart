@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pharmacy_wms/Models/ProductProvider.dart';
+import 'package:pharmacy_wms/Models/app_localizations.dart';
 import 'package:pharmacy_wms/Models/materialModel.dart';
 import 'package:pharmacy_wms/Services/ProductService.dart';
 
@@ -49,7 +50,7 @@ class _ProductEditDialogState extends State<ProductEditDialog> {
 
   Future<void> _save() async {
     if (_nameCtrl.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Material name is required')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tr.materialNameRequired)));
       return;
     }
     setState(() => _saving = true);
@@ -96,7 +97,7 @@ class _ProductEditDialogState extends State<ProductEditDialog> {
               children: [
                 Expanded(
                   child: Text(
-                    'Edit Product',
+                    context.tr.editProduct,
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: textColor),
                   ),
                 ),
@@ -109,27 +110,27 @@ class _ProductEditDialogState extends State<ProductEditDialog> {
             const SizedBox(height: 18),
             TextField(
               controller: _nameCtrl,
-              decoration: const InputDecoration(labelText: 'Material Name', border: OutlineInputBorder()),
+              decoration: InputDecoration(labelText: context.tr.materialName, border: const OutlineInputBorder()),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _skuCtrl,
-              decoration: const InputDecoration(labelText: 'SKU', border: OutlineInputBorder()),
+              decoration: InputDecoration(labelText: context.tr.sku, border: const OutlineInputBorder()),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _unitCtrl,
-              decoration: const InputDecoration(labelText: 'Unit', border: OutlineInputBorder()),
+              decoration: InputDecoration(labelText: context.tr.unit, border: const OutlineInputBorder()),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _locationCtrl,
-              decoration: const InputDecoration(labelText: 'Storage Location', border: OutlineInputBorder()),
+              decoration: InputDecoration(labelText: context.tr.storageLocation, border: const OutlineInputBorder()),
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               value: categories.contains(_category) ? _category : null,
-              decoration: const InputDecoration(labelText: 'Category', border: OutlineInputBorder()),
+              decoration: InputDecoration(labelText: context.tr.category, border: const OutlineInputBorder()),
               items: categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
               onChanged: (value) {
                 if (value != null) setState(() => _category = value);
@@ -141,14 +142,14 @@ class _ProductEditDialogState extends State<ProductEditDialog> {
               children: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
+                  child: Text(context.tr.cancel),
                 ),
                 const SizedBox(width: 12),
                 ElevatedButton(
                   onPressed: _saving ? null : _save,
                   child: _saving
                       ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Text('Save'),
+                      : Text(context.tr.save),
                 ),
               ],
             ),

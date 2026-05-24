@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pharmacy_wms/Models/app_localizations.dart';
 import 'package:pharmacy_wms/Models/materialModel.dart';
 import 'package:pharmacy_wms/Models/stockBatchModel.dart';
 import 'package:pharmacy_wms/Models/UserRoleModel.dart';
@@ -63,7 +64,7 @@ class _BatchDetailDialogState extends State<BatchDetailDialog> {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              '${widget.product.name} - Batches',
+              '${widget.product.name} - ${context.tr.batchesLabel}',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -80,7 +81,7 @@ class _BatchDetailDialogState extends State<BatchDetailDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text('Close'),
+          child: Text(context.tr.close),
         ),
       ],
     );
@@ -96,7 +97,7 @@ class _BatchDetailDialogState extends State<BatchDetailDialog> {
             const SizedBox(height: 8),
             Text(_error!, style: const TextStyle(color: Colors.red)),
             const SizedBox(height: 12),
-            ElevatedButton(onPressed: _loadBatches, child: const Text('Retry')),
+            ElevatedButton(onPressed: _loadBatches, child: Text(context.tr.retry)),
           ],
         ),
       );
@@ -117,7 +118,7 @@ class _BatchDetailDialogState extends State<BatchDetailDialog> {
                 color: isDark ? Colors.white24 : Colors.black12),
             const SizedBox(height: 12),
             Text(
-              'No stock batches for this product.',
+              context.tr.noStockBatches,
               style: TextStyle(color: isDark ? Colors.white60 : Colors.black45),
             ),
           ],
@@ -131,7 +132,7 @@ class _BatchDetailDialogState extends State<BatchDetailDialog> {
       children: [
         Row(
           children: [
-            Text('Total Stock: ',
+            Text(context.tr.totalStockLabel,
                 style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
             Text(
               '${_batches!.fold(0, (sum, b) => sum + b.quantity)}',
@@ -146,7 +147,7 @@ class _BatchDetailDialogState extends State<BatchDetailDialog> {
         const Divider(height: 1),
         const SizedBox(height: 8),
         Text(
-          'Batches (FEFO order)',
+          context.tr.batchesFefoOrder,
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
@@ -159,11 +160,11 @@ class _BatchDetailDialogState extends State<BatchDetailDialog> {
             child: DataTable(
               columnSpacing: 20,
               columns: [
-                const DataColumn(label: Text('Expiry')),
-                const DataColumn(label: Text('Qty'), numeric: true),
-                const DataColumn(label: Text('Status')),
+                DataColumn(label: Text(context.tr.expiryDate)),
+                DataColumn(label: Text(context.tr.quantity), numeric: true),
+                DataColumn(label: Text(context.tr.status)),
                 if (AuthService.isWarehouseManager)
-                  const DataColumn(label: Text('Actions')),
+                  DataColumn(label: Text(context.tr.actions)),
               ],
               rows: _batches!.map((batch) {
                 final isExpired = batch.isExpired;
@@ -172,13 +173,13 @@ class _BatchDetailDialogState extends State<BatchDetailDialog> {
                 String statusText;
                 if (isExpired) {
                   statusColor = Colors.red;
-                  statusText = 'EXPIRED';
+                  statusText = context.tr.expiredStatus;
                 } else if (isExpiringSoon) {
                   statusColor = Colors.orange;
-                  statusText = 'Expiring soon';
+                  statusText = context.tr.expiringSoonStatus;
                 } else {
                   statusColor = Colors.green;
-                  statusText = 'Good';
+                  statusText = context.tr.goodStatusLabel;
                 }
                 return DataRow(
                   color: WidgetStatePropertyAll(
@@ -216,7 +217,7 @@ class _BatchDetailDialogState extends State<BatchDetailDialog> {
                     if (AuthService.isWarehouseManager)
                       DataCell(IconButton(
                         icon: const Icon(Icons.edit_calendar, size: 18),
-                        tooltip: 'Edit Expiry',
+                        tooltip: context.tr.editExpiry,
                         onPressed: () => _openExpiryChange(batch),
                       )),
                   ],
@@ -240,7 +241,7 @@ class _BatchDetailDialogState extends State<BatchDetailDialog> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'FEFO: Earliest expiry will be dispatched first.',
+                      context.tr.fefoInfo,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.green[700],

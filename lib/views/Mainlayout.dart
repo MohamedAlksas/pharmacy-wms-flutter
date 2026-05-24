@@ -32,10 +32,10 @@ class _MainLayoutState extends State<MainLayout> with WidgetsBindingObserver {  
       EditRequestsPage(),
     ];  }
 
-  List<_MenuItem> _getMenuItems(AppLocalizations tr) {    if (AuthService.isSupervisor) {      return [        _MenuItem(Icons.list_alt, tr.orders, 0),        _MenuItem(Icons.receipt_long, 'Invoices', 1),        _MenuItem(Icons.bar_chart, tr.reports, 2),        _MenuItem(Icons.history, tr.auditLog, 3),                _MenuItem(Icons.approval, 'Approvals', 4),
-        _MenuItem(Icons.edit_note, 'Edit Requests', 5),
-      ];    }    return [      _MenuItem(Icons.dashboard, tr.dashboard, 0),      _MenuItem(Icons.inventory_2, tr.inventory, 1),      _MenuItem(Icons.assignment, 'Stocktake', 2),      _MenuItem(Icons.bar_chart, tr.reports, 3),      _MenuItem(Icons.list_alt, tr.orders, 4),      _MenuItem(Icons.receipt_long, 'Invoices', 5),      _MenuItem(Icons.history, tr.auditLog, 6),            _MenuItem(Icons.settings, tr.settings, 7),
-      _MenuItem(Icons.edit_note, 'Edit Requests', 8),
+  List<_MenuItem> _getMenuItems(AppLocalizations tr) {    if (AuthService.isSupervisor) {      return [        _MenuItem(Icons.list_alt, tr.orders, 0),        _MenuItem(Icons.receipt_long, tr.invoicesTitle, 1),        _MenuItem(Icons.bar_chart, tr.reports, 2),        _MenuItem(Icons.history, tr.auditLog, 3),                _MenuItem(Icons.approval, tr.pendingApprovals, 4),
+        _MenuItem(Icons.edit_note, tr.editRequests, 5),
+      ];    }    return [      _MenuItem(Icons.dashboard, tr.dashboard, 0),      _MenuItem(Icons.inventory_2, tr.inventory, 1),      _MenuItem(Icons.assignment, tr.stocktake, 2),      _MenuItem(Icons.bar_chart, tr.reports, 3),      _MenuItem(Icons.list_alt, tr.orders, 4),      _MenuItem(Icons.receipt_long, tr.invoicesTitle, 5),      _MenuItem(Icons.history, tr.auditLog, 6),            _MenuItem(Icons.settings, tr.settings, 7),
+      _MenuItem(Icons.edit_note, tr.editRequests, 8),
     ];  }
 
 

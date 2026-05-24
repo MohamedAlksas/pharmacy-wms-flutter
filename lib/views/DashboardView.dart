@@ -81,7 +81,7 @@ tr.unit.toLowerCase()
 
 };
     for (final m in all) {
-      final c = m.category.isEmpty ? 'Uncategorized' : m.category;
+      final c = m.category.isEmpty ? context.tr.uncategorizedLabel : m.category;
       cats[c] = (cats[c] ?? 0) + 1;
     
 }

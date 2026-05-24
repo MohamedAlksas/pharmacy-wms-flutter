@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pharmacy_wms/Models/app_localizations.dart';
 import 'package:pharmacy_wms/Services/ApprovalService.dart';
 import 'package:pharmacy_wms/widgets/toast.dart';
 
@@ -39,11 +40,11 @@ class _ExpiryChangeDialogState extends State<ExpiryChangeDialog> {
 
   Future<void> _submit() async {
     if (_newExpiry == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select a new expiry date')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tr.selectNewExpiry)));
       return;
     }
     if (_reasonCtrl.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter a reason')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tr.enterReason)));
       return;
     }
     setState(() => _saving = true);
@@ -55,7 +56,7 @@ class _ExpiryChangeDialogState extends State<ExpiryChangeDialog> {
       );
       if (!mounted) return;
       Navigator.pop(context, true);
-      showToast(context, 'Expiry change request submitted');
+      showToast(context, context.tr.expiryChangeSubmitted);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -86,7 +87,7 @@ class _ExpiryChangeDialogState extends State<ExpiryChangeDialog> {
               children: [
                 Expanded(
                   child: Text(
-                    'Request Expiry Change',
+                    context.tr.requestExpiryChange,
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: textColor),
                   ),
                 ),
@@ -97,12 +98,12 @@ class _ExpiryChangeDialogState extends State<ExpiryChangeDialog> {
               ],
             ),
             const SizedBox(height: 14),
-            Text('Product: ${widget.productName}', style: TextStyle(color: textColor, fontWeight: FontWeight.w500)),
+            Text('${context.tr.product}: ${widget.productName}', style: TextStyle(color: textColor, fontWeight: FontWeight.w500)),
             const SizedBox(height: 4),
-            Text('Current Expiry: ${widget.currentExpiry}',
+            Text('${context.tr.currentExpiry}: ${widget.currentExpiry}',
                 style: TextStyle(color: isDark ? Colors.white60 : Colors.black54)),
             const SizedBox(height: 18),
-            Text('New Expiry Date', style: TextStyle(fontWeight: FontWeight.w600, color: textColor)),
+            Text(context.tr.newExpiryDate, style: TextStyle(fontWeight: FontWeight.w600, color: textColor)),
             const SizedBox(height: 8),
             InkWell(
               onTap: _pickDate,
@@ -117,19 +118,19 @@ class _ExpiryChangeDialogState extends State<ExpiryChangeDialog> {
                 child: Text(
                   _newExpiry != null
                       ? '${_newExpiry!.year}-${_newExpiry!.month.toString().padLeft(2, '0')}-${_newExpiry!.day.toString().padLeft(2, '0')}'
-                      : 'Tap to pick a date',
+                      : context.tr.tapToPickDate,
                   style: TextStyle(color: _newExpiry != null ? textColor : Colors.grey),
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            Text('Reason', style: TextStyle(fontWeight: FontWeight.w600, color: textColor)),
+            Text(context.tr.reason, style: TextStyle(fontWeight: FontWeight.w600, color: textColor)),
             const SizedBox(height: 8),
             TextField(
               controller: _reasonCtrl,
               maxLines: 3,
               decoration: InputDecoration(
-                hintText: 'Why is this change needed?',
+                hintText: context.tr.whyChangeNeeded,
                 filled: true,
                 fillColor: isDark ? const Color(0xFF2A3441) : Colors.grey[100],
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -141,14 +142,14 @@ class _ExpiryChangeDialogState extends State<ExpiryChangeDialog> {
               children: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
+                  child: Text(context.tr.cancel),
                 ),
                 const SizedBox(width: 12),
                 ElevatedButton(
                   onPressed: _saving ? null : _submit,
                   child: _saving
                       ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Text('Submit Request'),
+                      : Text(context.tr.submitRequest),
                 ),
               ],
             ),
