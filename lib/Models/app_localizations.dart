@@ -186,6 +186,7 @@ count == 1 ? '' : 's'
   String get orderTypeAdd => isArabic ? 'إضافة' : 'Add';
   String get orderTypeExport => isArabic ? 'تصدير' : 'Export';
   String get orderTypeEdit => isArabic ? 'تعديل' : 'Edit';
+  String get orderTypeRefund => isArabic ? 'استرجاع' : 'Refund';
   String get orderStatusCompleted => isArabic ? 'مكتمل' : 'Completed';
   String get orderStatusPending => isArabic ? 'معلق' : 'Pending';
   String get orderStatusCanceled => isArabic ? 'ملغى' : 'Canceled';
