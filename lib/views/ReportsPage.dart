@@ -460,7 +460,7 @@ context.tr.itemsLabel
       ..sort((a, b) => (a.expiryDateValue ?? DateTime.now()).compareTo(b.expiryDateValue ?? DateTime.now()));
     final lowStock = MaterialService.getLowStockMaterials()
       ..sort((a, b) => a.quantity.compareTo(b.quantity));
-    return SingleChildScrollView(      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          _chartCard(isDark, context.tr.expiryTimeline,              _buildExpiryChart(isDark, all)),          const SizedBox(height: 16),          Row(            crossAxisAlignment: CrossAxisAlignment.start,            children: [              Expanded(child: _expirySection(isDark, context.tr.expiringSoonItems, expiringSoon, true)),              const SizedBox(width: 16),              Expanded(child: _expirySection(isDark, context.tr.lowStockItems, lowStock, false)),            ],          ),        ],      ),    );
+    return SingleChildScrollView(      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          _chartCard(isDark, context.tr.expiryTimeline,              _buildExpiryChart(isDark, all)),          const SizedBox(height: 16),          Row(            crossAxisAlignment: CrossAxisAlignment.start,            children: [              Expanded(child: _expirySection(isDark, context.tr.expiringSoonItems, expiringSoon, true)),              const SizedBox(width: 16),              Expanded(child: _expirySection(isDark, context.tr.lowStockItemsTitle, lowStock, false)),            ],          ),        ],      ),    );
   
 }
   Widget _expirySection(bool isDark, String title, List<MaterialModel> items, bool showExpiry) {
