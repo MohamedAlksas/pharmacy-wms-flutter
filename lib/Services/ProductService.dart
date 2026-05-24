@@ -147,6 +147,13 @@ class ProductService {
     throw Exception(await _extractError(response.statusCode, decoded));
   }
 
+  static Future<void> updateProductDetails(String id, Map<String, dynamic> body) async {
+    final response = await _patch(Uri.parse('$_baseUrl/$id'), body);
+    final decoded = _decodeBody(response.body);
+    if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204) return;
+    throw Exception(await _extractError(response.statusCode, decoded));
+  }
+
   static Future<List<MaterialModel>> fetchAllProducts() => getAllProducts();
   static Future<List<MaterialModel>> fetchAdminProducts() => getAdminProducts();
 

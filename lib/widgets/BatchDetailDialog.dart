@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pharmacy_wms/Models/materialModel.dart';
 import 'package:pharmacy_wms/Models/stockBatchModel.dart';
+import 'package:pharmacy_wms/Models/UserRoleModel.dart';
 import 'package:pharmacy_wms/Services/ProductService.dart';
+import 'package:pharmacy_wms/widgets/ExpiryChangeDialog.dart';
 
 class BatchDetailDialog extends StatefulWidget {
   final MaterialModel product;
@@ -33,6 +35,18 @@ class _BatchDetailDialogState extends State<BatchDetailDialog> {
       if (!mounted) return;
       setState(() => _error = e.toString());
     }
+  }
+
+  Future<void> _openExpiryChange(StockBatch batch) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (_) => ExpiryChangeDialog(
+        batchId: batch.id,
+        currentExpiry: batch.formattedExpiry,
+        productName: widget.product.name,
+      ),
+    );
+    if (result == true) _loadBatches();
   }
 
   @override
@@ -144,10 +158,12 @@ class _BatchDetailDialogState extends State<BatchDetailDialog> {
           child: SingleChildScrollView(
             child: DataTable(
               columnSpacing: 20,
-              columns: const [
-                DataColumn(label: Text('Expiry')),
-                DataColumn(label: Text('Qty'), numeric: true),
-                DataColumn(label: Text('Status')),
+              columns: [
+                const DataColumn(label: Text('Expiry')),
+                const DataColumn(label: Text('Qty'), numeric: true),
+                const DataColumn(label: Text('Status')),
+                if (AuthService.isWarehouseManager)
+                  const DataColumn(label: Text('Actions')),
               ],
               rows: _batches!.map((batch) {
                 final isExpired = batch.isExpired;
@@ -197,6 +213,12 @@ class _BatchDetailDialogState extends State<BatchDetailDialog> {
                         ),
                       ],
                     )),
+                    if (AuthService.isWarehouseManager)
+                      DataCell(IconButton(
+                        icon: const Icon(Icons.edit_calendar, size: 18),
+                        tooltip: 'Edit Expiry',
+                        onPressed: () => _openExpiryChange(batch),
+                      )),
                   ],
                 );
               }).toList(),
