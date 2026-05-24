@@ -10,7 +10,7 @@ class AuditLogService {
   static Future<List<AuditLogModel>> getAll() async {
     final response = await http
         .get(Uri.parse(_baseUrl), headers: AuthService.authHeaders)
-        .timeout(const Duration(seconds: 15));
+        .timeout(const Duration(seconds: 45));
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);

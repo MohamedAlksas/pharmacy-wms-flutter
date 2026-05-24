@@ -70,7 +70,7 @@ class NotificationService {
               'managerName': notification.managerName,
             }),
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 45));
       if (response.statusCode == 200 || response.statusCode == 201) {
         _notifications.insert(0, notification);
         changes.value++;
@@ -99,7 +99,7 @@ class NotificationService {
             Uri.parse('$_baseUrl/Notifications/mark-all-read'),
             headers: AuthService.authHeaders,
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 45));
     } catch (e) {
       debugPrint('[NotificationService] Failed to mark all read: $e');
     }
@@ -119,7 +119,7 @@ class NotificationService {
             Uri.parse('$_baseUrl/Notifications/$id/read'),
             headers: AuthService.authHeaders,
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 45));
     } catch (e) {
       debugPrint('[NotificationService] Failed to mark read: $e');
     }
@@ -171,7 +171,7 @@ class NotificationService {
             Uri.parse('$_baseUrl/Auth/supervisors'),
             headers: AuthService.authHeaders,
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 45));
       if (response.statusCode < 200 || response.statusCode >= 300) {
         return const [fallbackSupervisorEmail];
       }
@@ -208,7 +208,7 @@ class NotificationService {
                 '$managerName has requested an expiry date change for $productName (SKU: $productSku). Proposed new expiry: $newExpiry. Please review and approve or reject this request in the Orders page.',
           }),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(const Duration(seconds: 45));
     if (response.statusCode < 200 || response.statusCode >= 300) {
       debugPrint(
         'Edit request email to $to failed (${response.statusCode}): ${response.body}',
@@ -226,7 +226,7 @@ class NotificationService {
             Uri.parse('$_baseUrl/Notifications'),
             headers: AuthService.authHeaders,
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 45));
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
         final List<dynamic> items = decoded is List ? decoded : [];
