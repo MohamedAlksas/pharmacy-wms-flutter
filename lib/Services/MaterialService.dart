@@ -64,6 +64,33 @@ class MaterialService {
     }
   }).toList();
 
+  static int get lowStockThreshold => _lowStockThreshold;
+  static int get expiringSoonDays => _expiringSoonDays;
+
+  static bool isLowStock(MaterialModel material) => material.quantity < _lowStockThreshold;
+
+  static List<String> getMaterialStatuses(MaterialModel material) {
+    final statuses = <String>[];
+    try {
+      final expiry = DateTime.parse(material.expiryDate);
+      final now = DateTime.now();
+      if (expiry.isBefore(now)) {
+        statuses.add('Expired');
+      }
+      final daysUntilExpiry = expiry.difference(now).inDays;
+      if (daysUntilExpiry >= 0 && daysUntilExpiry <= _expiringSoonDays) {
+        statuses.add('Expiring Soon');
+      }
+      if (material.quantity < _lowStockThreshold) {
+        statuses.add('Low Stock');
+      }
+      if (statuses.isEmpty) statuses.add('Good');
+    } catch (_) {
+      statuses.add('Unknown');
+    }
+    return statuses;
+  }
+
   static List<Map<String, dynamic>> getMaterialsAsMap() =>
       _cache.map((m) => m.toJson()).toList();
 }

@@ -8,6 +8,7 @@ import 'package:pharmacy_wms/views/OrdersView.dart';
 import 'package:pharmacy_wms/views/InvoicesView.dart';
 import 'package:pharmacy_wms/views/AuditLogView.dart';
 import 'package:pharmacy_wms/views/ApprovalsView.dart';
+import 'package:pharmacy_wms/views/EditRequestsView.dart';
 import 'package:pharmacy_wms/views/ReportsPage.dart';
 import 'package:pharmacy_wms/views/ThresholdSettingsPage.dart';
 import 'package:pharmacy_wms/main.dart';
@@ -22,9 +23,20 @@ class _MainLayoutState extends State<MainLayout> with WidgetsBindingObserver {  
 
   void _onSelect(int index) {    if (_selectedIndex == index) return;    setState(() => _selectedIndex = index);    final w = MediaQuery.of(context).size.width;    if (w < 900 && !_sidebarCollapsed) {      setState(() => _sidebarCollapsed = true);    }  }
 
-  List<Widget> _getPages() {    if (AuthService.isSupervisor) {      return [        OrdersPage(onGoToOrders: () => _onSelect(0)),        InvoicesPage(),        ReportsPage(onGoToOrders: () => _onSelect(0)),        const AuditLogPage(),        const ApprovalsPage(),      ];    }    return const [      DashboardPage(),      InventoryPage(),      StocktakePage(),      ReportsPage(),      OrdersPage(),      InvoicesPage(),      AuditLogPage(),      ThresholdSettingsPage(),    ];  }
+  List<Widget> _getPages() {    if (AuthService.isSupervisor) {      return [        OrdersPage(onGoToOrders: () => _onSelect(0)),        InvoicesPage(),        ReportsPage(onGoToOrders: () => _onSelect(0)),                const AuditLogPage(),
+        const ApprovalsPage(),
+        const EditRequestsPage(),
+      ];
+    }    return const [      DashboardPage(),      InventoryPage(),      StocktakePage(),      ReportsPage(),      OrdersPage(),      InvoicesPage(),            AuditLogPage(),
+      ThresholdSettingsPage(),
+      EditRequestsPage(),
+    ];  }
 
-  List<_MenuItem> _getMenuItems(AppLocalizations tr) {    if (AuthService.isSupervisor) {      return [        _MenuItem(Icons.list_alt, tr.orders, 0),        _MenuItem(Icons.receipt_long, 'Invoices', 1),        _MenuItem(Icons.bar_chart, tr.reports, 2),        _MenuItem(Icons.history, tr.auditLog, 3),        _MenuItem(Icons.approval, 'Approvals', 4),      ];    }    return [      _MenuItem(Icons.dashboard, tr.dashboard, 0),      _MenuItem(Icons.inventory_2, tr.inventory, 1),      _MenuItem(Icons.assignment, 'Stocktake', 2),      _MenuItem(Icons.bar_chart, tr.reports, 3),      _MenuItem(Icons.list_alt, tr.orders, 4),      _MenuItem(Icons.receipt_long, 'Invoices', 5),      _MenuItem(Icons.history, tr.auditLog, 6),      _MenuItem(Icons.settings, tr.settings, 7),    ];  }
+  List<_MenuItem> _getMenuItems(AppLocalizations tr) {    if (AuthService.isSupervisor) {      return [        _MenuItem(Icons.list_alt, tr.orders, 0),        _MenuItem(Icons.receipt_long, 'Invoices', 1),        _MenuItem(Icons.bar_chart, tr.reports, 2),        _MenuItem(Icons.history, tr.auditLog, 3),                _MenuItem(Icons.approval, 'Approvals', 4),
+        _MenuItem(Icons.edit_note, 'Edit Requests', 5),
+      ];    }    return [      _MenuItem(Icons.dashboard, tr.dashboard, 0),      _MenuItem(Icons.inventory_2, tr.inventory, 1),      _MenuItem(Icons.assignment, 'Stocktake', 2),      _MenuItem(Icons.bar_chart, tr.reports, 3),      _MenuItem(Icons.list_alt, tr.orders, 4),      _MenuItem(Icons.receipt_long, 'Invoices', 5),      _MenuItem(Icons.history, tr.auditLog, 6),            _MenuItem(Icons.settings, tr.settings, 7),
+      _MenuItem(Icons.edit_note, 'Edit Requests', 8),
+    ];  }
 
 
   Future<void> _logout() async {    final confirmed = await showDialog<bool>(      context: context,      builder: (ctx) => AlertDialog(        title: Text(context.tr.logout),        content: Text(context.tr.logoutConfirmMsg),        actions: [          TextButton(            onPressed: () => Navigator.pop(ctx, false),            child: Text(context.tr.cancel),          ),          ElevatedButton(            onPressed: () => Navigator.pop(ctx, true),            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),            child: Text(context.tr.logout, style: const TextStyle(color: Colors.white)),          ),        ],      ),    );    if (confirmed == true) await AuthService.logout();  }  Future<void> _checkForUpdates() async {    try {      final remote = await UpdateService.fetchLatestVersion();      if (!mounted) return;      if (remote == null) {        showToast(context, context.tr.updateCheckFailed);        return;      }      final localVersion = await UpdateService.currentVersion;      final localBuild = await UpdateService.currentBuildNumber;      if (remote.isNewerThan(localVersion, localBuild)) {        if (!mounted) return;        showDialog(          context: context,          builder: (_) => UpdateDialog(version: remote),        );      } else {        showToast(context, context.tr.upToDate);      }    } catch (_) {      if (mounted) showToast(context, context.tr.updateCheckFailed);    }  }

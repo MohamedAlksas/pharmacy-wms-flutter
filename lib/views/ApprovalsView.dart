@@ -190,11 +190,15 @@ class _ApprovalsPageState extends State<ApprovalsPage> {
                 DataCell(Text((a['oldExpiry'] ?? a['currentExpiry'] ?? '').toString())),
                 DataCell(Text((a['newExpiry'] ?? '').toString())),
                 DataCell(Text((a['requestedBy'] ?? a['createdBy'] ?? a['requestedByName'] ?? '').toString())),
-                DataCell(SizedBox(
-                  width: 200,
-                  child: Text(
-                    (a['reason'] ?? '').toString(),
-                    overflow: TextOverflow.ellipsis,
+                DataCell(Tooltip(
+                  message: (a['reason'] ?? '').toString(),
+                  child: SizedBox(
+                    width: 120,
+                    child: Text(
+                      (a['reason'] ?? '').toString(),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   ),
                 )),
                 DataCell(Container(
@@ -205,20 +209,50 @@ class _ApprovalsPageState extends State<ApprovalsPage> {
                   ),
                   child: Text(status, style: TextStyle(fontSize: 12, color: _statusColor(status), fontWeight: FontWeight.w600)),
                 )),
-                DataCell(Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.check_circle_outline, color: Colors.green),
-                      tooltip: 'Approve',
-                      onPressed: status.toLowerCase() == 'pending' ? () => _approve(id) : null,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.cancel_outlined, color: Colors.red),
-                      tooltip: 'Reject',
-                      onPressed: status.toLowerCase() == 'pending' ? () => _reject(id) : null,
-                    ),
-                  ],
+                DataCell(Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (status.toLowerCase() == 'pending') ...[
+                        SizedBox(
+                          height: 32,
+                          child: ElevatedButton.icon(
+                            onPressed: () => _approve(id),
+                            icon: const Icon(Icons.check, size: 16),
+                            label: const Text('Approve', style: TextStyle(fontSize: 11)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        SizedBox(
+                          height: 32,
+                          child: ElevatedButton.icon(
+                            onPressed: () => _reject(id),
+                            icon: const Icon(Icons.close, size: 16),
+                            label: const Text('Reject', style: TextStyle(fontSize: 11)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                            ),
+                          ),
+                        ),
+                      ] else
+                        Text(
+                          status,
+                          style: TextStyle(
+                            color: _statusColor(status),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                          ),
+                        ),
+                    ],
+                  ),
                 )),
               ],
             );

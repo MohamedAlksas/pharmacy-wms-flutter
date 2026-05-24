@@ -19,6 +19,32 @@ class ApprovalService {
     throw Exception(_extractError(response.statusCode, decoded));
   }
 
+  static Future<List<Map<String, dynamic>>> fetchAllRequests() async {
+    final response = await http
+        .get(Uri.parse(_baseUrl), headers: AuthService.authHeaders)
+        .timeout(const Duration(seconds: 15));
+    final decoded = _decodeBody(response.body);
+    if (response.statusCode == 200) {
+      if (decoded is List) return decoded.cast<Map<String, dynamic>>();
+      if (decoded is Map && decoded['items'] is List) return List<Map<String, dynamic>>.from(decoded['items']);
+      if (decoded is Map && decoded['data'] is List) return List<Map<String, dynamic>>.from(decoded['data']);
+    }
+    throw Exception(_extractError(response.statusCode, decoded));
+  }
+
+  static Future<List<Map<String, dynamic>>> fetchMyRequests() async {
+    final response = await http
+        .get(Uri.parse('$_baseUrl/my'), headers: AuthService.authHeaders)
+        .timeout(const Duration(seconds: 15));
+    final decoded = _decodeBody(response.body);
+    if (response.statusCode == 200) {
+      if (decoded is List) return decoded.cast<Map<String, dynamic>>();
+      if (decoded is Map && decoded['items'] is List) return List<Map<String, dynamic>>.from(decoded['items']);
+      if (decoded is Map && decoded['data'] is List) return List<Map<String, dynamic>>.from(decoded['data']);
+    }
+    throw Exception(_extractError(response.statusCode, decoded));
+  }
+
   static Future<void> createExpiryChangeRequest(int batchId, String newExpiry, String reason) async {
     final response = await http
         .post(

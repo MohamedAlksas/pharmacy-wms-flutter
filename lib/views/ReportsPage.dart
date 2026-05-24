@@ -456,21 +456,18 @@ context.tr.itemsLabel
   
 }
   Widget _expiryTab(bool isDark, ProductProvider provider, List<MaterialModel> all) {
-    final now = DateTime.now();
-    final expiringSoon = all.where((m) {
-      final exp = m.expiryDateValue;
-      if (exp == null) return false;
-      final days = exp.difference(now).inDays;
-      return days >= 0 && days <= 90;
-    
-}).toList()..sort((a, b) => (a.expiryDateValue ?? now)        .compareTo(b.expiryDateValue ?? now));
-    return SingleChildScrollView(      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          _chartCard(isDark, context.tr.expiryTimeline,              _buildExpiryChart(isDark, all)),          const SizedBox(height: 16),          Container(            padding: const EdgeInsets.all(18),            decoration: BoxDecoration(              color: isDark ? const Color(0xFF1A2332) : Colors.white,              borderRadius: BorderRadius.circular(12),              border: Border.all(color: isDark ? const Color(0xFF2A3F5F) : Colors.grey.shade200),            ),            child: Column(              crossAxisAlignment: CrossAxisAlignment.start,              children: [                Row(                  mainAxisAlignment: MainAxisAlignment.spaceBetween,                  children: [                    Text(context.tr.expiringSoonItems,                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold,                            color: isDark ? Colors.white : Colors.black)),                    Text('${
-expiringSoon.length
-} ${
-context.tr.itemsLabel
-}',                        style: TextStyle(fontSize: 12,                            color: isDark ? Colors.white60 : Colors.black54)),                  ],                ),                const SizedBox(height: 12),                if (expiringSoon.isEmpty)                  Padding(                    padding: const EdgeInsets.all(20),                    child: Center(child: Text(context.tr.noData,                        style: TextStyle(color: isDark ? Colors.white60 : Colors.black54))),                  )                else                  ...expiringSoon.take(20).map((m) => Padding(                    padding: const EdgeInsets.symmetric(vertical: 4),                    child: Row(                      children: [                        Expanded(                          child: Text(m.name,                              style: TextStyle(fontSize: 13,                                  color: isDark ? Colors.white : Colors.black)),                        ),                        Text(m.expiryDate,                            style: TextStyle(fontSize: 12,                                color: isDark ? Colors.white60 : Colors.black54)),                        const SizedBox(width: 12),                        _statusBadge(MaterialService.getMaterialStatus(m), isDark),                      ],                    ),                  )),              ],            ),          ),        ],      ),    );
+    final expiringSoon = MaterialService.getExpiringSoonMaterials()
+      ..sort((a, b) => (a.expiryDateValue ?? DateTime.now()).compareTo(b.expiryDateValue ?? DateTime.now()));
+    final lowStock = MaterialService.getLowStockMaterials()
+      ..sort((a, b) => a.quantity.compareTo(b.quantity));
+    return SingleChildScrollView(      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          _chartCard(isDark, context.tr.expiryTimeline,              _buildExpiryChart(isDark, all)),          const SizedBox(height: 16),          Row(            crossAxisAlignment: CrossAxisAlignment.start,            children: [              Expanded(child: _expirySection(isDark, context.tr.expiringSoonItems, expiringSoon, true)),              const SizedBox(width: 16),              Expanded(child: _expirySection(isDark, context.tr.lowStockItems, lowStock, false)),            ],          ),        ],      ),    );
   
 }
+  Widget _expirySection(bool isDark, String title, List<MaterialModel> items, bool showExpiry) {
+    return Container(      padding: const EdgeInsets.all(18),      decoration: BoxDecoration(        color: isDark ? const Color(0xFF1A2332) : Colors.white,        borderRadius: BorderRadius.circular(12),        border: Border.all(color: isDark ? const Color(0xFF2A3F5F) : Colors.grey.shade200),      ),      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          Row(            mainAxisAlignment: MainAxisAlignment.spaceBetween,            children: [              Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold,                  color: isDark ? Colors.white : Colors.black)),              Text('${items.length} ${context.tr.itemsLabel}',                  style: TextStyle(fontSize: 12, color: isDark ? Colors.white60 : Colors.black54)),            ],          ),          const SizedBox(height: 12),          if (items.isEmpty)            Padding(              padding: const EdgeInsets.all(20),              child: Center(child: Text(context.tr.noData,                  style: TextStyle(color: isDark ? Colors.white60 : Colors.black54))),            )          else            ...items.take(20).map((m) => Padding(              padding: const EdgeInsets.symmetric(vertical: 4),              child: Row(                children: [                  Expanded(                    child: Text(m.name, style: TextStyle(fontSize: 13,                        color: isDark ? Colors.white : Colors.black)),                  ),                  if (showExpiry)                    Text(m.expiryDate, style: TextStyle(fontSize: 12,                        color: isDark ? Colors.white60 : Colors.black54))                  else                    Text('Qty: ${m.quantity}', style: TextStyle(fontSize: 12,                        color: isDark ? Colors.white60 : Colors.black54)),                  const SizedBox(width: 12),                  _statusBadge(MaterialService.getMaterialStatus(m), isDark),                ],              ),            )),        ],      ),    );
+  
+}
+
   Widget _buildExpiryChart(bool isDark, List<MaterialModel> all) {
     final data = _expiryTimelineData(all);
     final maxY = data.fold(0.0, (p, g) => p > g.barRods.first.toY        ? p : g.barRods.first.toY);
