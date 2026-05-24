@@ -6,7 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:pharmacy_wms/Models/UserRoleModel.dart';
 
 import 'package:pharmacy_wms/Services/api_config.dart';
-import 'package:pharmacy_wms/Services/http_client.dart';
+
+import 'package:http/http.dart' as http;
 
 
 class AppNotification {
@@ -56,14 +57,20 @@ class NotificationService {
 
   static Future<void> addNotification(AppNotification notification) async {
     try {
-      final response = await ApiClient.post(Uri.parse('$_baseUrl/Notifications'), {
-        'title': notification.title,
-        'body': notification.body,
-        'materialName': notification.materialName,
-        'productSku': notification.productSku,
-        'proposedExpiry': notification.proposedExpiry,
-        'managerName': notification.managerName,
-      });
+      final response = await http
+          .post(
+            Uri.parse('$_baseUrl/Notifications'),
+            headers: AuthService.authHeaders,
+            body: jsonEncode({
+              'title': notification.title,
+              'body': notification.body,
+              'materialName': notification.materialName,
+              'productSku': notification.productSku,
+              'proposedExpiry': notification.proposedExpiry,
+              'managerName': notification.managerName,
+            }),
+          )
+          .timeout(const Duration(seconds: 15));
       if (response.statusCode == 200 || response.statusCode == 201) {
         _notifications.insert(0, notification);
         changes.value++;
@@ -87,7 +94,12 @@ class NotificationService {
 
   static Future<void> markAllRead() async {
     try {
-      await ApiClient.post(Uri.parse('$_baseUrl/Notifications/mark-all-read'), const {});
+      await http
+          .post(
+            Uri.parse('$_baseUrl/Notifications/mark-all-read'),
+            headers: AuthService.authHeaders,
+          )
+          .timeout(const Duration(seconds: 15));
     } catch (e) {
       debugPrint('[NotificationService] Failed to mark all read: $e');
     }
@@ -102,7 +114,12 @@ class NotificationService {
 
   static Future<void> markRead(String id) async {
     try {
-      await ApiClient.patch(Uri.parse('$_baseUrl/Notifications/$id/read'), const {});
+      await http
+          .patch(
+            Uri.parse('$_baseUrl/Notifications/$id/read'),
+            headers: AuthService.authHeaders,
+          )
+          .timeout(const Duration(seconds: 15));
     } catch (e) {
       debugPrint('[NotificationService] Failed to mark read: $e');
     }
@@ -149,7 +166,12 @@ class NotificationService {
 
   static Future<List<String>> _getSupervisorEmails() async {
     try {
-      final response = await ApiClient.get(Uri.parse('$_baseUrl/Auth/supervisors'));
+      final response = await http
+          .get(
+            Uri.parse('$_baseUrl/Auth/supervisors'),
+            headers: AuthService.authHeaders,
+          )
+          .timeout(const Duration(seconds: 15));
       if (response.statusCode < 200 || response.statusCode >= 300) {
         return const [fallbackSupervisorEmail];
       }
@@ -175,12 +197,18 @@ class NotificationService {
     required String managerName,
     required String newExpiry,
   }) async {
-    final response = await ApiClient.post(Uri.parse('$_baseUrl/Notifications/send-email'), {
-      'to': to,
-      'subject': 'Edit Request: $productName',
-      'body':
-          '$managerName has requested an expiry date change for $productName (SKU: $productSku). Proposed new expiry: $newExpiry. Please review and approve or reject this request in the Orders page.',
-    });
+    final response = await http
+        .post(
+          Uri.parse('$_baseUrl/Notifications/send-email'),
+          headers: AuthService.authHeaders,
+          body: jsonEncode({
+            'to': to,
+            'subject': 'Edit Request: $productName',
+            'body':
+                '$managerName has requested an expiry date change for $productName (SKU: $productSku). Proposed new expiry: $newExpiry. Please review and approve or reject this request in the Orders page.',
+          }),
+        )
+        .timeout(const Duration(seconds: 15));
     if (response.statusCode < 200 || response.statusCode >= 300) {
       debugPrint(
         'Edit request email to $to failed (${response.statusCode}): ${response.body}',
@@ -193,7 +221,12 @@ class NotificationService {
 
   static Future<void> _fetchNotifications() async {
     try {
-      final response = await ApiClient.get(Uri.parse('$_baseUrl/Notifications'));
+      final response = await http
+          .get(
+            Uri.parse('$_baseUrl/Notifications'),
+            headers: AuthService.authHeaders,
+          )
+          .timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
         final List<dynamic> items = decoded is List ? decoded : [];

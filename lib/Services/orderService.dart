@@ -8,7 +8,8 @@ import 'package:pharmacy_wms/Models/UserRoleModel.dart';
 import 'package:pharmacy_wms/Models/orderModel.dart';
 
 import 'package:pharmacy_wms/Services/api_config.dart';
-import 'package:pharmacy_wms/Services/http_client.dart';
+
+import 'package:http/http.dart' as http;
 
 
 class OrderService {
@@ -39,7 +40,13 @@ class OrderService {
 
   static Future<void> addOrder(OrderModel order) async {
     try {
-      final response = await ApiClient.post(Uri.parse(_baseUrl), order.toJson());
+      final response = await http
+          .post(
+            Uri.parse(_baseUrl),
+            headers: AuthService.authHeaders,
+            body: jsonEncode(order.toJson()),
+          )
+          .timeout(const Duration(seconds: 15));
       if (response.statusCode == 200 || response.statusCode == 201) {
         _orders.insert(0, order);
         changes.value++;
@@ -56,7 +63,13 @@ class OrderService {
 
   static Future<Map<String, dynamic>?> dispatchFefo(Map<String, dynamic> body) async {
     try {
-      final response = await ApiClient.post(Uri.parse('$_baseUrl/export'), body);
+      final response = await http
+          .post(
+            Uri.parse('$_baseUrl/export'),
+            headers: AuthService.authHeaders,
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 15));
       final decoded = jsonDecode(response.body);
       if (response.statusCode == 200) {
         return decoded is Map<String, dynamic> ? decoded : null;
@@ -69,8 +82,13 @@ class OrderService {
   }
 
   static Future<void> updateOrderStatus(String id, OrderStatus status) async {
-    final response = await ApiClient.patch(
-        Uri.parse('$_baseUrl/$id/status'), {'status': status.name});
+    final response = await http
+        .patch(
+          Uri.parse('$_baseUrl/$id/status'),
+          headers: AuthService.authHeaders,
+          body: jsonEncode({'status': status.name}),
+        )
+        .timeout(const Duration(seconds: 15));
     if (response.statusCode == 200) {
       final index = _orders.indexWhere((order) => order.id == id);
       if (index != -1) {
@@ -93,13 +111,19 @@ class OrderService {
     String? expiryDate,
   }) async {
     try {
-      final response = await ApiClient.post(Uri.parse('$_baseUrl/refund'), {
-        'productId': productId,
-        'quantity': quantity,
-        'invoiceNumber': invoiceNumber,
-        'createdBy': createdBy,
-        'expiryDate': expiryDate,
-      });
+      final response = await http
+          .post(
+            Uri.parse('$_baseUrl/refund'),
+            headers: AuthService.authHeaders,
+            body: jsonEncode({
+              'productId': productId,
+              'quantity': quantity,
+              'invoiceNumber': invoiceNumber,
+              'createdBy': createdBy,
+              'expiryDate': expiryDate,
+            }),
+          )
+          .timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
         _orders.insert(0, OrderModel.fromJson(decoded as Map<String, dynamic>));
@@ -116,7 +140,9 @@ class OrderService {
 
   static Future<bool> checkInvoiceExists(String invoiceNumber) async {
     try {
-      final response = await ApiClient.get(Uri.parse('$_baseUrl/invoices/exists/$invoiceNumber'));
+      final response = await http
+          .get(Uri.parse('$_baseUrl/invoices/exists/$invoiceNumber'), headers: AuthService.authHeaders)
+          .timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
         return decoded['exists'] == true;
@@ -138,7 +164,9 @@ class OrderService {
 
   static Future<void> _fetchOrders() async {
     try {
-      final response = await ApiClient.get(Uri.parse(_baseUrl));
+      final response = await http
+          .get(Uri.parse(_baseUrl), headers: AuthService.authHeaders)
+          .timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
         final List<dynamic> items = decoded is List ? decoded : [];

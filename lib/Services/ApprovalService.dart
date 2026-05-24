@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'package:pharmacy_wms/Services/api_config.dart';
-import 'package:pharmacy_wms/Services/http_client.dart';
 import 'package:pharmacy_wms/Models/UserRoleModel.dart';
+import 'package:http/http.dart' as http;
 
 class ApprovalService {
   static String get _baseUrl => '${ApiConfig.baseUrl}/Approvals';
 
   static Future<List<Map<String, dynamic>>> fetchPendingApprovals() async {
-    final response = await ApiClient.get(Uri.parse('$_baseUrl/pending'));
+    final response = await http
+        .get(Uri.parse('$_baseUrl/pending'), headers: AuthService.authHeaders)
+        .timeout(const Duration(seconds: 15));
     final decoded = _decodeBody(response.body);
     if (response.statusCode == 200) {
       if (decoded is List) return decoded.cast<Map<String, dynamic>>();
@@ -18,7 +20,9 @@ class ApprovalService {
   }
 
   static Future<List<Map<String, dynamic>>> fetchAllRequests() async {
-    final response = await ApiClient.get(Uri.parse(_baseUrl));
+    final response = await http
+        .get(Uri.parse(_baseUrl), headers: AuthService.authHeaders)
+        .timeout(const Duration(seconds: 15));
     final decoded = _decodeBody(response.body);
     if (response.statusCode == 200) {
       if (decoded is List) return decoded.cast<Map<String, dynamic>>();
@@ -29,7 +33,9 @@ class ApprovalService {
   }
 
   static Future<List<Map<String, dynamic>>> fetchMyRequests() async {
-    final response = await ApiClient.get(Uri.parse('$_baseUrl/my'));
+    final response = await http
+        .get(Uri.parse('$_baseUrl/my'), headers: AuthService.authHeaders)
+        .timeout(const Duration(seconds: 15));
     final decoded = _decodeBody(response.body);
     if (response.statusCode == 200) {
       if (decoded is List) return decoded.cast<Map<String, dynamic>>();
@@ -40,21 +46,39 @@ class ApprovalService {
   }
 
   static Future<void> createExpiryChangeRequest(int batchId, String newExpiry, String reason) async {
-    final response = await ApiClient.post(Uri.parse(_baseUrl), {'batchId': batchId, 'newExpiry': newExpiry, 'reason': reason});
+    final response = await http
+        .post(
+          Uri.parse(_baseUrl),
+          headers: AuthService.authHeaders,
+          body: jsonEncode({'batchId': batchId, 'newExpiry': newExpiry, 'reason': reason}),
+        )
+        .timeout(const Duration(seconds: 15));
     final decoded = _decodeBody(response.body);
     if (response.statusCode == 200 || response.statusCode == 201) return;
     throw Exception(_extractError(response.statusCode, decoded));
   }
 
   static Future<void> approveRequest(int id, {String? notes}) async {
-    final response = await ApiClient.post(Uri.parse('$_baseUrl/$id/approve'), {'approved': true, if (notes != null) 'notes': notes});
+    final response = await http
+        .post(
+          Uri.parse('$_baseUrl/$id/approve'),
+          headers: AuthService.authHeaders,
+          body: jsonEncode({'approved': true, if (notes != null) 'notes': notes}),
+        )
+        .timeout(const Duration(seconds: 15));
     final decoded = _decodeBody(response.body);
     if (response.statusCode == 200 || response.statusCode == 204) return;
     throw Exception(_extractError(response.statusCode, decoded));
   }
 
   static Future<void> rejectRequest(int id, {String? notes}) async {
-    final response = await ApiClient.post(Uri.parse('$_baseUrl/$id/reject'), {'approved': false, if (notes != null) 'notes': notes});
+    final response = await http
+        .post(
+          Uri.parse('$_baseUrl/$id/reject'),
+          headers: AuthService.authHeaders,
+          body: jsonEncode({'approved': false, if (notes != null) 'notes': notes}),
+        )
+        .timeout(const Duration(seconds: 15));
     final decoded = _decodeBody(response.body);
     if (response.statusCode == 200 || response.statusCode == 204) return;
     throw Exception(_extractError(response.statusCode, decoded));
