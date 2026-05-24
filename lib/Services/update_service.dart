@@ -32,7 +32,7 @@ class UpdateService {
   static Future<AppVersion?> _fetchFrom(String url) async {
     final response = await http
         .get(Uri.parse(url))
-        .timeout(const Duration(seconds: 8));
+        .timeout(const Duration(seconds: 45));
     if (response.statusCode != 200) return null;
     final decoded = jsonDecode(response.body);
     if (decoded is! Map<String, dynamic>) return null;

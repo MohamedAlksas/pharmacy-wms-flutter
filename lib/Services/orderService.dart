@@ -46,7 +46,7 @@ class OrderService {
             headers: AuthService.authHeaders,
             body: jsonEncode(order.toJson()),
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 45));
       if (response.statusCode == 200 || response.statusCode == 201) {
         _orders.insert(0, order);
         changes.value++;
@@ -69,7 +69,7 @@ class OrderService {
             headers: AuthService.authHeaders,
             body: jsonEncode(body),
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 45));
       final decoded = jsonDecode(response.body);
       if (response.statusCode == 200) {
         return decoded is Map<String, dynamic> ? decoded : null;
@@ -88,7 +88,7 @@ class OrderService {
           headers: AuthService.authHeaders,
           body: jsonEncode({'status': status.name}),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(const Duration(seconds: 45));
     if (response.statusCode == 200) {
       final index = _orders.indexWhere((order) => order.id == id);
       if (index != -1) {
@@ -123,7 +123,7 @@ class OrderService {
               'expiryDate': expiryDate,
             }),
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 45));
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
         _orders.insert(0, OrderModel.fromJson(decoded as Map<String, dynamic>));
@@ -142,7 +142,7 @@ class OrderService {
     try {
       final response = await http
           .get(Uri.parse('$_baseUrl/invoices/exists/$invoiceNumber'), headers: AuthService.authHeaders)
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 45));
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
         return decoded['exists'] == true;
@@ -166,7 +166,7 @@ class OrderService {
     try {
       final response = await http
           .get(Uri.parse(_baseUrl), headers: AuthService.authHeaders)
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 45));
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
         final List<dynamic> items = decoded is List ? decoded : [];

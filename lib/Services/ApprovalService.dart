@@ -9,7 +9,7 @@ class ApprovalService {
   static Future<List<Map<String, dynamic>>> fetchPendingApprovals() async {
     final response = await http
         .get(Uri.parse('$_baseUrl/pending'), headers: AuthService.authHeaders)
-        .timeout(const Duration(seconds: 15));
+        .timeout(const Duration(seconds: 45));
     final decoded = _decodeBody(response.body);
     if (response.statusCode == 200) {
       if (decoded is List) return decoded.cast<Map<String, dynamic>>();
@@ -22,7 +22,7 @@ class ApprovalService {
   static Future<List<Map<String, dynamic>>> fetchAllRequests() async {
     final response = await http
         .get(Uri.parse(_baseUrl), headers: AuthService.authHeaders)
-        .timeout(const Duration(seconds: 15));
+        .timeout(const Duration(seconds: 45));
     final decoded = _decodeBody(response.body);
     if (response.statusCode == 200) {
       if (decoded is List) return decoded.cast<Map<String, dynamic>>();
@@ -35,7 +35,7 @@ class ApprovalService {
   static Future<List<Map<String, dynamic>>> fetchMyRequests() async {
     final response = await http
         .get(Uri.parse('$_baseUrl/my'), headers: AuthService.authHeaders)
-        .timeout(const Duration(seconds: 15));
+        .timeout(const Duration(seconds: 45));
     final decoded = _decodeBody(response.body);
     if (response.statusCode == 200) {
       if (decoded is List) return decoded.cast<Map<String, dynamic>>();
@@ -52,7 +52,7 @@ class ApprovalService {
           headers: AuthService.authHeaders,
           body: jsonEncode({'batchId': batchId, 'newExpiry': newExpiry, 'reason': reason}),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(const Duration(seconds: 45));
     final decoded = _decodeBody(response.body);
     if (response.statusCode == 200 || response.statusCode == 201) return;
     throw Exception(_extractError(response.statusCode, decoded));
@@ -65,7 +65,7 @@ class ApprovalService {
           headers: AuthService.authHeaders,
           body: jsonEncode({'approved': true, if (notes != null) 'notes': notes}),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(const Duration(seconds: 45));
     final decoded = _decodeBody(response.body);
     if (response.statusCode == 200 || response.statusCode == 204) return;
     throw Exception(_extractError(response.statusCode, decoded));
@@ -78,7 +78,7 @@ class ApprovalService {
           headers: AuthService.authHeaders,
           body: jsonEncode({'approved': false, if (notes != null) 'notes': notes}),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(const Duration(seconds: 45));
     final decoded = _decodeBody(response.body);
     if (response.statusCode == 200 || response.statusCode == 204) return;
     throw Exception(_extractError(response.statusCode, decoded));

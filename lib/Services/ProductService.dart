@@ -160,7 +160,7 @@ class ProductService {
   static Future<http.Response> _get(Uri uri) {
     return http
         .get(uri, headers: AuthService.authHeaders)
-        .timeout(const Duration(seconds: 15));
+        .timeout(const Duration(seconds: 45));
   }
 
 
@@ -169,7 +169,7 @@ class ProductService {
   static Future<http.Response> _post(Uri uri, Map<String, dynamic> body) {
     return http
         .post(uri, headers: AuthService.authHeaders, body: jsonEncode(body))
-        .timeout(const Duration(seconds: 15));
+        .timeout(const Duration(seconds: 45));
   }
 
 
@@ -178,7 +178,7 @@ class ProductService {
   static Future<http.Response> _patch(Uri uri, Map<String, dynamic> body) {
     return http
         .patch(uri, headers: AuthService.authHeaders, body: jsonEncode(body))
-        .timeout(const Duration(seconds: 15));
+        .timeout(const Duration(seconds: 45));
   }
 
 
@@ -187,7 +187,7 @@ class ProductService {
   static Future<http.Response> _put(Uri uri, Map<String, dynamic> body) {
     return http
         .put(uri, headers: AuthService.authHeaders, body: jsonEncode(body))
-        .timeout(const Duration(seconds: 15));
+        .timeout(const Duration(seconds: 45));
   }
 
 
@@ -196,7 +196,7 @@ class ProductService {
   static Future<http.Response> _delete(Uri uri) {
     return http
         .delete(uri, headers: AuthService.authHeaders)
-        .timeout(const Duration(seconds: 15));
+        .timeout(const Duration(seconds: 45));
   }
 
 

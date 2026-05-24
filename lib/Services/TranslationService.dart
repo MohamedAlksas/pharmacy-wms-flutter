@@ -124,7 +124,7 @@ class TranslationService {
             ],
           }),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(const Duration(seconds: 45));
 
     if (response.statusCode != 200) {
       throw Exception('HTTP ${response.statusCode}');
@@ -167,7 +167,7 @@ class TranslationService {
             ],
           }),
         )
-        .timeout(const Duration(seconds: 20));
+        .timeout(const Duration(seconds: 45));
 
     if (response.statusCode != 200) {
       throw Exception('HTTP ${response.statusCode}');

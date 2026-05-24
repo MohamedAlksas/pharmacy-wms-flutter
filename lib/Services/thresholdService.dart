@@ -55,7 +55,7 @@ class ThresholdService {
             headers: AuthService.authHeaders,
             body: jsonEncode({'lowStockThreshold': value}),
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 45));
       if (response.statusCode == 200) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setInt(_kLowStock, value);
@@ -76,7 +76,7 @@ class ThresholdService {
             headers: AuthService.authHeaders,
             body: jsonEncode({'expiringSoonDays': value}),
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 45));
       if (response.statusCode == 200) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setInt(_kExpiringSoonDays, value);
@@ -93,7 +93,7 @@ class ThresholdService {
     try {
       final response = await http
           .get(Uri.parse(_baseUrl), headers: AuthService.authHeaders)
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(seconds: 45));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         final prefs = await SharedPreferences.getInstance();
