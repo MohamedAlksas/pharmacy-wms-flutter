@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pharmacy_wms/Models/app_localizations.dart';
 import 'package:pharmacy_wms/Models/orderModel.dart';
+import 'package:pharmacy_wms/Services/AuthService.dart';
 import 'package:pharmacy_wms/Services/orderService.dart';
 
 class InvoicesPage extends StatefulWidget {
@@ -122,7 +123,7 @@ class _InvoicesPageState extends State<InvoicesPage> {
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
               ),
               const SizedBox(height: 8),
-              ...group.orders.map((o) => _materialCard(o, isDark)),
+              ...group.orders.map((o) => _materialCard(o, isDark, onRefresh: _load)),
             ],
           ),
         ),
@@ -136,12 +137,13 @@ class _InvoicesPageState extends State<InvoicesPage> {
     );
   }
 
-  Widget _materialCard(OrderModel order, bool isDark) {
+  Widget _materialCard(OrderModel order, bool isDark, {VoidCallback? onRefresh}) {
     final expiry = order.expiryDate;
     final typeColor = switch (order.type) {
       OrderType.add => Colors.green,
       OrderType.export => Colors.blue,
       OrderType.edit => Colors.orange,
+      OrderType.refund => Colors.purple,
     };
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -178,6 +180,23 @@ class _InvoicesPageState extends State<InvoicesPage> {
               ],
             ),
           ),
+          if (order.type == OrderType.export)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: SizedBox(
+                height: 30,
+                child: OutlinedButton.icon(
+                  onPressed: () => _showRefundDialog(context, order, onRefresh: onRefresh),
+                  icon: const Icon(Icons.replay, size: 14),
+                  label: const Text('Refund', style: TextStyle(fontSize: 11)),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.purple,
+                    side: const BorderSide(color: Colors.purple),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                  ),
+                ),
+              ),
+            ),
           _badge(order.type.name, typeColor),
         ],
       ),
@@ -429,6 +448,86 @@ class _InvoicesPageState extends State<InvoicesPage> {
     final m = local.month.toString().padLeft(2, '0');
     final d = local.day.toString().padLeft(2, '0');
     return '${local.year}-$m-$d';
+  }
+
+  void _showRefundDialog(BuildContext context, OrderModel order, {VoidCallback? onRefresh}) {
+    final qtyCtrl = TextEditingController();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Refund - ${order.productName}'),
+        content: SizedBox(
+          width: 300,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Available to refund: ${order.quantity} ${order.unit}'),
+              const SizedBox(height: 12),
+              TextField(
+                controller: qtyCtrl,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Quantity to refund',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final qty = int.tryParse(qtyCtrl.text.trim());
+              if (qty == null || qty <= 0 || qty > order.quantity) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Enter a valid quantity')),
+                );
+                return;
+              }
+              final pid = order.productId;
+              if (pid == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Cannot refund: product ID missing')),
+                );
+                return;
+              }
+              try {
+                await OrderService.refundOrder(
+                  productId: int.parse(pid),
+                  quantity: qty,
+                  invoiceNumber: order.invoiceNumber,
+                  createdBy: AuthService.currentUser?.fullName ?? 'system',
+                  expiryDate: order.expiryDate,
+                );
+                if (ctx.mounted) Navigator.pop(ctx);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Refunded $qty ${order.unit} of ${order.productName}')),
+                  );
+                }
+                onRefresh?.call();
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Refund failed: $e'), backgroundColor: Colors.red),
+                  );
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.purple, foregroundColor: Colors.white),
+            child: const Text('Refund'),
+          ),
+        ],
+      ),
+    );
   }
 
   String _formatExpiry(String raw) {
