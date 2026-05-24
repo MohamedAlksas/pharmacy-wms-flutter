@@ -52,6 +52,9 @@ class _AddMaterialWizardState extends State<AddMaterialWizard> {
   final _newNameController = TextEditingController();
   final _newSkuController = TextEditingController();
   final _newQuantityController = TextEditingController();
+  final _newUnitController = TextEditingController();
+  final _newLocationController = TextEditingController();
+  final _newCategoryController = TextEditingController();
   DateTime? _newExpiryDate;
   final List<_SessionMaterial> _sessionMaterials = [];
   bool _submitted = false;
@@ -81,193 +84,10 @@ class _AddMaterialWizardState extends State<AddMaterialWizard> {
     _newNameController.dispose();
     _newSkuController.dispose();
     _newQuantityController.dispose();
-    super.dispose();
-  
-}
-
-
-  Future<bool> _maybeDiscard() async {
-    if (!_hasUnsavedChanges || _popIntercepted) return true;
-    _popIntercepted = true;
-    final result = await showDialog<bool>(      context: context,      builder: (ctx) => AlertDialog(        title: Text(context.tr.discardChanges),        content: Text(context.tr.discardChangesMsg),        actions: [          TextButton(            onPressed: () => Navigator.pop(ctx, false),            child: Text(context.tr.cancel),          ),          ElevatedButton(            onPressed: () => Navigator.pop(ctx, true),            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),            child: Text(context.tr.discard, style: const TextStyle(color: Colors.white)),          ),        ],      ),    );
-    return result ?? false;
-  
-}
-
-  void _goToStep(int step) {
-    setState(() {
-      _submitted = false;
-      _step = step;
-    
-});
-  
-}
-
-  void _selectMode(int mode) {
-    setState(() {
-      _selectionMode = mode;
-    
-});
-  
-}
-
-  bool _canProceedFromSelection() {
-    return _selectionMode != null;
-  
-}
-
-  void _onNextFromSelection() {
-    if (!_canProceedFromSelection()) return;
-    _goToStep(2);
-  
-}
-
-  void _onAddToSession() {
-    setState(() {
-      _submitted = true;
-    
-});
-    bool ok;
-    if (_selectionMode == 0) {
-      ok = _addExistingToSession();
-    
-} else {
-      ok = _addNewToSession();
-    
-}    if (!ok) {
-      setState(() => _submitted = false);
-    
-}  
-}
-
-  bool _addExistingToSession() {
-    final tr = context.tr;
-    final selected = _selectedExistingProduct;
-    if (selected == null) {
-      _toast(tr.productNotFound);
-      return false;
-    
-}    if (!_formKey.currentState!.validate()) return false;
-    final addedQty = int.tryParse(_existingQuantityController.text.trim()) ?? 0;
-    if (addedQty <= 0) return false;
-    final product = widget.provider.findById(selected.id) ?? selected;
-    final body = product.toApiBody();
-    body['quantity'] = product.quantity + addedQty;
-    if (_existingExpiryDate != null) {
-      body['expiryDate'] = _existingExpiryDate!.toUtc().toIso8601String();
-    
-}
-    setState(() {
-      _sessionMaterials.add(_SessionMaterial(        mode: 'existing',        productId: product.id,        name: product.name,        sku: product.sku,        quantity: addedQty,        unit: product.unit,        logNumber: product.lot,        categoryId: product.categoryId,        expiryDate: _existingExpiryDate?.toUtc().toIso8601String() ?? product.expiryDate,        body: body,      ));
-      _clearExistingForm();
-      _goToStep(1);
-    
-});
-    return true;
-  
-}
-
-  bool _addNewToSession() {
-    final tr = context.tr;
-    if (!_formKey.currentState!.validate()) return false;
-    final name = _newNameController.text.trim();
-    final sku = _newSkuController.text.trim();
-    final qty = int.tryParse(_newQuantityController.text.trim()) ?? 0;
-    if (qty <= 0 || name.isEmpty || sku.isEmpty) return false;
-    if (_newExpiryDate == null) return false;
-    final body = <String, dynamic>{
-      'materialName': name,      'materialSKU': sku,      'quantity': qty,      'unit': '',      'logNumber': '',      'expiryDate': _newExpiryDate!.toUtc().toIso8601String(),      'storageLocation': '',      'isAvailable': true,      'categoryId': 0,    
-};
-    setState(() {
-      _sessionMaterials.add(_SessionMaterial(        mode: 'new',        productId: null,        name: name,        sku: sku,        quantity: qty,        unit: '',        logNumber: '',        categoryId: 0,        expiryDate: _newExpiryDate!.toUtc().toIso8601String(),        body: body,      ));
-      _clearNewForm();
-      _goToStep(1);
-    
-});
-    return true;
-  
-}
-
-  void _removeSessionMaterial(int index) {
-    setState(() {
-      _sessionMaterials.removeAt(index);
-    
-});
-  
-}
-
-
-  Future<void> _finishAndSave() async {
-    final tr = context.tr;
-    if (_sessionMaterials.isEmpty) return;
-    setState(() => _saving = true);
-    final invoiceNum = _invoiceController.text.trim();
-    String? error;
-    for (final sessionItem in _sessionMaterials) {
-      if (sessionItem.mode == 'existing') {
-        final err = await widget.provider.updateProduct(          sessionItem.productId!,          sessionItem.body,        );
-        if (err != null && error == null) error = err;
-      
-} else {
-        final err = await widget.provider.addProduct(sessionItem.body);
-        if (err != null && error == null) error = err;
-      
-}
-
-      final order = OrderModel(        productId: sessionItem.productId,        productName: sessionItem.name,        productSku: sessionItem.sku,        quantity: sessionItem.quantity,        unit: sessionItem.unit,        logNumber: sessionItem.logNumber,        categoryId: sessionItem.categoryId,        type: OrderType.add,        status: OrderStatus.completed,        createdBy: AuthService.currentUser?.fullName ?? '',        invoiceNumber: invoiceNum.isNotEmpty ? invoiceNum : null,        expiryDate: sessionItem.expiryDate.isNotEmpty ? sessionItem.expiryDate : null,      );
-      OrderService.addOrder(order);
-    
-}
-    setState(() => _saving = false);
-    if (error != null) {
-      _toast(error);
-    
-} else {
-      _toast(tr.stockUpdated);
-    
-}    if (mounted) Navigator.of(context).pop(true);
-  
-}
-
-  void _toast(String message) {
-    showToast(context, message);
-  
-}
-
-
-  Future<void> _pickDate(bool forExisting) async {
-    final initial = forExisting ? _existingExpiryDate : _newExpiryDate;
-    final picked = await showDatePicker(      context: context,      initialDate: initial ?? DateTime.now(),      firstDate: DateTime(2020),      lastDate: DateTime(2100),    );
-    if (picked != null) {
-      setState(() {
-        if (forExisting) {
-          _existingExpiryDate = picked;
-        
-} else {
-          _newExpiryDate = picked;
-        
-}      
-});
-    
-}  
-}
-
-  void _clearExistingForm() {
-    _existingSearchController.clear();
-    _existingQuantityController.clear();
-    _selectedExistingProduct = null;
-    _existingQuery = '';
-    _existingExpiryDate = null;
-  
-}
-
-  void _clearNewForm() {
-    _newNameController.clear();
-    _newSkuController.clear();
-    _newQuantityController.clear();
-    _newExpiryDate = null;
-  
-}
+    _newUnitController.dispose();
+    _newLocationController.dispose();
+    _newCategoryController.dispose();
+  }
 
   void _clearExistingSelection() {
     setState(() {
@@ -395,9 +215,69 @@ p.sku
   
 }
   Widget _buildNewFormStep(AppLocalizations tr, bool isDark) {
-    return Wrap(      spacing: 16,      runSpacing: 16,      children: [        _buildField(          controller: _newNameController,          label: tr.materialName,          hintText: 'e.g. Paracetamol',          icon: Icons.medication_outlined,          isDark: isDark,          validator: _required,          width: 280,        ),        _buildField(          controller: _newSkuController,          label: tr.materialSku,          hintText: 'MED-1001',          icon: Icons.qr_code_2_outlined,          isDark: isDark,          validator: _required,          width: 280,        ),        _buildField(          controller: _newQuantityController,          label: tr.quantity,          hintText: '1',          icon: Icons.inventory_2_outlined,          isDark: isDark,          keyboardType: TextInputType.number,          validator: _validatePositiveInt,          width: 280,        ),        _buildExpiryPicker(          label: tr.expiryDate,          isDark: isDark,          date: _newExpiryDate,          onTap: () => _pickDate(false),          width: 280,        ),      ],    );
-  
-}
+    return Wrap(      spacing: 16,      runSpacing: 16,      children: [
+        _buildField(
+          controller: _newNameController,
+          label: tr.materialName,
+          hintText: 'e.g. Paracetamol',
+          icon: Icons.medication_outlined,
+          isDark: isDark,
+          validator: _required,
+          width: 280,
+        ),
+        _buildField(
+          controller: _newSkuController,
+          label: tr.materialSku,
+          hintText: 'MED-1001',
+          icon: Icons.qr_code_2_outlined,
+          isDark: isDark,
+          validator: _required,
+          width: 280,
+        ),
+        _buildField(
+          controller: _newUnitController,
+          label: tr.unit,
+          hintText: 'Box, Tablet, Bottle',
+          icon: Icons.scale_outlined,
+          isDark: isDark,
+          width: 280,
+        ),
+        _buildField(
+          controller: _newCategoryController,
+          label: tr.category,
+          hintText: 'e.g. Pain Relief',
+          icon: Icons.category_outlined,
+          isDark: isDark,
+          width: 280,
+        ),
+        _buildField(
+          controller: _newLocationController,
+          label: tr.storageLocation,
+          hintText: 'Shelf A-12',
+          icon: Icons.location_on_outlined,
+          isDark: isDark,
+          width: 280,
+        ),
+        _buildField(
+          controller: _newQuantityController,
+          label: tr.quantity,
+          hintText: '1',
+          icon: Icons.inventory_2_outlined,
+          isDark: isDark,
+          keyboardType: TextInputType.number,
+          validator: _validatePositiveInt,
+          width: 280,
+        ),
+        _buildExpiryPicker(
+          label: tr.expiryDate,
+          isDark: isDark,
+          date: _newExpiryDate,
+          onTap: () => _pickDate(false),
+          width: 280,
+        ),
+      ],
+    );
+  }
   Widget _buildField({
     required TextEditingController controller,    required String label,    required String hintText,    required IconData icon,    required bool isDark,    double width = 280,    bool readOnly = false,    TextInputType? keyboardType,    String? Function(String?)? validator,    ValueChanged<String>? onChanged,  
 }) {
