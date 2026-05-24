@@ -41,6 +41,16 @@ class UpdateService {
 
   static Future<AppVersion?> fetchLatestVersion() async {
     try {
+      final remote = await _fetchFrom(_fallbackUrl);
+      if (remote != null) {
+        _cachedRemote = remote;
+        return remote;
+      }
+    } catch (e) {
+      debugPrint('[UpdateService] GitHub check failed: $e');
+    }
+
+    try {
       final backendUrl = '${ApiConfig.baseUrl}/Update';
       final remote = await _fetchFrom(backendUrl);
       if (remote != null) {
@@ -48,17 +58,7 @@ class UpdateService {
         return remote;
       }
     } catch (e) {
-      debugPrint('[UpdateService] Backend check failed: $e');
-    }
-
-    try {
-      final remote = await _fetchFrom(_fallbackUrl);
-      if (remote != null) {
-        _cachedRemote = remote;
-        return remote;
-      }
-    } catch (e) {
-      debugPrint('[UpdateService] GitHub fallback failed: $e');
+      debugPrint('[UpdateService] Backend fallback failed: $e');
     }
 
     return _cachedRemote;
