@@ -157,7 +157,6 @@ count == 1 ? '' : 's'
   String get locationHint => isArabic ? 'مثال: الرف A1' : 'e.g. Shelf A1';
   String get categoryIdHint => isArabic ? '1' : '1';
   String get selectDate => isArabic ? 'اختر تاريخًا' : 'Select date';
-  String get pleaseSelectDate => isArabic ? 'من فضلك اختر تاريخًا' : 'Please select an expiry date';
   String get addingProduct => isArabic ? 'جارٍ الإضافة...' : 'Adding...';
   String get productAdded => isArabic ? 'تمت إضافة المادة بنجاح' : 'Material added successfully';
     String get invoiceNumber => isArabic ? 'رقم الفاتورة' : 'Invoice Number';
