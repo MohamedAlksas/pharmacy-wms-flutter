@@ -21,7 +21,7 @@ import 'package:pdf/pdf.dart';
 
 import 'package:pdf/widgets.dart' as pw;
 
-import 'package:excel/excel.dart' hide Border;
+import 'package:excel/excel.dart' show Excel, CellValue, TextCellValue, CellIndex, CellStyle, ExcelColor, Sheet;
 
 import 'package:path_provider/path_provider.dart';
 
