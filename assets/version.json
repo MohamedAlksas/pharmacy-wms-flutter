@@ -1,6 +1,6 @@
 {
-    "latestVersion":  "1.1.18",
-    "latestBuildNumber":  19,
+    "latestVersion":  "1.1.19",
+    "latestBuildNumber":  20,
     "downloadUrl":  "https://github.com/test-pharm/pharmacy-wms-flutter/releases/latest/download/pharmacy-wms-windows.zip",
     "mandatory":  false,
     "releaseNotes":  [
