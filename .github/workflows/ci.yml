@@ -29,12 +29,6 @@ jobs:
           channel: "stable"
           cache: true
 
-      - run: flutter pub get
-      - run: flutter analyze
-        continue-on-error: true
-      - run: flutter config --enable-windows-desktop
-      - run: flutter build windows --release
-
       - name: Auto-bump version
         id: bump
         shell: powershell
@@ -58,6 +52,12 @@ jobs:
 
           "newVersion=$newVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           "newBuild=$newBuild" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - run: flutter pub get
+      - run: flutter analyze
+        continue-on-error: true
+      - run: flutter config --enable-windows-desktop
+      - run: flutter build windows --release
 
       - name: Zip the build
         run: |
