@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-
 import 'package:flutter/material.dart';
 
 import 'package:pharmacy_wms/Models/UserRoleModel.dart';
@@ -13,7 +12,6 @@ import 'package:pharmacy_wms/Services/api_config.dart';
 
 import 'package:http/http.dart' as http;
 
-
 class UserInfoPage extends StatefulWidget {
   final bool showBackButton;
 
@@ -22,7 +20,6 @@ class UserInfoPage extends StatefulWidget {
   @override
   State<UserInfoPage> createState() => _UserInfoPageState();
 }
-
 
 class _UserInfoPageState extends State<UserInfoPage> {
   static String get _baseUrl => ApiConfig.baseUrl;
@@ -38,7 +35,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
     _loadUserData();
   }
 
-
   @override
   void dispose() {
     _nameController.dispose();
@@ -46,16 +42,11 @@ class _UserInfoPageState extends State<UserInfoPage> {
     super.dispose();
   }
 
-
-
   void _loadUserData() {
     final user = AuthService.currentUser;
     _nameController.text = user?.fullName ?? '';
     _phoneController.text = user?.phoneNumber ?? '';
   }
-
-
-
 
   Future<void> _saveChanges() async {
     if (!_formKey.currentState!.validate()) return;
@@ -92,12 +83,10 @@ class _UserInfoPageState extends State<UserInfoPage> {
       _showSnack(context.tr.profileUpdated);
     } catch (e) {
       if (mounted) _showSnack(context.tr.unableToUpdateProfile, isError: true);
-    }
- finally {
+    } finally {
       if (mounted) setState(() => _saving = false);
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -196,7 +185,11 @@ class _UserInfoPageState extends State<UserInfoPage> {
                           const SizedBox(width: 12),
                           ElevatedButton(
                             onPressed: _saving ? null : _saveChanges,
-                            child: Text(_saving ? context.tr.saving : context.tr.saveChanges),
+                            child: Text(
+                              _saving
+                                  ? context.tr.saving
+                                  : context.tr.saveChanges,
+                            ),
                           ),
                         ],
                       ),
@@ -271,7 +264,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
     );
   }
 
-
   Widget _profileHeader(
     Color cardColor,
     Color roleColor,
@@ -284,17 +276,17 @@ class _UserInfoPageState extends State<UserInfoPage> {
       child: Row(
         children: [
           CircleAvatar(
-  radius: 42,
-  backgroundColor: roleColor.withOpacity(0.14),
-  child: ClipOval(
-    child: Image.asset(
-      'assets/pharmacy faculty logo.png',
-      width: 84,
-      height: 84,
-      fit: BoxFit.cover,
-    ),
-  ),
-),
+            radius: 42,
+            backgroundColor: roleColor.withOpacity(0.14),
+            child: ClipOval(
+              child: Image.asset(
+                'assets/pharmacy faculty logo.png',
+                width: 84,
+                height: 84,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
           const SizedBox(width: 18),
           Expanded(
             child: Column(
@@ -334,7 +326,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
     );
   }
 
-
   Widget _roleBadge(bool isManager, Color roleColor) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -350,14 +341,11 @@ class _UserInfoPageState extends State<UserInfoPage> {
     );
   }
 
-
-
   String _profileInitial() {
     final name = _nameController.text.trim();
     if (name.isEmpty) return '?';
     return name.substring(0, 1).toUpperCase();
   }
-
 
   Widget _notificationBadge() {
     final count = NotificationService.getUnread().length;
@@ -375,7 +363,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
     );
   }
 
-
   BoxDecoration _cardDecoration(Color color) {
     return BoxDecoration(
       color: color,
@@ -389,7 +376,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
       ],
     );
   }
-
 
   Widget _field({
     required TextEditingController controller,
@@ -417,8 +403,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
       },
     );
   }
-
-
 
   void _showNotificationsDialog() {
     showDialog(
@@ -472,13 +456,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
     );
   }
 
-
-
   void _showChangePasswordDialog() {
     showDialog(context: context, builder: (_) => const _ChangePasswordDialog());
   }
-
-
 
   void _showSnack(String message, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -490,14 +470,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
   }
 }
 
-
 class _ChangePasswordDialog extends StatefulWidget {
   const _ChangePasswordDialog();
 
   @override
   State<_ChangePasswordDialog> createState() => _ChangePasswordDialogState();
 }
-
 
 class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
   static String get _baseUrl => ApiConfig.baseUrl;
@@ -517,7 +495,6 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -534,9 +511,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
               state: _stepState(0),
               content: _stepContent(
                 children: [
-                  Text(
-                    context.tr.sendVerificationCode,
-                  ),
+                  Text(context.tr.sendVerificationCode),
                   const SizedBox(height: 12),
                   ElevatedButton(
                     onPressed: _loading ? null : _sendCode,
@@ -606,7 +581,6 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
     );
   }
 
-
   Widget _stepContent({required List<Widget> children}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -624,15 +598,11 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
     );
   }
 
-
   StepState _stepState(int index) {
     if (_step > index) return StepState.complete;
     if (_step == index) return StepState.editing;
     return StepState.indexed;
   }
-
-
-
 
   Future<void> _sendCode() async {
     final email = _registeredEmail;
@@ -651,18 +621,12 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
     );
   }
 
-
-
-
   Future<void> _verifyCode() async {
     await _post('/Auth/verify-reset-code', {
       'email': _registeredEmail,
       'code': _codeCtrl.text.trim(),
     }, onSuccess: () => setState(() => _step = 2));
   }
-
-
-
 
   Future<void> _changePassword() async {
     if (_newPasswordCtrl.text.length < 6) {
@@ -695,8 +659,6 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
     );
   }
 
-
-
   String get _registeredEmail => AuthService.currentUser?.email.trim() ?? '';
 
   Future<void> _post(
@@ -725,8 +687,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
       }
     } catch (_) {
       if (mounted) setState(() => _error = context.tr.requestFailedRetry);
-    }
-  finally {
+    } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
@@ -748,7 +709,6 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
               .toList();
           if (messages.isNotEmpty) return messages.join('\n');
         }
-
 
         final message =
             decoded['message'] ?? decoded['error'] ?? decoded['title'];
