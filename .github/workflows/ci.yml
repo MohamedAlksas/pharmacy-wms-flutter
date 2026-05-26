@@ -3,6 +3,13 @@ name: Flutter CI/CD
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - "**.md"
+      - "AGENTS.md"
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-and-release:
@@ -10,12 +17,22 @@ jobs:
       contents: write
     name: Build & Release
     runs-on: windows-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.27.x"
+          channel: "stable"
+          cache: true
+
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter config --enable-windows-desktop
+      - run: flutter build windows --release
 
       - name: Auto-bump version
         id: bump
@@ -29,30 +46,17 @@ jobs:
 
           Write-Output "Bumping from v$($json.latestVersion) (build $($json.latestBuildNumber)) to v$newVersion (build $newBuild)"
 
-          # Update version.json
           $json.latestVersion = $newVersion
           $json.latestBuildNumber = $newBuild
           $json | ConvertTo-Json -Depth 10 | Set-Content version.json
-
-          # Update assets/version.json
           $json | ConvertTo-Json -Depth 10 | Set-Content assets/version.json
 
-          # Update pubspec.yaml
           $pubspec = Get-Content pubspec.yaml -Raw
           $pubspec = $pubspec -replace '(?<=^version: ).+', "$newVersion+$newBuild"
           $pubspec | Set-Content pubspec.yaml
 
           "newVersion=$newVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           "newBuild=$newBuild" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.x'
-          channel: 'stable'
-
-      - run: flutter pub get
-      - run: flutter config --enable-windows-desktop
-      - run: flutter build windows --release
 
       - name: Zip the build
         run: |
@@ -65,6 +69,7 @@ jobs:
           name: v${{ steps.bump.outputs.newVersion }}
           files: pharmacy-wms-windows.zip
           fail_on_unmatched_files: true
+          draft: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
