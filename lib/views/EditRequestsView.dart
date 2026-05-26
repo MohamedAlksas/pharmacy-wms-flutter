@@ -133,12 +133,14 @@ class _EditRequestsPageState extends State<EditRequestsPage> {
     }
 
     return SingleChildScrollView(
-        child: DataTable(
+        child: SizedBox(
+          width: double.infinity,
+          child: DataTable(
           headingRowHeight: 54,
           dataRowMinHeight: 56,
           dataRowMaxHeight: 56,
           columnSpacing: 12,
-          horizontalMargin: 12,
+          horizontalMargin: 0,
           columnWidths: const {
             0: FlexColumnWidth(2),
             1: FlexColumnWidth(1),
@@ -206,6 +208,7 @@ class _EditRequestsPageState extends State<EditRequestsPage> {
               );
             }),
           ],
+        ),
         ),
       );
   }

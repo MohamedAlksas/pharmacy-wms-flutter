@@ -25,14 +25,16 @@ class _InventoryPageState extends State<InventoryPage> {  final TextEditingContr
   Widget _buildErrorState(BuildContext context, ProductProvider provider) {    return Center(      child: Column(        mainAxisSize: MainAxisSize.min,        children: [          const Icon(Icons.error_outline, color: Colors.red, size: 52),          const SizedBox(height: 12),          Text(            provider.error!,            style: const TextStyle(color: Colors.red),            textAlign: TextAlign.center,          ),          const SizedBox(height: 12),          ElevatedButton(            onPressed: provider.loadProducts,            child: Text(context.tr.retry),          ),        ],      ),    );  }
   Widget _buildContent(    BuildContext context,    ProductProvider provider,    List<MaterialModel> products, {    required int totalPages,    required int totalItems,  }) {    if (products.isEmpty) {      return Container(        width: double.infinity,        decoration: BoxDecoration(          color: Theme.of(context).cardColor,          borderRadius: BorderRadius.circular(12),        ),        padding: const EdgeInsets.all(40),        child: Center(          child: Column(            mainAxisSize: MainAxisSize.min,            children: [              Icon(Icons.inventory_2_outlined, size: 64,                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white24 : Colors.black12),              const SizedBox(height: 16),              Text(context.tr.noProductsFiltered,                  style: TextStyle(fontSize: 16,                      color: Theme.of(context).brightness == Brightness.dark ? Colors.white60 : Colors.black45)),              const SizedBox(height: 16),              if (AuthService.isWarehouseManager)                ElevatedButton.icon(                  onPressed: () => _openProductDialog(context, ProductProvider.of(context)),                  icon: const Icon(Icons.add),                  label: Text(context.tr.addProduct),                ),            ],          ),        ),      );    }
     return Column(      children: [        Expanded(          child: Container(            decoration: BoxDecoration(              color: Theme.of(context).cardColor,              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),            ),                        child: SingleChildScrollView(
-                child: DataTable(
+                child: SizedBox(
+                  width: double.infinity,
+                  child: DataTable(
             headingRowHeight: 54,
             dataRowMinHeight: 62,
             dataRowMaxHeight: 62,
             sortColumnIndex: _sortColumnIndex,
             sortAscending: _sortAscending,
             columnSpacing: 12,
-            horizontalMargin: 12,
+            horizontalMargin: 0,
             columnWidths: const {
               0: FlexColumnWidth(3),
               1: FlexColumnWidth(1),
@@ -80,6 +82,7 @@ class _InventoryPageState extends State<InventoryPage> {  final TextEditingContr
               ),
               DataColumn(label: Text(context.tr.actions)),
             ],            rows: products.map((product) {              final hasExpired = product.batches.any((b) => b.isExpired);              final hasExpiring = product.batches.any((b) => b.isExpiringSoon);              final isLowStock = MaterialService.isLowStock(product);              final hasWarning = hasExpiring || isLowStock;              final statuses = MaterialService.getMaterialStatuses(product);              return DataRow(                color: WidgetStateProperty.resolveWith<Color?>((states) {                  if (hasExpired && hasWarning) return Colors.red.withOpacity(0.12);                  if (hasExpired) return Colors.red.withOpacity(0.08);                  if (hasWarning) return Colors.orange.withOpacity(0.08);                  return null;                }),                cells: [                  DataCell(_productSummary(context, product)),                  DataCell(Column(                    mainAxisSize: MainAxisSize.min,                    crossAxisAlignment: CrossAxisAlignment.start,                    children: [                      Text(_databaseQuantityText(product)),                                          ],                  )),                  DataCell(Text(product.unit.isEmpty ? '-' : product.unit)),                  DataCell(_availabilityChip(context, product.isAvailable)),                  DataCell(hasExpired && hasWarning                      ? Row(mainAxisSize: MainAxisSize.min, children: [                          Icon(Icons.warning_amber_rounded, size: 14, color: Colors.red),                          const SizedBox(width: 4),                          Text(_formatDate(product.expiryDate), style: const TextStyle(color: Colors.red)),                        ])                      : Text(_formatDate(product.expiryDate))),                  DataCell(_buildActions(context, provider, product)),                ],              );                        }            ).toList(),
+            ),
             ),
             ),
           ),
