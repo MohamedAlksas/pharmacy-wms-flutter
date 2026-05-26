@@ -19,7 +19,7 @@ import 'package:pharmacy_wms/widgets/UpdateDialog.dart';
 class MainLayout extends StatefulWidget {  final int initialIndex;  const MainLayout({super.key, this.initialIndex = 0});  @override  State<MainLayout> createState() => _MainLayoutState();}
 class _MainLayoutState extends State<MainLayout> with WidgetsBindingObserver {  late int _selectedIndex;  bool _sidebarCollapsed = false;  @override  void initState() {    super.initState();    WidgetsBinding.instance.addObserver(this);    _selectedIndex = AuthService.isSupervisor ? 0 : widget.initialIndex;  }
   @override  void dispose() {    WidgetsBinding.instance.removeObserver(this);    super.dispose();  }
-  @override  void didChangeMetrics() {    final w = View.of(context).physicalSize.shortestSide /        View.of(context).devicePixelRatio;    final shouldCollapse = w < 900;    if (shouldCollapse != _sidebarCollapsed && mounted) {      setState(() => _sidebarCollapsed = shouldCollapse);    }  }
+  @override  void didChangeMetrics() {    final w = WidgetsBinding.instance.window.physicalSize.shortestSide /        WidgetsBinding.instance.window.devicePixelRatio;    final shouldCollapse = w < 900;    if (shouldCollapse != _sidebarCollapsed && mounted) {      setState(() => _sidebarCollapsed = shouldCollapse);    }  }
 
   void _onSelect(int index) {    if (_selectedIndex == index) return;    setState(() => _selectedIndex = index);    final w = MediaQuery.of(context).size.width;    if (w < 900 && !_sidebarCollapsed) {      setState(() => _sidebarCollapsed = true);    }  }
 
