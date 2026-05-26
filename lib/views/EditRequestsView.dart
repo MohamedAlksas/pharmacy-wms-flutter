@@ -133,12 +133,21 @@ class _EditRequestsPageState extends State<EditRequestsPage> {
     }
 
     return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: SingleChildScrollView(
         child: DataTable(
           headingRowHeight: 54,
           dataRowMinHeight: 56,
           dataRowMaxHeight: 56,
+          columnSpacing: 12,
+          horizontalMargin: 12,
+          columnWidths: const {
+            0: FlexColumnWidth(2),
+            1: FlexColumnWidth(1),
+            2: FlexColumnWidth(1),
+            3: FlexColumnWidth(1),
+            4: FlexColumnWidth(1.2),
+            5: FlexColumnWidth(1),
+            6: FlexColumnWidth(1),
+          },
           columns: [
             DataColumn(label: Text(context.tr.product)),
             DataColumn(label: Text(context.tr.oldExpiry)),
@@ -198,7 +207,6 @@ class _EditRequestsPageState extends State<EditRequestsPage> {
             }),
           ],
         ),
-      ),
-    );
+      );
   }
 }
