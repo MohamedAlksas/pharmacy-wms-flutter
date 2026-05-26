@@ -21,7 +21,7 @@ import 'package:pdf/pdf.dart';
 
 import 'package:pdf/widgets.dart' as pw;
 
-import 'package:excel/excel.dart' hide Border;
+import 'package:excel/excel.dart' as excel;
 
 import 'package:path_provider/path_provider.dart';
 
@@ -630,16 +630,16 @@ context.tr.error
     try {
       final all = provider.products;
       final filtered = _filteredList(provider);
-      final excel = Excel.createExcel();
-      final sheet = excel['Reports'];
-      final headerStyle = CellStyle(        bold: true, backgroundColorHex: ExcelColor.fromInt(0xFF0D6EFD),        fontColorHex: ExcelColor.fromInt(0xFFFFFFFF),      );
+      final workbook = excel.Excel.createExcel();
+      final sheet = workbook['Reports'];
+      final headerStyle = excel.CellStyle(        bold: true, backgroundColorHex: excel.ExcelColor.fromInt(0xFF0D6EFD),        fontColorHex: excel.ExcelColor.fromInt(0xFFFFFFFF),      );
       final headers = [context.tr.name, context.tr.sku, context.tr.category,          context.tr.quantity, context.tr.unit, context.tr.expiryDate,          context.tr.status, context.tr.storageLocation];
-      final headerRow = headers.map((h) => TextCellValue(h) as CellValue).toList();
+      final headerRow = headers.map((h) => excel.TextCellValue(h) as excel.CellValue).toList();
       sheet.appendRow(headerRow);
       for (int i = 0;
  i < headers.length;
  i++) {
-        sheet.cell(CellIndex.indexByColumnRow(            columnIndex: i, rowIndex: 0)).cellStyle = headerStyle;
+        sheet.cell(excel.CellIndex.indexByColumnRow(            columnIndex: i, rowIndex: 0)).cellStyle = headerStyle;
       
 }
 
@@ -650,19 +650,19 @@ context.tr.error
         final status = MaterialService.getMaterialStatus(m);
         final colorHex = statusColors[status] ?? '000000';
         final rowIdx = sheet.maxRows;
-        sheet.appendRow([          TextCellValue(m.name),          TextCellValue(m.sku),          TextCellValue(m.category),          TextCellValue(m.quantity.toString()),          TextCellValue(m.unit.isEmpty ? '-' : m.unit),          TextCellValue(_formatDate(m.expiryDate)),          TextCellValue(status),          TextCellValue(m.location.isEmpty ? '-' : m.location),        ]);
-        final fg = ExcelColor.fromInt(int.parse(colorHex, radix: 16) | 0xFF000000);
-        final bg = ExcelColor.fromInt((int.parse(colorHex, radix: 16) & 0xFFFFFF) | 0x20000000);
-        sheet.cell(CellIndex.indexByColumnRow(            columnIndex: 6, rowIndex: rowIdx)).cellStyle = CellStyle(          fontColorHex: fg, backgroundColorHex: bg,        );
+        sheet.appendRow([          excel.TextCellValue(m.name),          excel.TextCellValue(m.sku),          excel.TextCellValue(m.category),          excel.TextCellValue(m.quantity.toString()),          excel.TextCellValue(m.unit.isEmpty ? '-' : m.unit),          excel.TextCellValue(_formatDate(m.expiryDate)),          excel.TextCellValue(status),          excel.TextCellValue(m.location.isEmpty ? '-' : m.location),        ]);
+        final fg = excel.ExcelColor.fromInt(int.parse(colorHex, radix: 16) | 0xFF000000);
+        final bg = excel.ExcelColor.fromInt((int.parse(colorHex, radix: 16) & 0xFFFFFF) | 0x20000000);
+        sheet.cell(excel.CellIndex.indexByColumnRow(            columnIndex: 6, rowIndex: rowIdx)).cellStyle = excel.CellStyle(          fontColorHex: fg, backgroundColorHex: bg,        );
       
 }      _autoWidth(sheet, headers.length, filtered);
       final totalQty = filtered.fold<int>(0, (s, m) => s + m.quantity);
-      sheet.appendRow([        TextCellValue(''), TextCellValue(''),        TextCellValue(''), TextCellValue(''),        TextCellValue(''), TextCellValue(''),        TextCellValue(context.tr.total),        TextCellValue(totalQty.toString()),      ]);
+      sheet.appendRow([        excel.TextCellValue(''), excel.TextCellValue(''),        excel.TextCellValue(''), excel.TextCellValue(''),        excel.TextCellValue(''), excel.TextCellValue(''),        excel.TextCellValue(context.tr.total),        excel.TextCellValue(totalQty.toString()),      ]);
       final sumRowIdx = sheet.maxRows - 1;
       for (int i = 0;
  i < 8;
  i++) {
-        sheet.cell(CellIndex.indexByColumnRow(            columnIndex: i, rowIndex: sumRowIdx)).cellStyle = CellStyle(          bold: true, backgroundColorHex: ExcelColor.fromInt(0xFFF0F0F0),        );
+        sheet.cell(excel.CellIndex.indexByColumnRow(            columnIndex: i, rowIndex: sumRowIdx)).cellStyle = excel.CellStyle(          bold: true, backgroundColorHex: excel.ExcelColor.fromInt(0xFFF0F0F0),        );
       
 }
 
@@ -672,7 +672,7 @@ dir.path
 }/pharmacy_report_'          '${
 DateTime.now().millisecondsSinceEpoch
 }.xlsx';
-      final bytes = excel.encode();
+      final bytes = workbook.encode();
       if (bytes == null) throw Exception('Failed to encode Excel');
       await File(path).writeAsBytes(bytes);
       if (!context.mounted) return;
@@ -696,7 +696,7 @@ context.tr.errorGeneratingPdf
 }  
 }
 
-  void _autoWidth(Sheet sheet, int cols, List<MaterialModel> data) {
+  void _autoWidth(excel.Sheet sheet, int cols, List<MaterialModel> data) {
     for (int c = 0;
  c < cols;
  c++) {
@@ -704,7 +704,7 @@ context.tr.errorGeneratingPdf
       for (int r = 0;
  r <= data.length;
  r++) {
-        final cell = sheet.cell(CellIndex.indexByColumnRow(            columnIndex: c, rowIndex: r));
+        final cell = sheet.cell(excel.CellIndex.indexByColumnRow(            columnIndex: c, rowIndex: r));
         final v = cell.value?.toString() ?? '';
         if (v.length > maxW) maxW = v.length;
       
