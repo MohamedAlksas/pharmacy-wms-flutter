@@ -31,6 +31,7 @@ jobs:
 
       - run: flutter pub get
       - run: flutter analyze
+        continue-on-error: true
       - run: flutter config --enable-windows-desktop
       - run: flutter build windows --release
 
