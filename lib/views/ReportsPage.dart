@@ -30,7 +30,6 @@ import 'package:pharmacy_wms/Models/app_localizations.dart';
 import 'package:pharmacy_wms/Models/materialModel.dart';
 
 import 'package:pharmacy_wms/widgets/skeletons.dart';
-import 'package:pharmacy_wms/views/ExpiryCalendarView.dart';
 const _pieColors = [  Colors.blue, Colors.teal, Colors.orange, Colors.purple,  Colors.red, Colors.green, Colors.indigo, Colors.amber,];
 
 class ReportsPage extends StatefulWidget {
@@ -491,7 +490,7 @@ context.tr.itemsLabel
       ..sort((a, b) => (a.expiryDateValue ?? DateTime.now()).compareTo(b.expiryDateValue ?? DateTime.now()));
     final lowStock = MaterialService.getLowStockMaterials()
       ..sort((a, b) => a.quantity.compareTo(b.quantity));
-    return SingleChildScrollView(      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          _chartCard(isDark, context.tr.expiryTimeline,              _buildExpiryChart(isDark, all)),          const SizedBox(height: 16),          ExpiryCalendarView(provider: provider),          const SizedBox(height: 16),          Row(            crossAxisAlignment: CrossAxisAlignment.start,            children: [              Expanded(child: _expirySection(isDark, context.tr.expiringSoonItems, expiringSoon, true)),              const SizedBox(width: 16),              Expanded(child: _expirySection(isDark, context.tr.lowStockItemsTitle, lowStock, false)),            ],          ),        ],      ),    );
+    return SingleChildScrollView(      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          _chartCard(isDark, context.tr.expiryTimeline,              _buildExpiryChart(isDark, all)),          const SizedBox(height: 16),          Row(            crossAxisAlignment: CrossAxisAlignment.start,            children: [              Expanded(child: _expirySection(isDark, context.tr.expiringSoonItems, expiringSoon, true)),              const SizedBox(width: 16),              Expanded(child: _expirySection(isDark, context.tr.lowStockItemsTitle, lowStock, false)),            ],          ),        ],      ),    );
   
 }
   Widget _expirySection(bool isDark, String title, List<MaterialModel> items, bool showExpiry) {
