@@ -213,7 +213,7 @@ class _ReportsPageState extends State<ReportsPage>    with SingleTickerProviderS
           color: barColor,
           width: 16,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
-          backDrawInfo: BackgroundBarDrawInfo(
+          backDrawRodData: BackgroundBarChartRodData(
             show: true,
             toY: 100,
             color: Colors.grey.withOpacity(0.08),
