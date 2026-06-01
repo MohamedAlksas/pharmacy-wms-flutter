@@ -56,6 +56,12 @@ class _AddMaterialWizardState extends State<AddMaterialWizard> {
   final _newLocationController = TextEditingController();
   final _newCategoryController = TextEditingController();
   DateTime? _newExpiryDate;
+  final _nameFocus = FocusNode();
+  final _skuFocus = FocusNode();
+  final _unitFocus = FocusNode();
+  final _categoryFocus = FocusNode();
+  final _locationFocus = FocusNode();
+  final _quantityFocus = FocusNode();
   final List<_SessionMaterial> _sessionMaterials = [];
   bool _submitted = false;
   bool _saving = false;
@@ -87,6 +93,12 @@ class _AddMaterialWizardState extends State<AddMaterialWizard> {
     _newUnitController.dispose();
     _newLocationController.dispose();
     _newCategoryController.dispose();
+    _nameFocus.dispose();
+    _skuFocus.dispose();
+    _unitFocus.dispose();
+    _categoryFocus.dispose();
+    _locationFocus.dispose();
+    _quantityFocus.dispose();
     super.dispose();
   }
 
@@ -406,57 +418,66 @@ p.sku
 }
   Widget _buildNewFormStep(AppLocalizations tr, bool isDark) {
     return Wrap(      spacing: 16,      runSpacing: 16,      children: [
-        _buildField(
+        _buildFocusField(
           controller: _newNameController,
+          focusNode: _nameFocus,
+          nextFocusNode: _skuFocus,
           label: tr.materialName,
           hintText: tr.hintMaterialName,
           icon: Icons.medication_outlined,
           isDark: isDark,
-          validator: _required,
-          width: 280,
+          textInputAction: TextInputAction.next,
         ),
-        _buildField(
+        _buildFocusField(
           controller: _newSkuController,
+          focusNode: _skuFocus,
+          nextFocusNode: _unitFocus,
           label: tr.materialSku,
           hintText: tr.skuHint,
           icon: Icons.qr_code_2_outlined,
           isDark: isDark,
-          validator: _required,
-          width: 280,
+          textInputAction: TextInputAction.next,
         ),
-        _buildField(
+        _buildFocusField(
           controller: _newUnitController,
+          focusNode: _unitFocus,
+          nextFocusNode: _newCategoryController.text.isEmpty ? _categoryFocus : _locationFocus,
           label: tr.unit,
           hintText: tr.hintUnitExamples,
           icon: Icons.scale_outlined,
           isDark: isDark,
-          width: 280,
+          textInputAction: TextInputAction.next,
         ),
-        _buildField(
+        _buildFocusField(
           controller: _newCategoryController,
+          focusNode: _categoryFocus,
+          nextFocusNode: _locationFocus,
           label: tr.category,
           hintText: tr.hintCategoryExample,
           icon: Icons.category_outlined,
           isDark: isDark,
-          width: 280,
+          textInputAction: TextInputAction.next,
         ),
-        _buildField(
+        _buildFocusField(
           controller: _newLocationController,
+          focusNode: _locationFocus,
+          nextFocusNode: _quantityFocus,
           label: tr.storageLocation,
           hintText: tr.hintLocationExample,
           icon: Icons.location_on_outlined,
           isDark: isDark,
-          width: 280,
+          textInputAction: TextInputAction.next,
         ),
-        _buildField(
+        _buildFocusField(
           controller: _newQuantityController,
+          focusNode: _quantityFocus,
           label: tr.quantity,
           hintText: tr.quantityHint,
           icon: Icons.inventory_2_outlined,
           isDark: isDark,
           keyboardType: TextInputType.number,
-          validator: _validatePositiveInt,
-          width: 280,
+          textInputAction: TextInputAction.done,
+          onFieldSubmitted: (_) => _onAddToSession(),
         ),
         _buildExpiryPicker(
           label: tr.expiryDate,
@@ -472,8 +493,53 @@ p.sku
     required TextEditingController controller,    required String label,    required String hintText,    required IconData icon,    required bool isDark,    double width = 280,    bool readOnly = false,    TextInputType? keyboardType,    String? Function(String?)? validator,    ValueChanged<String>? onChanged,  
 }) {
     return SizedBox(      width: width,      child: Column(        crossAxisAlignment: CrossAxisAlignment.start,        children: [          Text(            label,            style: TextStyle(              fontSize: 13,              fontWeight: FontWeight.w600,              color: isDark ? Colors.white : Colors.black,            ),          ),          const SizedBox(height: 8),          TextFormField(            controller: controller,            keyboardType: keyboardType,            readOnly: readOnly,            onChanged: onChanged,            validator: readOnly ? (_) => null : validator ?? _required,            style: TextStyle(color: isDark ? Colors.white : Colors.black87),            decoration: InputDecoration(              hintText: hintText,              prefixIcon: Icon(icon),              suffixIcon: readOnly ? const Icon(Icons.lock_outline) : null,              filled: true,              fillColor: isDark ? const Color(0xFF2A3441) : Colors.grey[100],              border: OutlineInputBorder(                borderRadius: BorderRadius.circular(12),                borderSide: BorderSide.none,              ),            ),          ),        ],      ),    );
-  
-}
+  }
+
+  Widget _buildFocusField({
+    required TextEditingController controller,
+    required FocusNode focusNode,
+    FocusNode? nextFocusNode,
+    required String label,
+    required String hintText,
+    required IconData icon,
+    required bool isDark,
+    TextInputAction? textInputAction,
+    TextInputType? keyboardType,
+    void Function(String)? onFieldSubmitted,
+  }) {
+    return SizedBox(
+      width: 280,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? Colors.white : Colors.black)),
+          const SizedBox(height: 8),
+          TextFormField(
+            controller: controller,
+            focusNode: focusNode,
+            keyboardType: keyboardType,
+            textInputAction: textInputAction,
+            onFieldSubmitted: onFieldSubmitted ?? (_) {
+              if (nextFocusNode != null) {
+                FocusScope.of(context).requestFocus(nextFocusNode);
+              }
+            },
+            style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+            decoration: InputDecoration(
+              hintText: hintText,
+              prefixIcon: Icon(icon),
+              filled: true,
+              fillColor: isDark ? const Color(0xFF2A3441) : Colors.grey[100],
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
   Widget _buildExpiryPicker({
     required String label,    required bool isDark,    required DateTime? date,    required VoidCallback onTap,    double width = 280,  
 }) {

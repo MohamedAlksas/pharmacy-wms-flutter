@@ -189,9 +189,39 @@ class _ReportsPageState extends State<ReportsPage>    with SingleTickerProviderS
       final idx = (diff / 30).floor().clamp(0, 11);
       months[idx] = (months[idx] ?? 0) + 1;
     
-}    return months.entries.map((e) => BarChartGroupData(      x: e.key, barRods: [_barRod(e.value, _pieColors[e.key % _pieColors.length])],    )).toList();
-  
+}    return months.entries.map((e) => _buildGroupData(e.key, e.value.toDouble(), now.add(Duration(days: e.key * 30)))).toList();
+   
 }
+  BarChartGroupData _buildGroupData(int x, double value, DateTime targetMonthDate) {
+    final now = DateTime.now();
+    final daysUntil = targetMonthDate.difference(now).inDays;
+
+    Color barColor;
+    if (daysUntil <= 30) {
+      barColor = const Color(0xFFEF4444);
+    } else if (daysUntil <= 90) {
+      barColor = const Color(0xFFF59E0B);
+    } else {
+      barColor = const Color(0xFF10B981);
+    }
+
+    return BarChartGroupData(
+      x: x,
+      barRods: [
+        BarChartRodData(
+          toY: value,
+          color: barColor,
+          width: 16,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+          backDrawInfo: BackgroundBarDrawInfo(
+            show: true,
+            toY: 100,
+            color: Colors.grey.withOpacity(0.08),
+          ),
+        )
+      ],
+    );
+  }
   @override  Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final provider = ProductProvider.of(context);
