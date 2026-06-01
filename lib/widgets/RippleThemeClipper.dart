@@ -29,7 +29,7 @@ class ThemeTransitionWrapper extends StatefulWidget {
   State<ThemeTransitionWrapper> createState() => _ThemeTransitionWrapperState();
 }
 
-class _ThemeTransitionWrapperState extends State<ThemeTransitionWrapper>
+class ThemeTransitionWrapperState extends State<ThemeTransitionWrapper>
     with SingleTickerProviderStateMixin {
   late AnimationController _transitionController;
   Offset _toggleOffset = Offset.zero;
