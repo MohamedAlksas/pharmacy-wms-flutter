@@ -512,7 +512,7 @@ v.toInt()
 }
   Widget _notificationBell() {
     final unreadCount = NotificationService.getUnread().length;
-    return Stack(clipBehavior: Clip.none, children: [      IconButton(        tooltip: context.tr.editRequests,        onPressed: _showOrderNotifications,        icon: const Icon(Icons.notifications_none),      ),      if (unreadCount > 0)        Positioned(          right: 4, top: 4,          child: Container(            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),            decoration: BoxDecoration(              color: Colors.red, borderRadius: BorderRadius.circular(10),            ),            child: Text(unreadCount.toString(),                style: const TextStyle(color: Colors.white, fontSize: 10,                    fontWeight: FontWeight.bold)),          ),        ),    ]);
+    return Stack(clipBehavior: Clip.none, children: [      IconButton(        tooltip: context.tr.editRequests,        onPressed: _showOrderNotifications,        icon: const Icon(Icons.notifications_none),      ),      if (unreadCount > 0)        PositionedDirectional(          end: 4, top: 4,          child: Container(            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),            decoration: BoxDecoration(              color: Colors.red, borderRadius: BorderRadius.circular(10),            ),            child: Text(unreadCount.toString(),                style: const TextStyle(color: Colors.white, fontSize: 10,                    fontWeight: FontWeight.bold)),          ),        ),    ]);
   
 }
 

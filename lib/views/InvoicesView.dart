@@ -182,7 +182,7 @@ class _InvoicesPageState extends State<InvoicesPage> {
           ),
           if (order.type == OrderType.export)
             Padding(
-              padding: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsetsDirectional.only(end: 8),
               child: SizedBox(
                 height: 30,
                 child: OutlinedButton.icon(
@@ -428,7 +428,7 @@ class _InvoicesPageState extends State<InvoicesPage> {
                 color: const Color(0xFF1CA0A5).withOpacity(0.15),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: const Icon(Icons.arrow_forward_ios, size: 14, color: Color(0xFF1CA0A5)),
+              child: Icon(context.forwardIosIcon, size: 14, color: const Color(0xFF1CA0A5)),
             ),
           ],
         ),

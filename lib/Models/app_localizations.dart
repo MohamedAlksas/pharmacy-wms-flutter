@@ -26,6 +26,11 @@ Future<void> saveLanguage(AppLanguage lang) async {
 extension LocalizationContext on BuildContext {
   AppLocalizations get tr => AppLocalizations.of(languageNotifier.value);
 
+  IconData get backIcon => tr.isArabic ? Icons.arrow_forward : Icons.arrow_back;
+  IconData get forwardIcon => tr.isArabic ? Icons.arrow_back : Icons.arrow_forward;
+  IconData get forwardIosIcon => tr.isArabic ? Icons.arrow_back_ios : Icons.arrow_forward_ios;
+  IconData get chevronCollapseIcon => tr.isArabic ? Icons.chevron_right : Icons.chevron_left;
+  IconData get chevronExpandIcon => tr.isArabic ? Icons.chevron_left : Icons.chevron_right;
 }
 
 class AppLocalizations {

@@ -120,7 +120,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                   IconButton(
                     tooltip: context.tr.back,
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.arrow_back),
+                    icon: Icon(context.backIcon),
                   ),
                   const SizedBox(width: 8),
                 ],
