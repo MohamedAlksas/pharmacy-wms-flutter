@@ -26,7 +26,7 @@ class ThemeTransitionWrapper extends StatefulWidget {
   const ThemeTransitionWrapper({super.key, required this.child});
 
   @override
-  State<ThemeTransitionWrapper> createState() => _ThemeTransitionWrapperState();
+  State<ThemeTransitionWrapper> createState() => ThemeTransitionWrapperState();
 }
 
 class ThemeTransitionWrapperState extends State<ThemeTransitionWrapper>
