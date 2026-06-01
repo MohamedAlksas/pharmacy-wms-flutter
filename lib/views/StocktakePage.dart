@@ -5,6 +5,7 @@ import 'package:pharmacy_wms/Models/ProductProvider.dart';
 import 'package:pharmacy_wms/Models/materialModel.dart';
 
 import 'package:pharmacy_wms/Models/app_localizations.dart';
+import 'package:pharmacy_wms/Models/UserRoleModel.dart';
 
 import 'package:printing/printing.dart';
 
@@ -62,48 +63,241 @@ item.quantity
 }
 
 
-  Future<void> _generateStocktakePdf(    BuildContext context,    List<MaterialModel> products,  ) async {
+  Future<void> _generateStocktakePdf(
+    BuildContext context,
+    List<MaterialModel> products,
+  ) async {
+    final tr = context.tr;
     try {
       final pdf = pw.Document();
+      final isArabic = tr.isArabic;
+      final now = DateTime.now();
+
+      final totalUniqueItems = products.length;
+      final totalStockVolume = products.fold<int>(0, (sum, p) => sum + p.quantity);
+      final expiredCount = products.where((p) => p.batches.any((b) => b.isExpired)).length;
+      final lowStockCount = products.where((p) => p.quantity < 20).length;
+
       final grouped = _groupByLocation(products);
       final sortedLocations = grouped.keys.toList()..sort();
-      pdf.addPage(        pw.MultiPage(          pageFormat: PdfPageFormat.a4.landscape,          margin: const pw.EdgeInsets.all(20),          build: (pw.Context ctx) {
-            return [              pw.Header(                level: 0,                child: pw.Row(                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,                  children: [                    pw.Text(context.tr.stocktakeSheet,                        style: pw.TextStyle(                            fontSize: 22, fontWeight: pw.FontWeight.bold)),                    pw.Text(                        '${
-context.tr.generatedPrefix
-}${
-DateTime.now().toString().substring(0, 16)
-}',                        style: const pw.TextStyle(fontSize: 10)),                  ],                ),              ),              pw.SizedBox(height: 4),              pw.Text(                context.tr.pdfInstructions,                style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600),              ),              pw.SizedBox(height: 16),              ...sortedLocations.expand((location) {
+
+      pdf.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4.landscape,
+          margin: const pw.EdgeInsets.all(24),
+          footer: (pw.Context ctx) {
+            return pw.Container(
+              alignment: pw.Alignment.centerRight,
+              margin: const pw.EdgeInsets.only(top: 10),
+              decoration: pw.BoxDecoration(
+                border: pw.Border(top: pw.BorderSide(color: PdfColors.grey300, width: 0.5)),
+              ),
+              padding: const pw.EdgeInsets.only(top: 8),
+              child: pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    'Pharmacy WMS \u2014 Confidential Inventory Ledger',
+                    style: pw.TextStyle(fontSize: 8, color: PdfColors.grey500, fontStyle: pw.FontStyle.italic),
+                  ),
+                  pw.Text(
+                    'Page ${ctx.pageNumber} of ${ctx.pagesCount}',
+                    style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey600),
+                  ),
+                ],
+              ),
+            );
+          },
+          build: (pw.Context ctx) {
+            return [
+              pw.Container(
+                padding: const pw.EdgeInsets.only(bottom: 12),
+                decoration: pw.BoxDecoration(
+                  border: pw.Border(bottom: pw.BorderSide(color: PdfColor.fromInt(0xFF0A6B6E), width: 2.5)),
+                ),
+                child: pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text(
+                          isArabic ? '\u062A\u0642\u0631\u064A\u0631 \u0627\u0644\u062C\u0631\u062F \u0627\u0644\u0634\u0627\u0645\u0644 \u0644\u0644\u0645\u0633\u062A\u0648\u062F\u0639' : 'Master Warehouse Inventory Ledger',
+                          style: pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold, color: PdfColor.fromInt(0xFF0A6B6E)),
+                        ),
+                        pw.SizedBox(height: 4),
+                        pw.Text(
+                          'Executive Overview & Granular Stock Report',
+                          style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
+                        ),
+                      ],
+                    ),
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.end,
+                      children: [
+                        pw.Text(
+                          'Generated: ${now.toString().substring(0, 16)}',
+                          style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey700),
+                        ),
+                        pw.SizedBox(height: 2),
+                        pw.Text(
+                          'User: ${AuthService.currentUser?.fullName ?? "Supervisor"}',
+                          style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey700),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              pw.SizedBox(height: 14),
+
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  _pdfKpiCard('Total Unique Items', totalUniqueItems.toString(), PdfColors.blue700),
+                  _pdfKpiCard('Total Stock Volume', totalStockVolume.toString(), PdfColors.teal700),
+                  _pdfKpiCard('Expired Items Alert', expiredCount.toString(), PdfColors.red700),
+                  _pdfKpiCard('Low Stock Alerts', lowStockCount.toString(), PdfColors.orange700),
+                ],
+              ),
+              pw.SizedBox(height: 20),
+
+              pw.Text(
+                'Detailed Location & Batch Breakdown',
+                style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromInt(0xFF0A6B6E)),
+              ),
+              pw.SizedBox(height: 10),
+
+              ...sortedLocations.expand((location) {
                 final items = grouped[location]!;
-                final label = location.isEmpty ? context.tr.unspecified : location;
-                return [                  pw.Header(                    level: 1,                    child: pw.Text('${
-context.tr.locationPrefix
-}$label  (${
-items.length
-} ${
-context.tr.itemsLabel
-})',                        style: const pw.TextStyle(fontSize: 14)),                  ),                  pw.Table.fromTextArray(                    headerStyle: const pw.TextStyle(                        fontWeight: pw.FontWeight.bold, fontSize: 8),                    cellStyle: const pw.TextStyle(fontSize: 8),                    headerDecoration: const pw.BoxDecoration(                        color: PdfColors.grey300),                    border: pw.TableBorder.all(                        color: PdfColors.grey400, width: 0.5),                    columnWidths: {
-                      0: const pw.FixedColumnWidth(30),                      1: const pw.FixedColumnWidth(80),                      2: const pw.FixedColumnWidth(140),                      3: const pw.FixedColumnWidth(50),                      4: const pw.FixedColumnWidth(40),                      5: const pw.FixedColumnWidth(70),                      6: const pw.FixedColumnWidth(100),                      7: const pw.FixedColumnWidth(80),                    
-},                    headers: [                      context.tr.pdfColumnNum,                      context.tr.sku,                      context.tr.pdfColumnProductName,                      context.tr.quantity,                      context.tr.unit,                      context.tr.expiryDate,                      context.tr.storageLocation,                      context.tr.pdfColumnActualCount,                    ],                    data: List.generate(items.length, (i) {
-                      final m = items[i];
-                      return [                        (i + 1).toString(),                        m.sku,                        m.name,                        m.quantity.toString(),                        m.unit.isEmpty ? '-' : m.unit,                        _formatExpiry(m.expiryDate),                        m.location.isEmpty ? '-' : m.location,                        '',                      ];
-                    
-}),                  ),                  pw.SizedBox(height: 20),                ];
-              
-}),            ];
-          
-},        ),      );
+                final label = location.isEmpty ? tr.unspecified : location;
+
+                final List<List<String>> tableData = [];
+                int serialNumber = 1;
+
+                for (final product in items) {
+                  if (product.batches.isEmpty) {
+                    tableData.add([
+                      serialNumber.toString(),
+                      product.sku,
+                      product.name,
+                      '- (No Batch)',
+                      product.quantity.toString(),
+                      product.unit.isEmpty ? '-' : product.unit,
+                      _formatExpiry(product.expiryDate),
+                      product.createdAt.toString().substring(0, 10),
+                    ]);
+                    serialNumber++;
+                  } else {
+                    for (final batch in product.batches) {
+                      tableData.add([
+                        serialNumber.toString(),
+                        product.sku,
+                        '${product.name} (Batch)',
+                        batch.id.toString(),
+                        batch.quantity.toString(),
+                        product.unit.isEmpty ? '-' : product.unit,
+                        _formatExpiry(batch.expiryDate),
+                        batch.receivedDate.toString().substring(0, 10),
+                      ]);
+                      serialNumber++;
+                    }
+                  }
+                }
+
+                return [
+                  pw.Container(
+                    margin: const pw.EdgeInsets.only(top: 14, bottom: 6),
+                    padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: const pw.BoxDecoration(
+                      color: PdfColors.grey100,
+                      border: pw.Border(left: pw.BorderSide(color: PdfColor.fromInt(0xFF0A6B6E), width: 3)),
+                    ),
+                    child: pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text(
+                          'Storage Zone: $label',
+                          style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold),
+                        ),
+                        pw.Text(
+                          '${tableData.length} Active Batches Listed',
+                          style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
+                        ),
+                      ],
+                    ),
+                  ),
+                  pw.Table.fromTextArray(
+                    headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8, color: PdfColors.white),
+                    cellStyle: const pw.TextStyle(fontSize: 8),
+                    headerDecoration: const pw.BoxDecoration(color: PdfColor.fromInt(0xFF0A6B6E)),
+                    border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.5),
+                    columnWidths: {
+                      0: const pw.FixedColumnWidth(25),
+                      1: const pw.FixedColumnWidth(80),
+                      2: const pw.FixedColumnWidth(170),
+                      3: const pw.FixedColumnWidth(55),
+                      4: const pw.FixedColumnWidth(50),
+                      5: const pw.FixedColumnWidth(40),
+                      6: const pw.FixedColumnWidth(70),
+                      7: const pw.FixedColumnWidth(75),
+                    },
+                    headers: [
+                      'S/N',
+                      tr.sku,
+                      'Material Component Name',
+                      'Batch ID',
+                      'Batch Qty',
+                      tr.unit,
+                      tr.expiryDate,
+                      'Received Date',
+                    ],
+                    data: tableData,
+                  ),
+                  pw.SizedBox(height: 10),
+                ];
+              }),
+            ];
+          },
+        ),
+      );
+
       if (!context.mounted) return;
       _showPrintOptions(context, pdf);
-    
-} catch (e) {
+    } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(          SnackBar(content: Text('${
-context.tr.errorGeneratingPdf
-}: $e')),        );
-      
-}    
-}  
-}
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${tr.errorGeneratingPdf}: $e')),
+        );
+      }
+    }
+  }
+
+  static pw.Widget _pdfKpiCard(String label, String value, PdfColor accentColor) {
+    return pw.Container(
+      width: 160,
+      padding: const pw.EdgeInsets.all(10),
+      decoration: pw.BoxDecoration(
+        color: PdfColors.white,
+        borderRadius: const pw.BorderRadius.all(pw.Radius.circular(6)),
+        border: pw.Border.all(color: PdfColors.grey200, width: 1),
+      ),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(
+            label.toUpperCase(),
+            style: pw.TextStyle(fontSize: 7, color: PdfColors.grey500, fontWeight: pw.FontWeight.bold),
+          ),
+          pw.SizedBox(height: 4),
+          pw.Text(
+            value,
+            style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: accentColor),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _showPrintOptions(BuildContext context, pw.Document pdf) {
     showDialog(      context: context,      builder: (ctx) => AlertDialog(        title: Text(context.tr.stocktakeSheet),        content: Text(context.tr.chooseExportMethod),        actions: [          TextButton.icon(            onPressed: () {
