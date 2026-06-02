@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:flutter_localizations/flutter_localizations.dart';
-
 import 'package:pharmacy_wms/Models/UserRoleModel.dart';
 
 import 'package:pharmacy_wms/Models/app_localizations.dart';
@@ -17,27 +15,16 @@ class Loginview extends StatelessWidget {
 super.key
 });
   @override  Widget build(BuildContext context) {
-    return ValueListenableBuilder<ThemeMode>(      valueListenable: themeNotifier,      builder: (context, mode, _) {
-        return ValueListenableBuilder<AppLanguage>(          valueListenable: languageNotifier,          builder: (context, lang, _) {
-            return ValueListenableBuilder<int>(              valueListenable: AuthService.sessionChanges,              builder: (context, sessionTick, child) {
-                final authenticated = AuthService.isAuthenticated;
-                final tr = AppLocalizations.of(lang);
-                return MaterialApp(                  key: ValueKey('app-${
-mode.name
-}-$authenticated-${
-lang.name
-}'),                  debugShowCheckedModeBanner: false,                  title: tr.appTitle,                  themeMode: mode,                  locale: lang == AppLanguage.ar                      ? const Locale('ar')                      : const Locale('en'),                  supportedLocales: const [Locale('en'), Locale('ar')],                  localizationsDelegates: const [                    GlobalMaterialLocalizations.delegate,                    GlobalWidgetsLocalizations.delegate,                    GlobalCupertinoLocalizations.delegate,                  ],                  builder: (context, child) {
-                    return Directionality(                      textDirection: TextDirection.ltr,                      child: child!,                    );
-                  
-},                  theme: ThemeData(                    useMaterial3: true,                    brightness: Brightness.light,                    scaffoldBackgroundColor: const Color(0xFFF2F7F8),                    colorScheme: ColorScheme.fromSeed(                      seedColor: const Color(0xFF0A6B6E),                    ),                    fontFamily: lang == AppLanguage.ar ? 'Cairo' : null,                  ),                  darkTheme: ThemeData(                    useMaterial3: true,                    brightness: Brightness.dark,                    scaffoldBackgroundColor: const Color(0xFF0E1418),                    colorScheme: ColorScheme.fromSeed(                      seedColor: const Color(0xFF18B6B6),                      brightness: Brightness.dark,                    ),                    fontFamily: lang == AppLanguage.ar ? 'Cairo' : null,                  ),                  home: authenticated                      ? const MainLayout(initialIndex: 0)                      : const LoginPage(),                );
-              
-},            );
-          
-},        );
-      
-},    );
-  
-}
+    return ValueListenableBuilder<int>(
+      valueListenable: AuthService.sessionChanges,
+      builder: (context, sessionTick, child) {
+        final authenticated = AuthService.isAuthenticated;
+        return authenticated
+            ? const MainLayout(initialIndex: 0)
+            : const LoginPage();
+      },
+    );
+  }
 }
 class LoginPage extends StatefulWidget {
   const LoginPage({
