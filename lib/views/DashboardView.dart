@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/material.dart';
 
@@ -31,6 +31,7 @@ super.key
 }
 class _DashboardPageState extends State<DashboardPage> {
   Timer? _refreshTimer;
+  bool _alertsCollapsed = false;
   @override  void initState() {
     super.initState();
     NotificationService.changes.addListener(_handleNotificationChange);
@@ -69,11 +70,84 @@ class _DashboardPageState extends State<DashboardPage> {
 m.quantity
 } ${
 tr.unit.toLowerCase()
-}',                                        m.expiryDate,                                        m.category,                                      ),                                      const Divider(),                                    ],                                  ),                                ),                            ],                          ),                        ),                      ],                    ),                  ),                  if (AuthService.isWarehouseManager) ...[                    const SizedBox(width: 16),                    Expanded(                      flex: 1,                      child: Column(                        crossAxisAlignment: CrossAxisAlignment.start,                        children: [                          Row(                            children: [                              Text(                                tr.criticalAlertsTitle,                                style: const TextStyle(                                    fontWeight: FontWeight.w700),                              ),                              const Spacer(),                              if (criticalAlertsCount > 0)                                Container(                                  padding: const EdgeInsets.symmetric(                                      horizontal: 8, vertical: 4),                                  decoration: BoxDecoration(                                    color: Colors.red,                                    borderRadius: BorderRadius.circular(12),                                  ),                                  child: Text(                                    criticalAlertsCount.toString(),                                    style: const TextStyle(                                      color: Colors.white,                                      fontWeight: FontWeight.bold,                                      fontSize: 12,                                    ),                                  ),                                ),                            ],                          ),                          const SizedBox(height: 12),                          if (criticalAlerts.isEmpty)                            Container(                              padding: const EdgeInsets.all(16),                              decoration: BoxDecoration(                                borderRadius: BorderRadius.circular(12),                                color: Theme.of(context).cardColor,                              ),                              child: Center(                                child: Text(tr.noCriticalAlerts),                              ),                            )                          else                            ...criticalAlerts.take(5).map((alert) {
-                              final isExpired = alert.alertType == 'expired';
-                              return Padding(                                padding: const EdgeInsets.only(bottom: 10),                                child: _alertCard(                                  context,                                  alert.material?.name ?? 'Alert',                                  alert.message,                                  isExpired                                      ? Icons.error_outline                                      : Icons.warning_amber_rounded,                                  isExpired                                      ? Colors.redAccent                                      : Colors.orangeAccent,                                ),                              );
-                            
-}),                        ],                      ),                    ),                  ],                ],              ),            ),    );
+}',                                        m.expiryDate,                                        m.category,                                      ),                                      const Divider(),                                    ],                                  ),                                ),                            ],                          ),                        ),                      ],                    ),                  ),                  if (AuthService.isWarehouseManager) ...[                    const SizedBox(width: 16),                    Expanded(                      flex: 1,                      child: Column(                        crossAxisAlignment: CrossAxisAlignment.start,                        children: [                                                    InkWell(
+                            onTap: () => setState(() => _alertsCollapsed = !_alertsCollapsed),
+                            borderRadius: BorderRadius.circular(8),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    tr.criticalAlertsTitle,
+                                    style: const TextStyle(fontWeight: FontWeight.w700),
+                                  ),
+                                  const Spacer(),
+                                  if (criticalAlertsCount > 0)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        criticalAlertsCount.toString(),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
+                                  const SizedBox(width: 8),
+                                  AnimatedRotation(
+                                    turns: _alertsCollapsed ? -0.25 : 0,
+                                    duration: const Duration(milliseconds: 200),
+                                    child: const Icon(Icons.expand_more, size: 20),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          AnimatedSize(
+                            duration: const Duration(milliseconds: 250),
+                            child: _alertsCollapsed
+                                ? const SizedBox(width: double.infinity)
+                                : Column(
+                                    children: [
+                                      if (criticalAlerts.isEmpty)
+                                        Container(
+                                          padding: const EdgeInsets.all(16),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(12),
+                                            color: Theme.of(context).cardColor,
+                                          ),
+                                          child: Center(
+                                            child: Text(tr.noCriticalAlerts),
+                                          ),
+                                        )
+                                      else
+                                        ...criticalAlerts.take(5).map((alert) {
+                                          final isExpired = alert.alertType == 'expired';
+                                          return Padding(
+                                            padding: const EdgeInsets.only(bottom: 10),
+                                            child: _alertCard(
+                                              context,
+                                              alert.material?.name ?? 'Alert',
+                                              alert.message,
+                                              isExpired
+                                                  ? Icons.error_outline
+                                                  : Icons.warning_amber_rounded,
+                                              isExpired
+                                                  ? Colors.redAccent
+                                                  : Colors.orangeAccent,
+                                            ),
+                                          );
+                                        }),
+                                    ],
+                                  ),
+                          ),                        ],                      ),                    ),                  ],                ],              ),            ),    );
   
 }
   List<MapEntry<String, int>> _categoryData(List<MaterialModel> all) {

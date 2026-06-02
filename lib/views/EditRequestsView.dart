@@ -132,10 +132,19 @@ class _EditRequestsPageState extends State<EditRequestsPage> {
       );
     }
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: SingleChildScrollView(
-        child: DataTable(
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minWidth: constraints.maxWidth),
+              child: SingleChildScrollView(
+                child: DataTable(
           headingRowHeight: 54,
           dataRowMinHeight: 56,
           dataRowMaxHeight: 56,
@@ -199,6 +208,10 @@ class _EditRequestsPageState extends State<EditRequestsPage> {
           ],
         ),
       ),
+      ),
     );
+    },
+  ),
+  );
   }
 }
